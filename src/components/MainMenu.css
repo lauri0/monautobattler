@@ -1,0 +1,80 @@
+.main-menu {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 3rem;
+  padding: 2rem;
+}
+
+.menu-hero {
+  position: relative;
+  text-align: center;
+}
+
+.pokeball-bg {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 300px;
+  height: 300px;
+  border-radius: 50%;
+  background: radial-gradient(circle at 50% 45%,
+    rgba(233,69,96,0.15) 0%,
+    rgba(166,77,255,0.1) 50%,
+    transparent 70%);
+  pointer-events: none;
+}
+
+.menu-title {
+  font-size: clamp(2.5rem, 6vw, 4rem);
+  font-weight: 900;
+  line-height: 1.1;
+  background: linear-gradient(135deg, #e94560 0%, #a64dff 60%, #4facfe 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  margin-bottom: 0.5rem;
+  position: relative;
+}
+
+.menu-subtitle {
+  color: var(--text-muted);
+  font-size: 1.1rem;
+  position: relative;
+}
+
+.menu-buttons {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 1rem;
+  width: 100%;
+  max-width: 480px;
+}
+
+.menu-btn {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  color: var(--text);
+  padding: 1.4rem 1rem;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.6rem;
+  font-size: 1rem;
+  font-weight: 700;
+  border-radius: 14px;
+  transition: border-color 0.2s, background 0.2s, transform 0.1s, filter 0.15s;
+}
+
+.menu-btn:hover {
+  border-color: var(--accent);
+  background: var(--surface2);
+  filter: brightness(1.1);
+}
+
+.menu-btn-icon {
+  font-size: 2rem;
+}

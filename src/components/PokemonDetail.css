@@ -1,0 +1,94 @@
+.detail-layout {
+  display: grid;
+  grid-template-columns: 260px 1fr;
+  gap: 1.2rem;
+  align-items: start;
+}
+
+@media (max-width: 700px) {
+  .detail-layout { grid-template-columns: 1fr; }
+}
+
+.detail-hero {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.5rem;
+  text-align: center;
+}
+
+.detail-num {
+  font-size: 0.8rem;
+  color: var(--text-muted);
+  font-weight: 600;
+}
+
+.detail-artwork {
+  width: 180px;
+  height: 180px;
+  object-fit: contain;
+}
+
+.detail-name {
+  font-size: 1.5rem;
+  font-weight: 800;
+  text-transform: capitalize;
+  color: var(--text);
+}
+
+.detail-record-row {
+  display: flex;
+  justify-content: space-around;
+  gap: 0.5rem;
+}
+
+.detail-stat-box {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.15rem;
+}
+.detail-stat-label { font-size: 0.72rem; color: var(--text-muted); text-transform: uppercase; font-weight: 600; }
+.detail-stat-val { font-size: 1.15rem; font-weight: 800; color: var(--text); }
+
+.section-title {
+  font-size: 0.85rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--text-muted);
+  margin-bottom: 0.75rem;
+}
+
+.stats-table { width: 100%; border-collapse: collapse; }
+.stats-table td { padding: 0.3rem 0.3rem; }
+.stat-label { font-size: 0.8rem; font-weight: 700; color: var(--text-muted); width: 40px; }
+.stat-base { font-size: 0.85rem; font-weight: 600; width: 36px; text-align: right; padding-right: 8px; }
+.stat-bar-cell { width: 100%; }
+.stat-bar-bg { background: #333355; border-radius: 99px; height: 8px; overflow: hidden; }
+.stat-bar-fill { height: 100%; border-radius: 99px; }
+.stat-lv50 { font-size: 0.8rem; color: var(--text-muted); width: 36px; text-align: right; padding-left: 8px; }
+
+.matchup-row { display: flex; gap: 0.5rem; align-items: flex-start; margin-bottom: 0.5rem; flex-wrap: wrap; }
+.matchup-label { font-size: 0.8rem; font-weight: 700; color: var(--text-muted); min-width: 70px; padding-top: 2px; }
+.matchup-badges { display: flex; flex-wrap: wrap; gap: 4px; }
+.matchup-badge {
+  padding: 0.15rem 0.5rem;
+  border-radius: 4px;
+  font-size: 0.72rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  color: white;
+  text-shadow: 0 1px 2px rgba(0,0,0,0.4);
+}
+
+.moveset-slots { display: flex; flex-direction: column; gap: 0.6rem; }
+.move-slot {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  background: var(--surface2);
+  border-radius: 8px;
+  padding: 0.5rem 0.75rem;
+}
+.move-slot-num { font-size: 0.75rem; color: var(--text-muted); font-weight: 700; min-width: 44px; }

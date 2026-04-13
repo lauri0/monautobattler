@@ -1,0 +1,87 @@
+.sim-config {
+  display: flex;
+  align-items: flex-end;
+  gap: 1.5rem;
+  flex-wrap: wrap;
+}
+
+.sim-config-label {
+  font-size: 0.8rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--text-muted);
+  display: block;
+  margin-bottom: 0.5rem;
+}
+
+.sim-count-btns {
+  display: flex;
+  gap: 0.5rem;
+}
+
+.sim-run-btn {
+  padding: 0.6rem 1.5rem;
+  align-self: flex-end;
+}
+
+.sim-table-wrapper {
+  overflow-x: auto;
+}
+
+.sim-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.9rem;
+}
+
+.sim-table th {
+  text-align: left;
+  padding: 0.5rem 0.75rem;
+  font-size: 0.78rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--text-muted);
+  border-bottom: 1px solid var(--border);
+}
+
+.sim-table th.sortable {
+  cursor: pointer;
+  user-select: none;
+}
+.sim-table th.sortable:hover {
+  color: var(--text);
+}
+
+.sim-table td {
+  padding: 0.6rem 0.75rem;
+  border-bottom: 1px solid var(--border);
+  vertical-align: middle;
+}
+.sim-table tr:last-child td { border-bottom: none; }
+.sim-table tr:hover td { background: var(--surface2); }
+
+.rank-cell {
+  font-size: 0.8rem;
+  color: var(--text-muted);
+  font-weight: 700;
+}
+
+.pokemon-cell {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.sim-sprite {
+  width: 44px;
+  height: 44px;
+  object-fit: contain;
+}
+
+.sim-pokemon-name {
+  font-weight: 700;
+  text-transform: capitalize;
+  margin-bottom: 3px;
+}
