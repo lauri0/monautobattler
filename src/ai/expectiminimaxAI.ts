@@ -1,5 +1,5 @@
 import type { BattlePokemon, Move, AIStrategy } from '../models/types';
-import { simulateTurnDeterministic } from '../battle/battleEngine';
+import { simulateTurnDeterministic, usableMoves } from '../battle/battleEngine';
 import type { ChanceOutcome } from '../battle/battleEngine';
 
 const DEPTH = 2;
@@ -153,12 +153,17 @@ function expectiminimax(
   if (p1.currentHp <= 0 || p2.currentHp <= 0) return scoreLeaf(p1, p2);
   if (depth === 0) return scoreLeaf(p1, p2);
 
+  // Prune moves that can't be used this turn (e.g. Fake Out after turn 1) so
+  // the tree doesn't waste branches on guaranteed-no-op actions.
+  const p1Moves = usableMoves(p1, turnNumber);
+  const p2Moves = usableMoves(p2, turnNumber);
+
   let bestVal = -Infinity;
 
-  for (const aiMove of p1.moves) {
+  for (const aiMove of p1Moves) {
     let worstVal = Infinity;
 
-    for (const oppMove of p2.moves) {
+    for (const oppMove of p2Moves) {
       const outcomes = enumerateOutcomes(p1, p2, aiMove, oppMove);
       let expectedVal = 0;
 
@@ -184,24 +189,29 @@ function expectiminimax(
 // ── AIStrategy implementation ─────────────────────────────────────────────────
 
 export class ExpectiminimaxAI implements AIStrategy {
-  selectMove(attacker: BattlePokemon, defender: BattlePokemon): Move {
-    let bestMove = attacker.moves[0];
+  selectMove(attacker: BattlePokemon, defender: BattlePokemon, turnNumber = 1): Move {
+    // Root-level move list: already filtered by resolveTurn, but re-apply for
+    // safety in case a caller hands us unfiltered moves.
+    const aiMoves = usableMoves(attacker, turnNumber);
+    const oppMoves = usableMoves(defender, turnNumber);
+
+    let bestMove = aiMoves[0] ?? attacker.moves[0];
     let bestVal = -Infinity;
 
-    for (const aiMove of attacker.moves) {
+    for (const aiMove of aiMoves) {
       let worstVal = Infinity;
 
-      for (const oppMove of defender.moves) {
+      for (const oppMove of oppMoves) {
         const outcomes = enumerateOutcomes(attacker, defender, aiMove, oppMove);
         let expectedVal = 0;
 
         for (const outcome of outcomes) {
           const { p1After, p2After, battleOver } = simulateTurnDeterministic(
-            attacker, defender, aiMove, oppMove, 1, outcome,
+            attacker, defender, aiMove, oppMove, turnNumber, outcome,
           );
           const childVal = battleOver
             ? scoreLeaf(p1After, p2After)
-            : expectiminimax(p1After, p2After, DEPTH - 1, 2);
+            : expectiminimax(p1After, p2After, DEPTH - 1, turnNumber + 1);
           expectedVal += outcome.probability * childVal;
         }
 

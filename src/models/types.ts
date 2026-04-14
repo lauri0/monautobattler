@@ -138,5 +138,7 @@ export interface EloChange {
 }
 
 export interface AIStrategy {
-  selectMove(attacker: BattlePokemon, defender: BattlePokemon): Move;
+  // turnNumber is the current battle turn (1-based). Optional for back-compat;
+  // AIs that model first-turn-only moves should use it to prune correctly.
+  selectMove(attacker: BattlePokemon, defender: BattlePokemon, turnNumber?: number): Move;
 }

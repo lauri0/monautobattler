@@ -2,6 +2,16 @@ import type { BattlePokemon, Move, TurnEvent, BattleResult, StatStageName, StatS
 import { calcDamage, calcExpectedDamage, effectiveSpeed } from './damageCalc';
 import { defaultAI } from '../ai/aiModule';
 
+/**
+ * Returns the moves the pokemon can actually use on `turnNumber`. Currently
+ * just filters out firstTurnOnly moves (e.g. Fake Out) on turn > 1, but kept
+ * as a helper so future turn-gated mechanics have one place to extend.
+ */
+export function usableMoves(p: BattlePokemon, turnNumber: number): Move[] {
+  if (turnNumber <= 1) return p.moves;
+  return p.moves.filter(m => !m.effect?.firstTurnOnly);
+}
+
 function clampStage(v: number): number {
   return Math.max(-6, Math.min(6, v));
 }
@@ -373,12 +383,16 @@ export function resolveTurn(
   ai1: AIStrategy = defaultAI,
   ai2: AIStrategy = defaultAI,
 ): { events: TurnEvent[]; p1After: BattlePokemon; p2After: BattlePokemon; battleOver: boolean } {
-  // Filter firstTurnOnly moves on turns > 1
-  const movesFor = (p: BattlePokemon) =>
-    turnNumber > 1 ? p.moves.filter(m => !m.effect?.firstTurnOnly) : p.moves;
-
-  const move1 = ai1.selectMove({ ...pokemon1, moves: movesFor(pokemon1) }, pokemon2);
-  const move2 = ai2.selectMove({ ...pokemon2, moves: movesFor(pokemon2) }, pokemon1);
+  const move1 = ai1.selectMove(
+    { ...pokemon1, moves: usableMoves(pokemon1, turnNumber) },
+    pokemon2,
+    turnNumber,
+  );
+  const move2 = ai2.selectMove(
+    { ...pokemon2, moves: usableMoves(pokemon2, turnNumber) },
+    pokemon1,
+    turnNumber,
+  );
 
   // Determine order
   let first: BattlePokemon, second: BattlePokemon;

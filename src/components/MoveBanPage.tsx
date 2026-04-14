@@ -10,6 +10,37 @@ interface Props {
   onBack: () => void;
 }
 
+interface MoveRowProps {
+  m: Move;
+  isAllowed: boolean;
+  onAllow: (m: Move) => void;
+  onBan: (id: number) => void;
+}
+
+// Hoisted so React doesn't remount every row on each parent render — remounts
+// cause the list's scrollHeight to collapse briefly, which the browser clamps
+// by snapping scrollTop to 0.
+function MoveRow({ m, isAllowed, onAllow, onBan }: MoveRowProps) {
+  const fx = effectSummary(m);
+  return (
+    <div className="ban-result-row">
+      <span className="ban-type-badge" style={{ background: getTypeColor(m.type) }}>
+        {m.type}
+      </span>
+      <span className="ban-move-name">
+        {m.damageClass === 'physical' ? '⚔' : '✦'} {m.name}
+      </span>
+      <span className="ban-move-meta">
+        {m.power}pw · {m.accuracy ?? '—'}%{m.priority ? ` · pri ${m.priority > 0 ? '+' : ''}${m.priority}` : ''}{fx ? ` · ${fx}` : ''}
+      </span>
+      {isAllowed
+        ? <button className="ban-btn" onClick={() => onBan(m.id)}>Ban</button>
+        : <button className="allow-btn" onClick={() => onAllow(m)}>Allow</button>
+      }
+    </div>
+  );
+}
+
 export default function MoveBanPage({ onBack }: Props) {
   const [search, setSearch] = useState('');
   const [allowedIds, setAllowedIds] = useState<number[]>(() => getAllowedMoveIds());
@@ -116,26 +147,6 @@ export default function MoveBanPage({ onBack }: Props) {
     allowedIds.map(id => moveIndex.get(id)).filter(Boolean) as Move[]
   );
 
-  function MoveRow({ m, isAllowed }: { m: Move; isAllowed: boolean }) {
-    const fx = effectSummary(m);
-    return (
-      <div className="ban-result-row">
-        <span className="ban-type-badge" style={{ background: getTypeColor(m.type) }}>
-          {m.type}
-        </span>
-        <span className="ban-move-name">
-          {m.damageClass === 'physical' ? '⚔' : '✦'} {m.name}
-        </span>
-        <span className="ban-move-meta">
-          {m.power}pw · {m.accuracy ?? '—'}%{fx ? ` · ${fx}` : ''}
-        </span>
-        {isAllowed
-          ? <button className="ban-btn" onClick={() => ban(m.id)}>Ban</button>
-          : <button className="allow-btn" onClick={() => allow(m)}>Allow</button>
-        }
-      </div>
-    );
-  }
 
   return (
     <div className="page">
@@ -192,7 +203,13 @@ export default function MoveBanPage({ onBack }: Props) {
 
           <div className="ban-results-list" ref={resultsListRef}>
             {(hasSearch ? searchResults : bannedMoves).map(m => (
-              <MoveRow key={m.id} m={m} isAllowed={allowedIds.includes(m.id)} />
+              <MoveRow
+                key={m.id}
+                m={m}
+                isAllowed={allowedIds.includes(m.id)}
+                onAllow={allow}
+                onBan={ban}
+              />
             ))}
           </div>
         </div>
@@ -210,7 +227,13 @@ export default function MoveBanPage({ onBack }: Props) {
 
           <div className="ban-results-list">
             {allowedMoves.map(m => (
-              <MoveRow key={m.id} m={m} isAllowed={true} />
+              <MoveRow
+                key={m.id}
+                m={m}
+                isAllowed={true}
+                onAllow={allow}
+                onBan={ban}
+              />
             ))}
           </div>
         </div>

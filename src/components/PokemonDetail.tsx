@@ -196,7 +196,7 @@ export default function PokemonDetail({ pokemon, onBack }: Props) {
                           const fx = effectSummary(m);
                           return (
                             <option key={m.id} value={m.id} style={{ background: getTypeColor(m.type), color: '#fff' }}>
-                              {`${m.damageClass === 'physical' ? '⚔' : '✦'} ${m.name}  ${m.power}pw  ${m.accuracy ?? '—'}%${fx ? `  · ${fx}` : ''}`}
+                              {`${m.damageClass === 'physical' ? '⚔' : '✦'} ${m.name}  ${m.power}pw  ${m.accuracy ?? '—'}%${m.priority ? `  · pri ${m.priority > 0 ? '+' : ''}${m.priority}` : ''}${fx ? `  · ${fx}` : ''}`}
                             </option>
                           );
                         })}
