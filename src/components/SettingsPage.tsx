@@ -1,7 +1,14 @@
 import { useState } from 'react';
 import { fetchAndStoreRange } from '../api/pokeapi';
 import { clearAllPokemonData } from '../persistence/db';
-import { clearLoadedRange, getLoadedRange, resetAllStats } from '../persistence/userStorage';
+import {
+  clearLoadedRange,
+  getLoadedRange,
+  resetAllStats,
+  getMoveLearnSettings,
+  setMoveLearnSettings,
+  type MoveLearnSettings,
+} from '../persistence/userStorage';
 
 interface Props {
   onBack: () => void;
@@ -15,21 +22,46 @@ export default function SettingsPage({ onBack, onDataLoaded }: Props) {
   const [progress, setProgress] = useState(0);
   const [progressMsg, setProgressMsg] = useState('');
   const [error, setError] = useState('');
+  const [summary, setSummary] = useState('');
+  const [learnSettings, setLearnSettingsState] = useState<MoveLearnSettings>(() =>
+    getMoveLearnSettings()
+  );
   const loadedRange = getLoadedRange();
+
+  function toggleLearn(key: keyof MoveLearnSettings) {
+    const updated = { ...learnSettings, [key]: !learnSettings[key] };
+    setLearnSettingsState(updated);
+    setMoveLearnSettings(updated);
+  }
+
+  const anyLearnEnabled = Object.values(learnSettings).some(Boolean);
 
   async function handleLoad() {
     if (fromId < 1 || toId < fromId) {
       setError('Invalid range.');
       return;
     }
+    if (!anyLearnEnabled) {
+      setError('Enable at least one move learn method.');
+      return;
+    }
     setError('');
+    setSummary('');
     setLoading(true);
     setProgress(0);
     try {
-      await fetchAndStoreRange(fromId, toId, (msg, done, total) => {
+      const result = await fetchAndStoreRange(fromId, toId, (msg, done, total) => {
         setProgressMsg(msg);
         setProgress(total > 0 ? done / total : 0);
       });
+      const msg =
+        result.loaded.length === 0
+          ? `No BDSP-available Pokemon in range #${fromId}–#${toId}.`
+          : `Loaded ${result.loaded.length} BDSP Pokemon` +
+            (result.skipped.length > 0
+              ? ` (${result.skipped.length} not in BDSP were skipped)`
+              : '');
+      setSummary(msg);
       onDataLoaded();
     } catch (e) {
       setError('Failed to load data. Check your connection.');
@@ -59,7 +91,11 @@ export default function SettingsPage({ onBack, onDataLoaded }: Props) {
       <h1 className="page-title">Settings</h1>
 
       <div className="card" style={{ marginBottom: '1.5rem' }}>
-        <h2 style={{ marginBottom: '1rem', color: 'var(--text)' }}>Pokemon Data Manager</h2>
+        <h2 style={{ marginBottom: '0.5rem', color: 'var(--text)' }}>Pokemon Data Manager</h2>
+        <p style={{ color: 'var(--text-muted)', fontSize: '0.85rem', marginBottom: '1rem' }}>
+          Only Pokemon and moves available in <strong>Brilliant Diamond / Shining Pearl</strong> are fetched.
+          IDs outside the BDSP pokedex are skipped.
+        </p>
 
         {loadedRange.ids.length > 0 ? (
           <p style={{ color: 'var(--text-muted)', marginBottom: '1rem' }}>
@@ -68,6 +104,39 @@ export default function SettingsPage({ onBack, onDataLoaded }: Props) {
         ) : (
           <p style={{ color: 'var(--text-muted)', marginBottom: '1rem' }}>No data loaded yet.</p>
         )}
+
+        <div style={{ marginBottom: '1rem' }}>
+          <span style={{
+            fontSize: '0.78rem', fontWeight: 700, textTransform: 'uppercase',
+            letterSpacing: '0.05em', color: 'var(--text-muted)', display: 'block', marginBottom: '0.5rem',
+          }}>
+            Move Learn Methods
+          </span>
+          <div style={{ display: 'flex', flexWrap: 'wrap', gap: '1rem' }}>
+            {([
+              { key: 'levelUp', label: 'Level-up' },
+              { key: 'machine', label: 'TM / HM (machine)' },
+              { key: 'tutor', label: 'Tutor' },
+              { key: 'egg', label: 'Egg' },
+            ] as { key: keyof MoveLearnSettings; label: string }[]).map(({ key, label }) => (
+              <label key={key} style={{
+                display: 'flex', alignItems: 'center', gap: '0.4rem',
+                cursor: loading ? 'not-allowed' : 'pointer', fontSize: '0.9rem',
+              }}>
+                <input
+                  type="checkbox"
+                  checked={learnSettings[key]}
+                  onChange={() => toggleLearn(key)}
+                  disabled={loading}
+                />
+                {label}
+              </label>
+            ))}
+          </div>
+          <p style={{ fontSize: '0.75rem', color: 'var(--text-muted)', marginTop: '0.4rem' }}>
+            Applies when loading new Pokemon. Already-loaded Pokemon keep their previously fetched moves.
+          </p>
+        </div>
 
         <div style={{ display: 'flex', gap: '1rem', alignItems: 'center', flexWrap: 'wrap', marginBottom: '1rem' }}>
           <label style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
@@ -110,6 +179,9 @@ export default function SettingsPage({ onBack, onDataLoaded }: Props) {
         )}
 
         {error && <p style={{ color: '#f44336', marginTop: '0.5rem' }}>{error}</p>}
+        {summary && !loading && (
+          <p style={{ color: 'var(--text-muted)', marginTop: '0.5rem', fontSize: '0.85rem' }}>{summary}</p>
+        )}
 
         <div style={{ marginTop: '1.2rem', borderTop: '1px solid var(--border)', paddingTop: '1rem' }}>
           <button className="btn-danger" onClick={handleDeleteData} disabled={loading}>

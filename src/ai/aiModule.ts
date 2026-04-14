@@ -1,9 +1,7 @@
-import type { BattlePokemon, Move } from '../models/types';
+import type { BattlePokemon, Move, AIStrategy } from '../models/types';
 import { calcMinDamage, calcExpectedDamage } from '../battle/damageCalc';
 
-export interface AIStrategy {
-  selectMove(attacker: BattlePokemon, defender: BattlePokemon): Move;
-}
+export type { AIStrategy };
 
 /**
  * Default AI: uses real damage calculations to make decisions.

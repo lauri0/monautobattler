@@ -78,6 +78,52 @@ export function clearLoadedRange(): void {
   localStorage.removeItem(LOADED_RANGE_KEY);
 }
 
+const BATTLE_SELECTION_KEY = 'battle_selection';
+
+export function getBattleSelection(): { idA: number; idB: number } | null {
+  try {
+    const raw = localStorage.getItem(BATTLE_SELECTION_KEY);
+    return raw ? JSON.parse(raw) : null;
+  } catch {
+    return null;
+  }
+}
+
+export function setBattleSelection(idA: number, idB: number): void {
+  localStorage.setItem(BATTLE_SELECTION_KEY, JSON.stringify({ idA, idB }));
+}
+
+const MOVE_LEARN_SETTINGS_KEY = 'move_learn_settings';
+
+export interface MoveLearnSettings {
+  levelUp: boolean;
+  machine: boolean;
+  tutor: boolean;
+  egg: boolean;
+}
+
+const DEFAULT_MOVE_LEARN_SETTINGS: MoveLearnSettings = {
+  levelUp: true,
+  machine: true,
+  tutor: true,
+  egg: false,
+};
+
+export function getMoveLearnSettings(): MoveLearnSettings {
+  try {
+    const raw = localStorage.getItem(MOVE_LEARN_SETTINGS_KEY);
+    if (!raw) return { ...DEFAULT_MOVE_LEARN_SETTINGS };
+    const parsed = JSON.parse(raw);
+    return { ...DEFAULT_MOVE_LEARN_SETTINGS, ...parsed };
+  } catch {
+    return { ...DEFAULT_MOVE_LEARN_SETTINGS };
+  }
+}
+
+export function setMoveLearnSettings(settings: MoveLearnSettings): void {
+  localStorage.setItem(MOVE_LEARN_SETTINGS_KEY, JSON.stringify(settings));
+}
+
 const ALLOWED_MOVES_KEY = 'allowed_moves';
 
 export function getAllowedMoveIds(): number[] {

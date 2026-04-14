@@ -5,7 +5,13 @@
       "Bash(npx tsc:*)",
       "Bash(npm run:*)",
       "Bash(echo \"EXIT:$?\")",
-      "WebFetch(domain:pokeapi.co)"
+      "WebFetch(domain:pokeapi.co)",
+      "Bash(curl -s \"https://pokeapi.co/api/v2/version-group?limit=100\")",
+      "Bash(python -c \"import json,sys; d=json.load\\(sys.stdin\\); [print\\(r['name']\\) for r in d['results']]\")",
+      "Bash(curl -s \"https://pokeapi.co/api/v2/version-group/brilliant-diamond-shining-pearl\")",
+      "Bash(python -c \"import json,sys; d=json.load\\(sys.stdin\\); print\\('Pokedexes:', [p['name'] for p in d['pokedexes']]\\)\")",
+      "Bash(curl -s \"https://pokeapi.co/api/v2/pokemon/1\")",
+      "Bash(python -c \"import json,sys; d=json.load\\(sys.stdin\\); vgs=set\\(\\); [vgs.add\\(v['version_group']['name']\\) for m in d['moves'] for v in m['version_group_details']]; print\\('BDSP in moves?', 'brilliant-diamond-shining-pearl' in vgs\\)\")"
     ]
   }
 }

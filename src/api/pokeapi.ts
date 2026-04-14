@@ -1,8 +1,30 @@
 import type { PokemonData, Move, TypeName, DamageClass, StatusCondition, MoveEffect, StatChange } from '../models/types';
-import { savePokemonData, saveMove, saveSprite } from '../persistence/db';
-import { addToLoadedRange } from '../persistence/userStorage';
+import { savePokemonData, saveMove } from '../persistence/db';
+import { addToLoadedRange, getMoveLearnSettings, type MoveLearnSettings } from '../persistence/userStorage';
 
 const BASE = 'https://pokeapi.co/api/v2';
+
+// Version group used to gate both Pokemon availability and move-learn sources.
+export const BDSP_VERSION_GROUP = 'brilliant-diamond-shining-pearl';
+
+// PokeAPI move_learn_method names we map onto our settings toggles.
+const LEARN_METHOD_TO_SETTING: Record<string, keyof MoveLearnSettings> = {
+  'level-up': 'levelUp',
+  'machine': 'machine',
+  'tutor': 'tutor',
+  'egg': 'egg',
+};
+
+// PokeAPI attaches only the 'original-sinnoh' regional dex to the BDSP version
+// group, which excludes species obtainable post-game (e.g. Bulbasaur in the
+// Underground). A more accurate availability check is: "does this Pokemon have
+// at least one move learnable in BDSP?" That's what we use below — it naturally
+// covers every species playable in the game.
+function isPokemonInBdsp(raw: RawPokemon): boolean {
+  return raw.moves.some(m =>
+    m.version_group_details.some(vgd => vgd.version_group.name === BDSP_VERSION_GROUP)
+  );
+}
 
 async function fetchJson<T>(url: string): Promise<T> {
   const res = await fetch(url);
@@ -100,15 +122,26 @@ async function fetchMoveData(moveUrl: string): Promise<Move | null> {
 
 export async function fetchAndStorePokemon(
   id: number,
-  onProgress?: (msg: string) => void
-): Promise<PokemonData> {
+  onProgress?: (msg: string) => void,
+  learnSettings?: MoveLearnSettings
+): Promise<PokemonData | null> {
   onProgress?.(`Fetching Pokemon #${id}...`);
   const raw = await fetchJson<RawPokemon>(`${BASE}/pokemon/${id}`);
+  const settings = learnSettings ?? getMoveLearnSettings();
 
-  // Collect unique move URLs
-  const moveUrls = Array.from(
-    new Set(raw.moves.map((m: RawMoveEntry) => m.move.url))
+  // Skip Pokemon not available in BDSP.
+  if (!isPokemonInBdsp(raw)) return null;
+
+  // Only keep moves learnable in BDSP via one of the enabled learn methods.
+  const filteredEntries = raw.moves.filter(m =>
+    m.version_group_details.some(vgd => {
+      if (vgd.version_group.name !== BDSP_VERSION_GROUP) return false;
+      const key = LEARN_METHOD_TO_SETTING[vgd.move_learn_method.name];
+      return key !== undefined && settings[key];
+    })
   );
+
+  const moveUrls = Array.from(new Set(filteredEntries.map(m => m.move.url)));
 
   onProgress?.(`Fetching moves for ${raw.name} (${moveUrls.length} moves)...`);
   const moveResults = await Promise.allSettled(
@@ -127,49 +160,86 @@ export async function fetchAndStorePokemon(
   moves.sort((a, b) => b.power - a.power);
 
   const baseStats = parseStats(raw.stats);
-  const spriteUrl = `https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/${id}.png`;
+  const localSpriteUrl = `/sprites/${id}.png`;
 
   const pokemon: PokemonData = {
     id: raw.id,
     name: raw.name,
     types: raw.types.map((t: RawTypeEntry) => t.type.name as TypeName),
     baseStats,
-    spriteUrl,
+    spriteUrl: localSpriteUrl,
     availableMoves: moves,
   };
 
   await savePokemonData(pokemon);
-
-  // Fetch and cache sprite blob
-  try {
-    onProgress?.(`Fetching sprite for ${raw.name}...`);
-    const imgRes = await fetch(spriteUrl);
-    if (imgRes.ok) {
-      const blob = await imgRes.blob();
-      await saveSprite(id, blob);
-    }
-  } catch {
-    // Sprite fetch failure is non-fatal
-  }
+  await ensureSpriteOnDisk(id, raw.name, onProgress);
 
   return pokemon;
+}
+
+// Download the sprite from PokeAPI and POST it to the Vite dev middleware,
+// which writes it to public/sprites/{id}.png so it can be committed. Skips the
+// network fetch if the file is already present locally.
+async function ensureSpriteOnDisk(
+  id: number,
+  name: string,
+  onProgress?: (msg: string) => void
+): Promise<void> {
+  try {
+    const check = await fetch(`/__sprite-exists/${id}`);
+    if (check.ok) {
+      const { exists } = (await check.json()) as { exists: boolean };
+      if (exists) return;
+    }
+  } catch {
+    // Fall through to download
+  }
+
+  try {
+    onProgress?.(`Fetching sprite for ${name}...`);
+    const remoteUrl = `https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/${id}.png`;
+    const imgRes = await fetch(remoteUrl);
+    if (!imgRes.ok) return;
+    const blob = await imgRes.blob();
+    await fetch(`/__save-sprite/${id}`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'image/png' },
+      body: blob,
+    });
+  } catch {
+    // Sprite fetch/save failure is non-fatal
+  }
 }
 
 export async function fetchAndStoreRange(
   from: number,
   to: number,
   onProgress?: (msg: string, done: number, total: number) => void
-): Promise<void> {
-  const ids = Array.from({ length: to - from + 1 }, (_, i) => from + i);
+): Promise<{ loaded: number[]; skipped: number[] }> {
+  const settings = getMoveLearnSettings();
+  const allIds = Array.from({ length: to - from + 1 }, (_, i) => from + i);
+  const loaded: number[] = [];
+  const skipped: number[] = [];
   let done = 0;
 
-  for (const id of ids) {
-    await fetchAndStorePokemon(id, (msg) => onProgress?.(msg, done, ids.length));
+  for (const id of allIds) {
+    const result = await fetchAndStorePokemon(
+      id,
+      (msg) => onProgress?.(msg, done, allIds.length),
+      settings
+    );
+    if (result) {
+      loaded.push(id);
+      onProgress?.(`Loaded #${id}`, done + 1, allIds.length);
+    } else {
+      skipped.push(id);
+      onProgress?.(`Skipped #${id} (not in BDSP)`, done + 1, allIds.length);
+    }
     done++;
-    onProgress?.(`Loaded #${id}`, done, ids.length);
   }
 
-  addToLoadedRange(ids);
+  if (loaded.length > 0) addToLoadedRange(loaded);
+  return { loaded, skipped };
 }
 
 function parseStats(stats: RawStat[]): PokemonData['baseStats'] {
@@ -194,7 +264,14 @@ interface RawPokemon {
 }
 interface RawTypeEntry { type: { name: string } }
 interface RawStat { stat: { name: string }; base_stat: number }
-interface RawMoveEntry { move: { url: string } }
+interface RawMoveEntry {
+  move: { name: string; url: string };
+  version_group_details: Array<{
+    level_learned_at: number;
+    version_group: { name: string; url: string };
+    move_learn_method: { name: string; url: string };
+  }>;
+}
 interface RawMove {
   id: number;
   name: string;

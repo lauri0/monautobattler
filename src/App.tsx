@@ -8,8 +8,9 @@ import BattlePage from './components/BattlePage';
 import MassSimPage from './components/MassSimPage';
 import SettingsPage from './components/SettingsPage';
 import MoveBanPage from './components/MoveBanPage';
+import GauntletPage from './components/GauntletPage';
 
-type Page = 'menu' | 'pokedex' | 'pokedex-detail' | 'battle' | 'masssim' | 'settings' | 'moveban';
+type Page = 'menu' | 'pokedex' | 'pokedex-detail' | 'battle' | 'masssim' | 'gauntlet' | 'settings' | 'moveban';
 
 export default function App() {
   const [page, setPage] = useState<Page>('menu');
@@ -96,6 +97,10 @@ export default function App() {
 
   if (page === 'masssim') {
     return <MassSimPage allPokemon={allPokemon} onBack={() => setPage('menu')} />;
+  }
+
+  if (page === 'gauntlet') {
+    return <GauntletPage allPokemon={allPokemon} onBack={() => setPage('menu')} />;
   }
 
   if (page === 'moveban') {

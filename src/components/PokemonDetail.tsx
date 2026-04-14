@@ -22,18 +22,32 @@ import { effectSummary } from '../utils/moveEffectSummary';
 
 export default function PokemonDetail({ pokemon, onBack }: Props) {
   const persisted = getPokemonPersisted(pokemon.id);
-  const [moveset, setMoveset] = useState<number[]>(
-    persisted.moveset.length === 4
+  const allowedIds = getAllowedMoveIds();
+
+  const [moveset, setMoveset] = useState<number[]>(() => {
+    const stored = persisted.moveset.length === 4
       ? persisted.moveset
-      : pokemon.availableMoves.slice(0, 4).map(m => m.id)
-  );
+      : pokemon.availableMoves.slice(0, 4).map(m => m.id);
+    // Keep only allowed moves; fill remaining slots from allowed list
+    const valid = stored.filter(id => allowedIds.includes(id));
+    if (valid.length < 4) {
+      const used = new Set(valid);
+      for (const m of pokemon.availableMoves) {
+        if (valid.length >= 4) break;
+        if (allowedIds.includes(m.id) && !used.has(m.id)) {
+          valid.push(m.id);
+          used.add(m.id);
+        }
+      }
+    }
+    return valid;
+  });
   const [disabled, setDisabled] = useState(persisted.disabled);
   const [saved, setSaved] = useState(false);
 
   const stats = calcLevel50Stats(pokemon.baseStats);
   const { weaknesses, resistances, immunities } = getDefensiveMatchups(pokemon.types);
   const moveMap = new Map<number, Move>(pokemon.availableMoves.map(m => [m.id, m]));
-  const allowedIds = getAllowedMoveIds();
 
   function handleMoveChange(slot: number, moveId: number) {
     const next = [...moveset];

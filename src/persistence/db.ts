@@ -4,7 +4,6 @@ const DB_NAME = 'PokemonBattlerDB';
 const DB_VERSION = 1;
 const POKEMON_STORE = 'pokemon';
 const MOVES_STORE = 'moves';
-const SPRITES_STORE = 'sprites';
 
 let dbInstance: IDBDatabase | null = null;
 
@@ -20,9 +19,6 @@ function openDB(): Promise<IDBDatabase> {
       }
       if (!db.objectStoreNames.contains(MOVES_STORE)) {
         db.createObjectStore(MOVES_STORE, { keyPath: 'id' });
-      }
-      if (!db.objectStoreNames.contains(SPRITES_STORE)) {
-        db.createObjectStore(SPRITES_STORE, { keyPath: 'id' });
       }
     };
     req.onsuccess = (e) => {
@@ -93,19 +89,9 @@ export async function getAllMoves(): Promise<Move[]> {
   return txGetAll<Move>(MOVES_STORE);
 }
 
-export async function saveSprite(id: number, blob: Blob): Promise<void> {
-  await txPut(SPRITES_STORE, { id, blob });
-}
-
-export async function getSprite(id: number): Promise<Blob | undefined> {
-  const row = await txGet<{ id: number; blob: Blob }>(SPRITES_STORE, id);
-  return row?.blob;
-}
-
 export async function clearAllPokemonData(): Promise<void> {
   await Promise.all([
     txClear(POKEMON_STORE),
     txClear(MOVES_STORE),
-    txClear(SPRITES_STORE),
   ]);
 }

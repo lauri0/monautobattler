@@ -136,3 +136,7 @@ export interface EloChange {
   oldElo: number;
   newElo: number;
 }
+
+export interface AIStrategy {
+  selectMove(attacker: BattlePokemon, defender: BattlePokemon): Move;
+}

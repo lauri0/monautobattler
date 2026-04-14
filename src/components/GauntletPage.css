@@ -1,0 +1,147 @@
+.gauntlet-config {
+  display: grid;
+  grid-template-columns: 1fr 1fr auto;
+  gap: 1.5rem;
+  align-items: end;
+}
+
+@media (max-width: 800px) {
+  .gauntlet-config {
+    grid-template-columns: 1fr;
+  }
+}
+
+.gauntlet-config-group {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.gauntlet-label {
+  font-size: 0.78rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--text-muted);
+}
+
+.gauntlet-select {
+  padding: 0.5rem 0.75rem;
+  background: var(--surface2);
+  color: var(--text);
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  font-size: 0.95rem;
+}
+
+.gauntlet-moveset {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.35rem;
+  align-items: center;
+  margin-top: 0.25rem;
+}
+
+.gauntlet-moveset-label {
+  font-size: 0.75rem;
+  color: var(--text-muted);
+  margin-right: 0.25rem;
+}
+
+.gauntlet-move-chip {
+  font-size: 0.75rem;
+  padding: 0.15rem 0.5rem;
+  border-radius: 999px;
+  background: var(--surface2);
+  border: 1px solid var(--border);
+  text-transform: capitalize;
+}
+
+.gauntlet-count-row {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.gauntlet-slider {
+  flex: 1;
+}
+
+.gauntlet-count-value {
+  font-size: 1.25rem;
+  font-weight: 700;
+  color: var(--text);
+  min-width: 2ch;
+  text-align: right;
+}
+
+.gauntlet-total-hint {
+  font-size: 0.75rem;
+  color: var(--text-muted);
+}
+
+.gauntlet-run-btn {
+  padding: 0.75rem 1.5rem;
+  white-space: nowrap;
+}
+
+.gauntlet-summary {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1rem;
+  gap: 1rem;
+  flex-wrap: wrap;
+}
+
+.gauntlet-overall {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  padding: 0.5rem 1rem;
+  background: var(--surface2);
+  border-radius: 8px;
+  border: 1px solid var(--border);
+}
+
+.gauntlet-overall-label {
+  font-size: 0.7rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--text-muted);
+}
+
+.gauntlet-overall-value {
+  font-size: 1.6rem;
+  font-weight: 700;
+  color: #f1c40f;
+  line-height: 1.1;
+}
+
+.gauntlet-overall-sub {
+  font-size: 0.75rem;
+  color: var(--text-muted);
+}
+
+.gauntlet-winpct-cell {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  min-width: 160px;
+}
+
+.gauntlet-winpct-bar-bg {
+  flex: 1;
+  height: 8px;
+  background: var(--surface2);
+  border-radius: 4px;
+  overflow: hidden;
+  min-width: 60px;
+}
+
+.gauntlet-winpct-bar {
+  height: 100%;
+  border-radius: 4px;
+  transition: width 0.2s ease;
+}

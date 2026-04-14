@@ -2,6 +2,7 @@ import { useState, useRef } from 'react';
 import type { PokemonData } from '../models/types';
 import { buildBattlePokemon } from '../battle/buildBattlePokemon';
 import { runFullBattle } from '../battle/battleEngine';
+import { expectiminimaxAI } from '../ai/expectiminimaxAI';
 import { applyEloResult } from '../utils/eloCalc';
 import { getPokemonPersisted, setManyPokemonPersisted } from '../persistence/userStorage';
 import TypeBadge from './TypeBadge';
@@ -73,7 +74,7 @@ export default function MassSimPage({ allPokemon, onBack }: Props) {
       const bpA = buildBattlePokemon(dataA);
       const bpB = buildBattlePokemon(dataB);
 
-      const result = runFullBattle(bpA, bpB);
+      const result = runFullBattle(bpA, bpB, expectiminimaxAI, expectiminimaxAI);
       const winnerId = result.winner.data.id;
       const loserId = result.loser.data.id;
 

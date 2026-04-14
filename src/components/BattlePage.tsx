@@ -2,8 +2,9 @@ import { useState, useRef, useEffect } from 'react';
 import type { PokemonData, BattlePokemon, TurnEvent } from '../models/types';
 import { buildBattlePokemon } from '../battle/buildBattlePokemon';
 import { resolveTurn } from '../battle/battleEngine';
+import { expectiminimaxAI } from '../ai/expectiminimaxAI';
 import { applyEloResult } from '../utils/eloCalc';
-import { getPokemonPersisted, setPokemonPersisted } from '../persistence/userStorage';
+import { getPokemonPersisted, setPokemonPersisted, getBattleSelection, setBattleSelection } from '../persistence/userStorage';
 import HpBar from './HpBar';
 import TypeBadge from './TypeBadge';
 import { getTypeColor } from '../utils/typeColors';
@@ -28,8 +29,14 @@ function effectivenessText(e: number): string {
 export default function BattlePage({ allPokemon, onBack }: Props) {
   const enabled = allPokemon.filter(p => !getPokemonPersisted(p.id).disabled);
   const [phase, setPhase] = useState<Phase>('select');
-  const [selA, setSelA] = useState(enabled[0]?.id ?? 0);
-  const [selB, setSelB] = useState(enabled[1]?.id ?? 0);
+  const [selA, setSelA] = useState(() => {
+    const saved = getBattleSelection();
+    return saved && enabled.some(p => p.id === saved.idA) ? saved.idA : (enabled[0]?.id ?? 0);
+  });
+  const [selB, setSelB] = useState(() => {
+    const saved = getBattleSelection();
+    return saved && enabled.some(p => p.id === saved.idB) ? saved.idB : (enabled[1]?.id ?? 0);
+  });
   const [p1, setP1] = useState<BattlePokemon | null>(null);
   const [p2, setP2] = useState<BattlePokemon | null>(null);
   const [log, setLog] = useState<TurnEvent[]>([]);
@@ -48,6 +55,7 @@ export default function BattlePage({ allPokemon, onBack }: Props) {
     const dataA = allPokemon.find(p => p.id === selA);
     const dataB = allPokemon.find(p => p.id === selB);
     if (!dataA || !dataB || selA === selB) return;
+    setBattleSelection(selA, selB);
     setP1(buildBattlePokemon(dataA));
     setP2(buildBattlePokemon(dataB));
     setLog([]);
@@ -59,7 +67,7 @@ export default function BattlePage({ allPokemon, onBack }: Props) {
 
   function nextTurn() {
     if (!p1 || !p2 || battleOver) return;
-    const { events, p1After, p2After, battleOver: over } = resolveTurn(p1, p2, turn);
+    const { events, p1After, p2After, battleOver: over } = resolveTurn(p1, p2, turn, expectiminimaxAI, expectiminimaxAI);
     setLog(prev => [...prev, ...events]);
     setP1(p1After);
     setP2(p2After);

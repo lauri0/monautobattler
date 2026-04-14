@@ -73,10 +73,22 @@ export default function MoveBanPage({ onBack }: Props) {
   }
 
   function banAll() {
-    if (!confirm('Remove all allowed moves?')) return;
+    if (allowedIds.length === 0) return;
+    if (!confirm(`Ban all ${allowedIds.length} currently allowed moves? This cannot be undone.`)) return;
     setAllowedIds([]);
     setAllowedMoveIds([]);
   }
+
+  function allowAll() {
+    const allIds = allMoves.map(m => m.id);
+    const wouldAdd = allIds.length - allowedIds.length;
+    if (wouldAdd <= 0) return;
+    if (!confirm(`Allow all ${allMoves.length} moves (adds ${wouldAdd})? This cannot be undone.`)) return;
+    setAllowedIds(allIds);
+    setAllowedMoveIds(allIds);
+  }
+
+  const allMovesAllowed = allMoves.length > 0 && allowedIds.length === allMoves.length;
 
   const allowedMoves = allowedIds.map(id => moveIndex.get(id)).filter(Boolean) as Move[];
 
@@ -118,6 +130,25 @@ export default function MoveBanPage({ onBack }: Props) {
         autoFocus
       />
 
+      <div className="ban-bulk-toolbar">
+        <button
+          className="allow-btn ban-bulk-btn"
+          onClick={allowAll}
+          disabled={allMovesAllowed || allMoves.length === 0}
+          title="Allow every move"
+        >
+          Allow all moves
+        </button>
+        <button
+          className="ban-btn ban-bulk-btn"
+          onClick={banAll}
+          disabled={allowedIds.length === 0}
+          title="Ban every currently allowed move"
+        >
+          Ban all moves
+        </button>
+      </div>
+
       <div className="ban-layout">
         {/* Search results panel */}
         <div className="ban-panel">
@@ -145,9 +176,6 @@ export default function MoveBanPage({ onBack }: Props) {
           <h2 className="ban-panel-title">
             Allowed
             <span className="ban-panel-count">{allowedIds.length}</span>
-            {allowedIds.length > 0 && (
-              <button className="ban-clear-btn" onClick={banAll}>Ban all</button>
-            )}
           </h2>
 
           {allowedIds.length === 0 && (
