@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import type { PokemonData, Move } from '../models/types';
-import { getPokemonPersisted, setPokemonPersisted } from '../persistence/userStorage';
+import { getPokemonPersisted, setPokemonPersisted, getAllowedMoveIds } from '../persistence/userStorage';
 import { calcLevel50Stats } from '../utils/statCalc';
 import { getDefensiveMatchups } from '../utils/typeChart';
 import { getTypeColor } from '../utils/typeColors';
@@ -18,6 +18,8 @@ const STAT_LABELS: Record<string, string> = {
 };
 const STAT_MAX = 255;
 
+import { effectSummary } from '../utils/moveEffectSummary';
+
 export default function PokemonDetail({ pokemon, onBack }: Props) {
   const persisted = getPokemonPersisted(pokemon.id);
   const [moveset, setMoveset] = useState<number[]>(
@@ -31,6 +33,7 @@ export default function PokemonDetail({ pokemon, onBack }: Props) {
   const stats = calcLevel50Stats(pokemon.baseStats);
   const { weaknesses, resistances, immunities } = getDefensiveMatchups(pokemon.types);
   const moveMap = new Map<number, Move>(pokemon.availableMoves.map(m => [m.id, m]));
+  const allowedIds = getAllowedMoveIds();
 
   function handleMoveChange(slot: number, moveId: number) {
     const next = [...moveset];
@@ -173,11 +176,16 @@ export default function PokemonDetail({ pokemon, onBack }: Props) {
                       onChange={e => handleMoveChange(slot, Number(e.target.value))}
                       style={{ flex: 1 }}
                     >
-                      {pokemon.availableMoves.map(m => (
-                        <option key={m.id} value={m.id} style={{ background: getTypeColor(m.type), color: '#fff' }}>
-                          {m.damageClass === 'physical' ? '⚔ ' : '✦ '}{m.name} ({m.type}, {m.power} power, {m.accuracy ?? '—'}% acc, {m.damageClass})
-                        </option>
-                      ))}
+                      {pokemon.availableMoves
+                        .filter(m => allowedIds.includes(m.id))
+                        .map(m => {
+                          const fx = effectSummary(m);
+                          return (
+                            <option key={m.id} value={m.id} style={{ background: getTypeColor(m.type), color: '#fff' }}>
+                              {`${m.damageClass === 'physical' ? '⚔' : '✦'} ${m.name}  ${m.power}pw  ${m.accuracy ?? '—'}%${fx ? `  · ${fx}` : ''}`}
+                            </option>
+                          );
+                        })}
                     </select>
                     {selectedMove && (
                       <TypeBadge type={selectedMove.type} />

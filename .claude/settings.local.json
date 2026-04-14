@@ -3,7 +3,9 @@
     "allow": [
       "Bash(npm install:*)",
       "Bash(npx tsc:*)",
-      "Bash(npm run:*)"
+      "Bash(npm run:*)",
+      "Bash(echo \"EXIT:$?\")",
+      "WebFetch(domain:pokeapi.co)"
     ]
   }
 }

@@ -1,4 +1,4 @@
-import type { PokemonData, Move, TypeName, DamageClass } from '../models/types';
+import type { PokemonData, Move, TypeName, DamageClass, StatusCondition, MoveEffect, StatChange } from '../models/types';
 import { savePokemonData, saveMove, saveSprite } from '../persistence/db';
 import { addToLoadedRange } from '../persistence/userStorage';
 
@@ -10,6 +10,14 @@ async function fetchJson<T>(url: string): Promise<T> {
   return res.json() as Promise<T>;
 }
 
+const STATUS_MAP: Record<string, StatusCondition> = {
+  burn: 'burn',
+  poison: 'poison',
+  paralysis: 'paralysis',
+  sleep: 'sleep',
+  freeze: 'freeze',
+};
+
 async function fetchMoveData(moveUrl: string): Promise<Move | null> {
   try {
     const data = await fetchJson<RawMove>(moveUrl);
@@ -17,6 +25,62 @@ async function fetchMoveData(moveUrl: string): Promise<Move | null> {
     if (!rawClass || rawClass === 'status') return null;
     const damageClass = rawClass as DamageClass;
     if (!data.power) return null;
+
+    // Build secondary effect if any meaningful data exists
+    let effect: MoveEffect | undefined;
+
+    if (data.meta) {
+      const m = data.meta;
+      const ailmentName = STATUS_MAP[m.ailment?.name ?? ''];
+      const hasDrain = m.drain !== 0;
+      const hasAilment = !!ailmentName;
+      const hasStatChanges = data.stat_changes.length > 0;
+      const hasFlinch = m.flinch_chance > 0;
+      const hasCritRate = m.crit_rate > 0;
+      // Confusion applied to foe: ailment is confusion with a > 0 chance
+      const hasConfusion = m.ailment?.name === 'confusion' && m.ailment_chance > 0;
+
+      if (hasDrain || hasAilment || hasStatChanges || hasFlinch || hasCritRate || hasConfusion) {
+        effect = {};
+
+        if (hasDrain) {
+          effect.drain = m.drain;
+        }
+
+        if (hasAilment) {
+          effect.ailment = ailmentName;
+          effect.ailmentChance = m.ailment_chance;
+        }
+
+        if (hasStatChanges) {
+          const foeDrop = m.category?.name === 'damage-lower' && m.stat_chance > 0;
+          effect.statChanges = data.stat_changes.map(sc => ({
+            stat: sc.stat.name as StatChange['stat'],
+            change: sc.change,
+            target: foeDrop ? 'foe' : 'user',
+          } satisfies StatChange));
+          effect.statChance = m.stat_chance;
+        }
+
+        if (hasFlinch) {
+          effect.flinchChance = m.flinch_chance;
+        }
+
+        if (hasCritRate) {
+          effect.critRate = m.crit_rate;
+        }
+
+        if (hasConfusion) {
+          effect.confuses = true;
+          effect.confusionChance = m.ailment_chance;
+        }
+      }
+    }
+
+    // Fake Out: always-flinch move that only works on the first turn
+    if (data.name === 'fake-out') {
+      effect = { ...effect, firstTurnOnly: true };
+    }
 
     return {
       id: data.id,
@@ -27,6 +91,7 @@ async function fetchMoveData(moveUrl: string): Promise<Move | null> {
       pp: data.pp,
       damageClass,
       priority: data.priority ?? 0,
+      ...(effect ? { effect } : {}),
     };
   } catch {
     return null;
@@ -139,4 +204,14 @@ interface RawMove {
   pp: number;
   damage_class: { name: string } | null;
   priority: number;
+  stat_changes: Array<{ change: number; stat: { name: string } }>;
+  meta: {
+    ailment: { name: string };
+    ailment_chance: number;
+    drain: number;
+    stat_chance: number;
+    flinch_chance: number;
+    crit_rate: number;
+    category: { name: string } | null;
+  } | null;
 }

@@ -89,6 +89,10 @@ export async function getMove(id: number): Promise<Move | undefined> {
   return txGet<Move>(MOVES_STORE, id);
 }
 
+export async function getAllMoves(): Promise<Move[]> {
+  return txGetAll<Move>(MOVES_STORE);
+}
+
 export async function saveSprite(id: number, blob: Blob): Promise<void> {
   await txPut(SPRITES_STORE, { id, blob });
 }

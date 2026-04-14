@@ -23,5 +23,6 @@ export function buildBattlePokemon(pokemonData: PokemonData): BattlePokemon {
     level50Stats,
     moves,
     currentHp: level50Stats.hp,
+    statStages: { attack: 0, defense: 0, 'special-attack': 0, 'special-defense': 0, speed: 0 },
   };
 }

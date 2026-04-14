@@ -77,3 +77,18 @@ export function addToLoadedRange(ids: number[]): void {
 export function clearLoadedRange(): void {
   localStorage.removeItem(LOADED_RANGE_KEY);
 }
+
+const ALLOWED_MOVES_KEY = 'allowed_moves';
+
+export function getAllowedMoveIds(): number[] {
+  try {
+    const raw = localStorage.getItem(ALLOWED_MOVES_KEY);
+    return raw ? JSON.parse(raw) : [];
+  } catch {
+    return [];
+  }
+}
+
+export function setAllowedMoveIds(ids: number[]): void {
+  localStorage.setItem(ALLOWED_MOVES_KEY, JSON.stringify(ids));
+}
