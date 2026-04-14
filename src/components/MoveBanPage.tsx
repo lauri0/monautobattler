@@ -29,28 +29,43 @@ export default function MoveBanPage({ onBack }: Props) {
     return map;
   }, [allMoves]);
 
+  // Order by type alphabetically, then by move name alphabetically.
+  const sortMoves = (moves: Move[]): Move[] =>
+    [...moves].sort((a, b) =>
+      a.type.localeCompare(b.type) || a.name.localeCompare(b.name)
+    );
+
+  const hasSearch = search.trim().length > 0;
+
   // Search results: all moves matching query (both allowed and banned)
   const searchResults = useMemo((): Move[] => {
     const q = search.trim().toLowerCase();
     if (!q) return [];
 
     const matchedPokemon = allPokemon.filter(p => p.name.toLowerCase().includes(q));
+    let results: Move[];
     if (matchedPokemon.length > 0) {
       const seen = new Set<number>();
-      const moves: Move[] = [];
+      results = [];
       for (const p of matchedPokemon) {
         for (const m of p.availableMoves) {
           if (!seen.has(m.id)) {
             seen.add(m.id);
-            moves.push(m);
+            results.push(m);
           }
         }
       }
-      return moves;
+    } else {
+      results = allMoves.filter(m => m.name.toLowerCase().includes(q));
     }
-
-    return allMoves.filter(m => m.name.toLowerCase().includes(q));
+    return sortMoves(results);
   }, [search, allPokemon, allMoves]);
+
+  // Banned moves = every move not currently allowed.
+  const bannedMoves = useMemo((): Move[] => {
+    const allowedSet = new Set(allowedIds);
+    return sortMoves(allMoves.filter(m => !allowedSet.has(m.id)));
+  }, [allMoves, allowedIds]);
 
   useLayoutEffect(() => {
     if (resultsListRef.current) {
@@ -80,17 +95,26 @@ export default function MoveBanPage({ onBack }: Props) {
   }
 
   function allowAll() {
-    const allIds = allMoves.map(m => m.id);
-    const wouldAdd = allIds.length - allowedIds.length;
-    if (wouldAdd <= 0) return;
-    if (!confirm(`Allow all ${allMoves.length} moves (adds ${wouldAdd})? This cannot be undone.`)) return;
-    setAllowedIds(allIds);
-    setAllowedMoveIds(allIds);
+    const allowedSet = new Set(allowedIds);
+    const toAdd = allMoves.filter(m => !allowedSet.has(m.id));
+    if (toAdd.length === 0) return;
+    if (!confirm(`Allow all ${allMoves.length} moves (adds ${toAdd.length})? This cannot be undone.`)) return;
+    // Preserve any previously-allowed IDs that aren't in the current store
+    // (e.g. moves from a different game) rather than silently dropping them.
+    const next = Array.from(new Set([...allowedIds, ...allMoves.map(m => m.id)]));
+    setAllowedIds(next);
+    setAllowedMoveIds(next);
   }
 
-  const allMovesAllowed = allMoves.length > 0 && allowedIds.length === allMoves.length;
+  const allMovesAllowed = useMemo(() => {
+    if (allMoves.length === 0) return false;
+    const allowedSet = new Set(allowedIds);
+    return allMoves.every(m => allowedSet.has(m.id));
+  }, [allMoves, allowedIds]);
 
-  const allowedMoves = allowedIds.map(id => moveIndex.get(id)).filter(Boolean) as Move[];
+  const allowedMoves = sortMoves(
+    allowedIds.map(id => moveIndex.get(id)).filter(Boolean) as Move[]
+  );
 
   function MoveRow({ m, isAllowed }: { m: Move; isAllowed: boolean }) {
     const fx = effectSummary(m);
@@ -150,22 +174,24 @@ export default function MoveBanPage({ onBack }: Props) {
       </div>
 
       <div className="ban-layout">
-        {/* Search results panel */}
+        {/* Left panel: search results while typing, otherwise the ban list. */}
         <div className="ban-panel">
           <h2 className="ban-panel-title">
-            Results
-            {search.trim() && <span className="ban-panel-count">{searchResults.length}</span>}
+            {hasSearch ? 'Results' : 'Ban List'}
+            <span className="ban-panel-count">
+              {hasSearch ? searchResults.length : bannedMoves.length}
+            </span>
           </h2>
 
-          {!search.trim() && (
-            <p className="ban-empty">Start typing to search for moves or Pokemon.</p>
-          )}
-          {search.trim() && searchResults.length === 0 && (
+          {hasSearch && searchResults.length === 0 && (
             <p className="ban-empty">No matching moves found.</p>
+          )}
+          {!hasSearch && bannedMoves.length === 0 && (
+            <p className="ban-empty">No moves banned — all are allowed.</p>
           )}
 
           <div className="ban-results-list" ref={resultsListRef}>
-            {searchResults.map(m => (
+            {(hasSearch ? searchResults : bannedMoves).map(m => (
               <MoveRow key={m.id} m={m} isAllowed={allowedIds.includes(m.id)} />
             ))}
           </div>

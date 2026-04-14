@@ -124,6 +124,42 @@ export function setMoveLearnSettings(settings: MoveLearnSettings): void {
   localStorage.setItem(MOVE_LEARN_SETTINGS_KEY, JSON.stringify(settings));
 }
 
+const GAME_VERSION_KEY = 'game_version';
+
+export type GameVersion = 'bdsp' | 'lgpe';
+
+export interface GameVersionInfo {
+  id: GameVersion;
+  label: string;
+  versionGroup: string;
+}
+
+export const GAME_VERSIONS: readonly GameVersionInfo[] = [
+  { id: 'bdsp', label: 'Brilliant Diamond / Shining Pearl', versionGroup: 'brilliant-diamond-shining-pearl' },
+  { id: 'lgpe', label: "Let's Go Pikachu / Eevee", versionGroup: 'lets-go-pikachu-lets-go-eevee' },
+];
+
+const DEFAULT_GAME_VERSION: GameVersion = 'bdsp';
+
+export function getSelectedGame(): GameVersion {
+  try {
+    const raw = localStorage.getItem(GAME_VERSION_KEY);
+    if (raw === 'bdsp' || raw === 'lgpe') return raw;
+  } catch {
+    // fall through
+  }
+  return DEFAULT_GAME_VERSION;
+}
+
+export function setSelectedGame(game: GameVersion): void {
+  localStorage.setItem(GAME_VERSION_KEY, game);
+}
+
+export function getSelectedGameInfo(): GameVersionInfo {
+  const id = getSelectedGame();
+  return GAME_VERSIONS.find(g => g.id === id) ?? GAME_VERSIONS[0];
+}
+
 const ALLOWED_MOVES_KEY = 'allowed_moves';
 
 export function getAllowedMoveIds(): number[] {

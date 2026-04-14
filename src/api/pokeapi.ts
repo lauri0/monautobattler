@@ -1,11 +1,14 @@
 import type { PokemonData, Move, TypeName, DamageClass, StatusCondition, MoveEffect, StatChange } from '../models/types';
 import { savePokemonData, saveMove } from '../persistence/db';
-import { addToLoadedRange, getMoveLearnSettings, type MoveLearnSettings } from '../persistence/userStorage';
+import {
+  addToLoadedRange,
+  getMoveLearnSettings,
+  getSelectedGameInfo,
+  type MoveLearnSettings,
+  type GameVersionInfo,
+} from '../persistence/userStorage';
 
 const BASE = 'https://pokeapi.co/api/v2';
-
-// Version group used to gate both Pokemon availability and move-learn sources.
-export const BDSP_VERSION_GROUP = 'brilliant-diamond-shining-pearl';
 
 // PokeAPI move_learn_method names we map onto our settings toggles.
 const LEARN_METHOD_TO_SETTING: Record<string, keyof MoveLearnSettings> = {
@@ -15,14 +18,12 @@ const LEARN_METHOD_TO_SETTING: Record<string, keyof MoveLearnSettings> = {
   'egg': 'egg',
 };
 
-// PokeAPI attaches only the 'original-sinnoh' regional dex to the BDSP version
-// group, which excludes species obtainable post-game (e.g. Bulbasaur in the
-// Underground). A more accurate availability check is: "does this Pokemon have
-// at least one move learnable in BDSP?" That's what we use below — it naturally
-// covers every species playable in the game.
-function isPokemonInBdsp(raw: RawPokemon): boolean {
+// Availability check: "does this Pokemon have at least one move learnable in
+// the selected game?" This is more accurate than the regional pokedex, which
+// often excludes post-game-obtainable species.
+function isPokemonInGame(raw: RawPokemon, versionGroup: string): boolean {
   return raw.moves.some(m =>
-    m.version_group_details.some(vgd => vgd.version_group.name === BDSP_VERSION_GROUP)
+    m.version_group_details.some(vgd => vgd.version_group.name === versionGroup)
   );
 }
 
@@ -123,19 +124,22 @@ async function fetchMoveData(moveUrl: string): Promise<Move | null> {
 export async function fetchAndStorePokemon(
   id: number,
   onProgress?: (msg: string) => void,
-  learnSettings?: MoveLearnSettings
+  learnSettings?: MoveLearnSettings,
+  game?: GameVersionInfo
 ): Promise<PokemonData | null> {
   onProgress?.(`Fetching Pokemon #${id}...`);
   const raw = await fetchJson<RawPokemon>(`${BASE}/pokemon/${id}`);
   const settings = learnSettings ?? getMoveLearnSettings();
+  const gameInfo = game ?? getSelectedGameInfo();
+  const versionGroup = gameInfo.versionGroup;
 
-  // Skip Pokemon not available in BDSP.
-  if (!isPokemonInBdsp(raw)) return null;
+  // Skip Pokemon not available in the selected game.
+  if (!isPokemonInGame(raw, versionGroup)) return null;
 
-  // Only keep moves learnable in BDSP via one of the enabled learn methods.
+  // Only keep moves learnable in the selected game via one of the enabled learn methods.
   const filteredEntries = raw.moves.filter(m =>
     m.version_group_details.some(vgd => {
-      if (vgd.version_group.name !== BDSP_VERSION_GROUP) return false;
+      if (vgd.version_group.name !== versionGroup) return false;
       const key = LEARN_METHOD_TO_SETTING[vgd.move_learn_method.name];
       return key !== undefined && settings[key];
     })
@@ -217,6 +221,7 @@ export async function fetchAndStoreRange(
   onProgress?: (msg: string, done: number, total: number) => void
 ): Promise<{ loaded: number[]; skipped: number[] }> {
   const settings = getMoveLearnSettings();
+  const game = getSelectedGameInfo();
   const allIds = Array.from({ length: to - from + 1 }, (_, i) => from + i);
   const loaded: number[] = [];
   const skipped: number[] = [];
@@ -226,14 +231,15 @@ export async function fetchAndStoreRange(
     const result = await fetchAndStorePokemon(
       id,
       (msg) => onProgress?.(msg, done, allIds.length),
-      settings
+      settings,
+      game
     );
     if (result) {
       loaded.push(id);
       onProgress?.(`Loaded #${id}`, done + 1, allIds.length);
     } else {
       skipped.push(id);
-      onProgress?.(`Skipped #${id} (not in BDSP)`, done + 1, allIds.length);
+      onProgress?.(`Skipped #${id} (not in ${game.label})`, done + 1, allIds.length);
     }
     done++;
   }

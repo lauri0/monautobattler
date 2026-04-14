@@ -7,7 +7,11 @@ import {
   resetAllStats,
   getMoveLearnSettings,
   setMoveLearnSettings,
+  getSelectedGame,
+  setSelectedGame,
+  GAME_VERSIONS,
   type MoveLearnSettings,
+  type GameVersion,
 } from '../persistence/userStorage';
 
 interface Props {
@@ -26,7 +30,14 @@ export default function SettingsPage({ onBack, onDataLoaded }: Props) {
   const [learnSettings, setLearnSettingsState] = useState<MoveLearnSettings>(() =>
     getMoveLearnSettings()
   );
+  const [game, setGameState] = useState<GameVersion>(() => getSelectedGame());
+  const gameLabel = GAME_VERSIONS.find(g => g.id === game)?.label ?? game;
   const loadedRange = getLoadedRange();
+
+  function changeGame(next: GameVersion) {
+    setGameState(next);
+    setSelectedGame(next);
+  }
 
   function toggleLearn(key: keyof MoveLearnSettings) {
     const updated = { ...learnSettings, [key]: !learnSettings[key] };
@@ -56,10 +67,10 @@ export default function SettingsPage({ onBack, onDataLoaded }: Props) {
       });
       const msg =
         result.loaded.length === 0
-          ? `No BDSP-available Pokemon in range #${fromId}–#${toId}.`
-          : `Loaded ${result.loaded.length} BDSP Pokemon` +
+          ? `No ${gameLabel}-available Pokemon in range #${fromId}–#${toId}.`
+          : `Loaded ${result.loaded.length} ${gameLabel} Pokemon` +
             (result.skipped.length > 0
-              ? ` (${result.skipped.length} not in BDSP were skipped)`
+              ? ` (${result.skipped.length} not in ${gameLabel} were skipped)`
               : '');
       setSummary(msg);
       onDataLoaded();
@@ -93,9 +104,31 @@ export default function SettingsPage({ onBack, onDataLoaded }: Props) {
       <div className="card" style={{ marginBottom: '1.5rem' }}>
         <h2 style={{ marginBottom: '0.5rem', color: 'var(--text)' }}>Pokemon Data Manager</h2>
         <p style={{ color: 'var(--text-muted)', fontSize: '0.85rem', marginBottom: '1rem' }}>
-          Only Pokemon and moves available in <strong>Brilliant Diamond / Shining Pearl</strong> are fetched.
-          IDs outside the BDSP pokedex are skipped.
+          Only Pokemon and moves available in <strong>{gameLabel}</strong> are fetched.
+          IDs outside that game's pokedex are skipped.
         </p>
+
+        <div style={{ marginBottom: '1rem' }}>
+          <span style={{
+            fontSize: '0.78rem', fontWeight: 700, textTransform: 'uppercase',
+            letterSpacing: '0.05em', color: 'var(--text-muted)', display: 'block', marginBottom: '0.4rem',
+          }}>
+            Game
+          </span>
+          <select
+            value={game}
+            onChange={e => changeGame(e.target.value as GameVersion)}
+            disabled={loading}
+            style={{ padding: '0.4rem 0.6rem', fontSize: '0.9rem' }}
+          >
+            {GAME_VERSIONS.map(g => (
+              <option key={g.id} value={g.id}>{g.label}</option>
+            ))}
+          </select>
+          <p style={{ fontSize: '0.75rem', color: 'var(--text-muted)', marginTop: '0.4rem' }}>
+            Applies when loading new Pokemon. Already-loaded Pokemon keep their previously fetched moves.
+          </p>
+        </div>
 
         {loadedRange.ids.length > 0 ? (
           <p style={{ color: 'var(--text-muted)', marginBottom: '1rem' }}>
