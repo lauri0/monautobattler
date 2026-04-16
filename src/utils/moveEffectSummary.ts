@@ -55,5 +55,13 @@ export function effectSummary(move: Move): string {
     parts.push(chance === 0 ? 'confuse' : `${chance}% confuse`);
   }
 
+  if (eff.doublePowerIfHit) {
+    parts.push('2× if hit');
+  }
+
+  if (eff.doublePowerIfTargetStatus) {
+    parts.push('2× vs status');
+  }
+
   return parts.join(' · ');
 }

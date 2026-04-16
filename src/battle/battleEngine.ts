@@ -2,14 +2,46 @@ import type { BattlePokemon, Move, TurnEvent, BattleResult, StatStageName, StatS
 import { calcDamage, calcExpectedDamage, effectiveSpeed } from './damageCalc';
 import { defaultAI } from '../ai/aiModule';
 
+export const STRUGGLE: Move = {
+  id: -1,
+  name: 'struggle',
+  type: 'normal',
+  power: 50,
+  accuracy: 100,
+  pp: 1,
+  damageClass: 'physical',
+  priority: 0,
+  effect: { drain: -25 },
+};
+
 /**
  * Returns the moves the pokemon can actually use on `turnNumber`. Currently
  * just filters out firstTurnOnly moves (e.g. Fake Out) on turn > 1, but kept
  * as a helper so future turn-gated mechanics have one place to extend.
+ * Falls back to Struggle when no moves are available.
  */
 export function usableMoves(p: BattlePokemon, turnNumber: number): Move[] {
-  if (turnNumber <= 1) return p.moves;
-  return p.moves.filter(m => !m.effect?.firstTurnOnly);
+  const moves = turnNumber <= 1 ? p.moves : p.moves.filter(m => !m.effect?.firstTurnOnly);
+  return moves.length > 0 ? moves : [STRUGGLE];
+}
+
+/**
+ * Returns a possibly-modified copy of `move` whose base power reflects
+ * context-dependent multipliers (Revenge, Hex, ...). The original object is
+ * returned unchanged when no multiplier applies.
+ */
+function effectivePowerMove(
+  move: Move,
+  defender: BattlePokemon,
+  foeHitUserThisTurn: boolean,
+): Move {
+  const eff = move.effect;
+  if (!eff) return move;
+  let multiplier = 1;
+  if (eff.doublePowerIfHit && foeHitUserThisTurn) multiplier *= 2;
+  if (eff.doublePowerIfTargetStatus && defender.statusCondition) multiplier *= 2;
+  if (multiplier === 1) return move;
+  return { ...move, power: move.power * multiplier };
 }
 
 function clampStage(v: number): number {
@@ -114,6 +146,19 @@ function canAct(
   return { canAct: true, updated: p };
 }
 
+// Type-based immunity to major ailments (approximates real Pokemon rules).
+// Sleep has no type immunity; confusion also has none.
+function isImmuneToAilment(defender: BattlePokemon, ailment: import('../models/types').StatusCondition): boolean {
+  const types = defender.data.types;
+  switch (ailment) {
+    case 'burn':      return types.includes('fire');
+    case 'poison':    return types.includes('poison') || types.includes('steel');
+    case 'paralysis': return types.includes('electric');
+    case 'freeze':    return types.includes('ice');
+    default:          return false;
+  }
+}
+
 function applySecondaryEffects(
   attacker: BattlePokemon,
   defender: BattlePokemon,
@@ -156,7 +201,7 @@ function applySecondaryEffects(
   }
 
   // Primary ailment
-  if (eff.ailment && !defender.statusCondition) {
+  if (eff.ailment && !defender.statusCondition && !isImmuneToAilment(defender, eff.ailment)) {
     const chance = eff.ailmentChance ?? 0;
     if (chance === 0 || Math.random() * 100 < chance) {
       events.push({ kind: 'status_applied', turn, pokemonName: defender.data.name, condition: eff.ailment });
@@ -249,7 +294,7 @@ export function simulateTurnDeterministic(
   move2: Move,
   turnNumber: number,
   outcome: ChanceOutcome,
-): { p1After: BattlePokemon; p2After: BattlePokemon; battleOver: boolean } {
+): { p1After: BattlePokemon; p2After: BattlePokemon; battleOver: boolean; lastAttackerIsP1?: boolean } {
   // Filter firstTurnOnly moves on turn > 1
   const m1 = turnNumber > 1 && move1.effect?.firstTurnOnly ? null : move1;
   const m2 = turnNumber > 1 && move2.effect?.firstTurnOnly ? null : move2;
@@ -298,16 +343,20 @@ export function simulateTurnDeterministic(
     move: Move | null,
     hit: boolean,
     effects: { statChange: boolean; ailment: boolean; flinch: boolean; confusion: boolean },
-  ): { attacker: BattlePokemon; defender: BattlePokemon; flinched: boolean } {
-    if (!move || !move.power) return { attacker, defender, flinched: false };
+    foeHitUserThisTurn: boolean,
+  ): { attacker: BattlePokemon; defender: BattlePokemon; flinched: boolean; dealtDamage: boolean } {
+    if (!move || !move.power) return { attacker, defender, flinched: false, dealtDamage: false };
     const fraction = actionFraction(attacker);
-    if (fraction === 0) return { attacker, defender, flinched: false };
+    if (fraction === 0) return { attacker, defender, flinched: false, dealtDamage: false };
 
     let flinched = false;
+    let dealtDamage = false;
 
     if (hit) {
-      const rawDmg = expectedDamageWithCrit(attacker, defender, move);
+      const effectiveMove = effectivePowerMove(move, defender, foeHitUserThisTurn);
+      const rawDmg = expectedDamageWithCrit(attacker, defender, effectiveMove);
       const dmg = Math.max(1, Math.floor(rawDmg * fraction));
+      dealtDamage = dmg > 0;
 
       // Drain / recoil (deterministic)
       let defHp = Math.max(0, defender.currentHp - dmg);
@@ -328,7 +377,7 @@ export function simulateTurnDeterministic(
         attacker = result.attacker;
         defender = result.defender;
       }
-      if (effects.ailment && move.effect?.ailment && !defender.statusCondition) {
+      if (effects.ailment && move.effect?.ailment && !defender.statusCondition && !isImmuneToAilment(defender, move.effect.ailment)) {
         defender = { ...defender, statusCondition: move.effect.ailment };
       }
       if (effects.flinch && move.effect?.flinchChance) {
@@ -339,25 +388,37 @@ export function simulateTurnDeterministic(
       }
     }
 
-    return { attacker, defender, flinched };
+    return { attacker, defender, flinched, dealtDamage };
   }
 
+  // Track who last attacked (needed when both faint from recoil)
+  let lastAttackerIsP1: boolean | undefined;
+
   // First attacker
+  let firstDealtDamage = false;
   {
-    const r = applyMove(a, d, firstMove, firstHit, firstEffects);
+    // First attacker never has a "hit earlier this turn" bonus available.
+    const r = applyMove(a, d, firstMove, firstHit, firstEffects, false);
     a = r.attacker; d = r.defender; secondFlinched = r.flinched;
+    firstDealtDamage = r.dealtDamage;
     if (isP1First) { p1 = a; p2 = d; } else { p2 = a; p1 = d; }
-    if (p1.currentHp <= 0 || p2.currentHp <= 0) battleOver = true;
+    if (p1.currentHp <= 0 || p2.currentHp <= 0) {
+      battleOver = true;
+      lastAttackerIsP1 = isP1First;
+    }
   }
 
   // Second attacker
   if (!battleOver && !secondFlinched) {
     let a2 = isP1First ? p2 : p1;
     let d2 = isP1First ? p1 : p2;
-    const r = applyMove(a2, d2, secondMove, secondHit, secondEffects);
+    const r = applyMove(a2, d2, secondMove, secondHit, secondEffects, firstDealtDamage);
     a2 = r.attacker; d2 = r.defender;
     if (isP1First) { p1 = d2; p2 = a2; } else { p2 = d2; p1 = a2; }
-    if (p1.currentHp <= 0 || p2.currentHp <= 0) battleOver = true;
+    if (p1.currentHp <= 0 || p2.currentHp <= 0) {
+      battleOver = true;
+      lastAttackerIsP1 = !isP1First;
+    }
   }
 
   // End-of-turn burn/poison ticks (deterministic)
@@ -373,7 +434,7 @@ export function simulateTurnDeterministic(
     if (p1.currentHp <= 0 || p2.currentHp <= 0) battleOver = true;
   }
 
-  return { p1After: p1, p2After: p2, battleOver };
+  return { p1After: p1, p2After: p2, battleOver, lastAttackerIsP1 };
 }
 
 export function resolveTurn(
@@ -382,7 +443,7 @@ export function resolveTurn(
   turnNumber: number,
   ai1: AIStrategy = defaultAI,
   ai2: AIStrategy = defaultAI,
-): { events: TurnEvent[]; p1After: BattlePokemon; p2After: BattlePokemon; battleOver: boolean } {
+): { events: TurnEvent[]; p1After: BattlePokemon; p2After: BattlePokemon; battleOver: boolean; lastAttackerIsP1?: boolean } {
   const move1 = ai1.selectMove(
     { ...pokemon1, moves: usableMoves(pokemon1, turnNumber) },
     pokemon2,
@@ -426,7 +487,9 @@ export function resolveTurn(
   let p1 = { ...pokemon1 };
   let p2 = { ...pokemon2 };
   let battleOver = false;
+  let lastAttackerIsP1: boolean | undefined;
   let secondFlinched = false;
+  let secondWasHitThisTurn = false; // tracks if first attacker damaged the second (for Revenge)
 
   // ── First attacker ──────────────────────────────────────────────
   {
@@ -442,7 +505,10 @@ export function resolveTurn(
       attacker = attackerChecked;
 
       if (acts) {
-        const result = calcDamage(attacker, defender, firstMove);
+        // First attacker: Revenge bonus never applies (no prior hit this turn);
+        // Hex bonus applies if the target already has a status (carried over).
+        const effMove = effectivePowerMove(firstMove, defender, false);
+        const result = calcDamage(attacker, defender, effMove);
         const newDefHp = Math.max(0, defender.currentHp - result.damage);
         defender = { ...defender, currentHp: newDefHp };
 
@@ -456,6 +522,7 @@ export function resolveTurn(
         });
 
         if (!result.missed && result.effectiveness !== 0) {
+          if (result.damage > 0) secondWasHitThisTurn = true;
           const eff = applySecondaryEffects(attacker, defender, firstMove, result.damage, turnNumber, events);
           attacker = eff.attacker;
           defender = eff.defender;
@@ -467,7 +534,10 @@ export function resolveTurn(
     if (firstIsP1) { p1 = attacker; p2 = defender; }
     else            { p2 = attacker; p1 = defender; }
 
-    if (p1.currentHp <= 0 || p2.currentHp <= 0) battleOver = true;
+    if (p1.currentHp <= 0 || p2.currentHp <= 0) {
+      battleOver = true;
+      lastAttackerIsP1 = firstIsP1;
+    }
   }
 
   // ── Second attacker ─────────────────────────────────────────────
@@ -485,7 +555,8 @@ export function resolveTurn(
       attacker = attackerChecked;
 
       if (acts) {
-        const result = calcDamage(attacker, defender, secondMove);
+        const effectiveMove = effectivePowerMove(secondMove, defender, secondWasHitThisTurn);
+        const result = calcDamage(attacker, defender, effectiveMove);
         const newDefHp = Math.max(0, defender.currentHp - result.damage);
         defender = { ...defender, currentHp: newDefHp };
 
@@ -510,7 +581,10 @@ export function resolveTurn(
     if (secondIsP1) { p1 = attacker; p2 = defender; }
     else             { p2 = attacker; p1 = defender; }
 
-    if (p1.currentHp <= 0 || p2.currentHp <= 0) battleOver = true;
+    if (p1.currentHp <= 0 || p2.currentHp <= 0) {
+      battleOver = true;
+      lastAttackerIsP1 = secondIsP1;
+    }
   }
 
   // ── End-of-turn: burn / poison ticks ────────────────────────────
@@ -520,7 +594,7 @@ export function resolveTurn(
     if (p1.currentHp <= 0 || p2.currentHp <= 0) battleOver = true;
   }
 
-  return { events, p1After: p1, p2After: p2, battleOver };
+  return { events, p1After: p1, p2After: p2, battleOver, lastAttackerIsP1 };
 }
 
 export function runFullBattle(
@@ -535,16 +609,27 @@ export function runFullBattle(
   let turn = 1;
   const MAX_TURNS = 500;
 
+  let lastAttackerIsP1: boolean | undefined;
   while (p1.currentHp > 0 && p2.currentHp > 0 && turn <= MAX_TURNS) {
-    const { events, p1After, p2After, battleOver } = resolveTurn(p1, p2, turn, ai1, ai2);
-    allEvents.push(...events);
-    p1 = p1After;
-    p2 = p2After;
-    if (battleOver) break;
+    const result = resolveTurn(p1, p2, turn, ai1, ai2);
+    allEvents.push(...result.events);
+    p1 = result.p1After;
+    p2 = result.p2After;
+    lastAttackerIsP1 = result.lastAttackerIsP1;
+    if (result.battleOver) break;
     turn++;
   }
 
-  const winner = p1.currentHp > 0 ? p1 : p2;
-  const loser = p1.currentHp > 0 ? p2 : p1;
+  let winner: BattlePokemon, loser: BattlePokemon;
+  if (p1.currentHp > 0) {
+    winner = p1; loser = p2;
+  } else if (p2.currentHp > 0) {
+    winner = p2; loser = p1;
+  } else {
+    // Both fainted (recoil KO) — the defender wins
+    const defenderIsP1 = lastAttackerIsP1 === false;
+    winner = defenderIsP1 ? p1 : p2;
+    loser = defenderIsP1 ? p2 : p1;
+  }
   return { winner, loser, log: allEvents };
 }

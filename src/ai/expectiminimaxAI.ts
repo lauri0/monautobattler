@@ -19,7 +19,7 @@ function sumStages(p: BattlePokemon): number {
   return Object.values(p.statStages).reduce((s, v) => s + v, 0);
 }
 
-function scoreLeaf(aiP: BattlePokemon, oppP: BattlePokemon): number {
+function scoreLeaf(aiP: BattlePokemon, oppP: BattlePokemon, aiWasLastAttacker?: boolean): number {
   // Always return a smooth score that reflects HP differential, even at terminal
   // states. Using a hard ±1 for faint creates large "flat" regions where the AI
   // sees every move as an equivalent loss (e.g. when it's going to be KO'd in
@@ -28,7 +28,11 @@ function scoreLeaf(aiP: BattlePokemon, oppP: BattlePokemon): number {
   // "losing less badly" — i.e. dealing more damage before fainting.
   const aiHpFrac = Math.max(0, aiP.currentHp) / aiP.level50Stats.hp;
   const oppHpFrac = Math.max(0, oppP.currentHp) / oppP.level50Stats.hp;
-  const faintTerm = (oppP.currentHp <= 0 ? 1 : 0) - (aiP.currentHp <= 0 ? 1 : 0);
+  let faintTerm = (oppP.currentHp <= 0 ? 1 : 0) - (aiP.currentHp <= 0 ? 1 : 0);
+  // Both fainted (recoil KO): the attacker loses
+  if (aiP.currentHp <= 0 && oppP.currentHp <= 0 && aiWasLastAttacker !== undefined) {
+    faintTerm = aiWasLastAttacker ? -1 : 1;
+  }
   const hpScore = (aiHpFrac - oppHpFrac) * 0.5;
   const stageScore = (sumStages(aiP) - sumStages(oppP)) * 0.02;
   const statusScore =
@@ -168,11 +172,11 @@ function expectiminimax(
       let expectedVal = 0;
 
       for (const outcome of outcomes) {
-        const { p1After, p2After, battleOver } = simulateTurnDeterministic(
+        const { p1After, p2After, battleOver, lastAttackerIsP1 } = simulateTurnDeterministic(
           p1, p2, aiMove, oppMove, turnNumber, outcome,
         );
         const childVal = battleOver
-          ? scoreLeaf(p1After, p2After)
+          ? scoreLeaf(p1After, p2After, lastAttackerIsP1)
           : expectiminimax(p1After, p2After, depth - 1, turnNumber + 1);
         expectedVal += outcome.probability * childVal;
       }
@@ -206,11 +210,11 @@ export class ExpectiminimaxAI implements AIStrategy {
         let expectedVal = 0;
 
         for (const outcome of outcomes) {
-          const { p1After, p2After, battleOver } = simulateTurnDeterministic(
+          const { p1After, p2After, battleOver, lastAttackerIsP1 } = simulateTurnDeterministic(
             attacker, defender, aiMove, oppMove, turnNumber, outcome,
           );
           const childVal = battleOver
-            ? scoreLeaf(p1After, p2After)
+            ? scoreLeaf(p1After, p2After, lastAttackerIsP1)
             : expectiminimax(p1After, p2After, DEPTH - 1, turnNumber + 1);
           expectedVal += outcome.probability * childVal;
         }

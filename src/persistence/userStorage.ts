@@ -174,3 +174,81 @@ export function getAllowedMoveIds(): number[] {
 export function setAllowedMoveIds(ids: number[]): void {
   localStorage.setItem(ALLOWED_MOVES_KEY, JSON.stringify(ids));
 }
+
+// ── Export / Import ──────────────────────────────────────────────────────────
+
+export interface PokedexExport {
+  version: 1;
+  pokemon: Record<number, PokemonPersisted>;
+  allowedMoves: number[];
+}
+
+export function exportPokedexState(): PokedexExport {
+  return {
+    version: 1,
+    pokemon: loadAllStats(),
+    allowedMoves: getAllowedMoveIds(),
+  };
+}
+
+function sanitizePokemon(id: number, raw: unknown): PokemonPersisted {
+  const obj = (typeof raw === 'object' && raw !== null ? raw : {}) as Record<string, unknown>;
+  return {
+    id,
+    elo: typeof obj.elo === 'number' && isFinite(obj.elo) ? obj.elo : 1500,
+    wins: typeof obj.wins === 'number' && obj.wins >= 0 ? Math.floor(obj.wins) : 0,
+    losses: typeof obj.losses === 'number' && obj.losses >= 0 ? Math.floor(obj.losses) : 0,
+    moveset: Array.isArray(obj.moveset)
+      ? obj.moveset.filter((v): v is number => typeof v === 'number' && Number.isInteger(v))
+      : [],
+    disabled: typeof obj.disabled === 'boolean' ? obj.disabled : false,
+  };
+}
+
+export function importPokedexState(raw: unknown): { pokemonCount: number; warnings: string[] } {
+  const warnings: string[] = [];
+  const data = (typeof raw === 'object' && raw !== null ? raw : {}) as Record<string, unknown>;
+
+  // Accept any version or missing version — best-effort
+  if (data.version !== undefined && data.version !== 1) {
+    warnings.push(`Unknown export version (${data.version}), importing best-effort.`);
+  }
+
+  // Pokemon data
+  const pokemonRaw = data.pokemon;
+  const sanitized: Record<number, PokemonPersisted> = {};
+  let pokemonCount = 0;
+
+  if (typeof pokemonRaw === 'object' && pokemonRaw !== null && !Array.isArray(pokemonRaw)) {
+    for (const [key, val] of Object.entries(pokemonRaw as Record<string, unknown>)) {
+      const id = Number(key);
+      if (!Number.isInteger(id) || id < 1) {
+        warnings.push(`Skipped invalid pokemon ID: ${key}`);
+        continue;
+      }
+      sanitized[id] = sanitizePokemon(id, val);
+      pokemonCount++;
+    }
+  } else if (pokemonRaw !== undefined) {
+    warnings.push('Pokemon data missing or malformed — skipped.');
+  }
+
+  if (pokemonCount > 0) {
+    saveAllStats(sanitized);
+  }
+
+  // Allowed moves
+  if (Array.isArray(data.allowedMoves)) {
+    const validIds = data.allowedMoves.filter(
+      (v): v is number => typeof v === 'number' && Number.isInteger(v) && v > 0,
+    );
+    if (validIds.length !== data.allowedMoves.length) {
+      warnings.push(`Filtered out ${data.allowedMoves.length - validIds.length} invalid allowed move IDs.`);
+    }
+    setAllowedMoveIds(validIds);
+  } else if (data.allowedMoves !== undefined) {
+    warnings.push('Allowed moves data malformed — skipped.');
+  }
+
+  return { pokemonCount, warnings };
+}

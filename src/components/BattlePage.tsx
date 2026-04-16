@@ -67,7 +67,7 @@ export default function BattlePage({ allPokemon, onBack }: Props) {
 
   function nextTurn() {
     if (!p1 || !p2 || battleOver) return;
-    const { events, p1After, p2After, battleOver: over } = resolveTurn(p1, p2, turn, expectiminimaxAI, expectiminimaxAI);
+    const { events, p1After, p2After, battleOver: over, lastAttackerIsP1 } = resolveTurn(p1, p2, turn, expectiminimaxAI, expectiminimaxAI);
     setLog(prev => [...prev, ...events]);
     setP1(p1After);
     setP2(p2After);
@@ -75,9 +75,17 @@ export default function BattlePage({ allPokemon, onBack }: Props) {
     if (over) {
       setBattleOver(true);
       setPhase('end');
-      // Determine winner/loser and update ELO
-      const winner = p1After.currentHp > 0 ? p1After : p2After;
-      const loser = p1After.currentHp > 0 ? p2After : p1After;
+      // Determine winner/loser — if both fainted (recoil), defender wins
+      let winner: typeof p1After, loser: typeof p1After;
+      if (p1After.currentHp > 0) {
+        winner = p1After; loser = p2After;
+      } else if (p2After.currentHp > 0) {
+        winner = p2After; loser = p1After;
+      } else {
+        const defenderIsP1 = lastAttackerIsP1 === false;
+        winner = defenderIsP1 ? p1After : p2After;
+        loser = defenderIsP1 ? p2After : p1After;
+      }
       const wP = getPokemonPersisted(winner.data.id);
       const lP = getPokemonPersisted(loser.data.id);
       const { newWinnerElo, newLoserElo } = applyEloResult(wP.elo, lP.elo);
@@ -183,7 +191,16 @@ export default function BattlePage({ allPokemon, onBack }: Props) {
   );
 }
 
+const STATUS_STYLES: Record<string, { label: string; bg: string }> = {
+  burn:      { label: 'BRN', bg: '#e94560' },
+  poison:    { label: 'PSN', bg: '#a64dff' },
+  paralysis: { label: 'PAR', bg: '#f1c40f' },
+  sleep:     { label: 'SLP', bg: '#6c7a89' },
+  freeze:    { label: 'FRZ', bg: '#4fc3f7' },
+};
+
 function BattlerPanel({ pokemon }: { pokemon: BattlePokemon }) {
+  const status = pokemon.statusCondition ? STATUS_STYLES[pokemon.statusCondition] : null;
   return (
     <div className="battler-panel card">
       <img src={pokemon.data.spriteUrl} alt={pokemon.data.name} className="battler-sprite" />
@@ -191,6 +208,16 @@ function BattlerPanel({ pokemon }: { pokemon: BattlePokemon }) {
       <div style={{ display: 'flex', gap: 4, justifyContent: 'center', marginBottom: 8 }}>
         {pokemon.data.types.map(t => <TypeBadge key={t} type={t} />)}
       </div>
+      {(status || pokemon.confused) && (
+        <div className="battler-ailments">
+          {status && (
+            <span className="ailment-badge" style={{ background: status.bg }}>{status.label}</span>
+          )}
+          {pokemon.confused && (
+            <span className="ailment-badge" style={{ background: '#d68910' }}>CNF</span>
+          )}
+        </div>
+      )}
       <HpBar current={pokemon.currentHp} max={pokemon.level50Stats.hp} />
       <div className="battler-moves">
         {pokemon.moves.map(m => (

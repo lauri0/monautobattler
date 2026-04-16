@@ -105,6 +105,16 @@ async function fetchMoveData(moveUrl: string): Promise<Move | null> {
       effect = { ...effect, firstTurnOnly: true };
     }
 
+    // Revenge / Avalanche: double base power if user was hit by the target earlier this turn
+    if (data.name === 'revenge' || data.name === 'avalanche') {
+      effect = { ...effect, doublePowerIfHit: true };
+    }
+
+    // Hex: doubles base power if the target has a major status condition
+    if (data.name === 'hex') {
+      effect = { ...effect, doublePowerIfTargetStatus: true };
+    }
+
     return {
       id: data.id,
       name: data.name,

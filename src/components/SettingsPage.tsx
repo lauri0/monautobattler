@@ -10,6 +10,8 @@ import {
   getSelectedGame,
   setSelectedGame,
   GAME_VERSIONS,
+  exportPokedexState,
+  importPokedexState,
   type MoveLearnSettings,
   type GameVersion,
 } from '../persistence/userStorage';
@@ -94,6 +96,47 @@ export default function SettingsPage({ onBack, onDataLoaded }: Props) {
     if (!confirm('Reset all ELO and win/loss records to default? Movesets are kept.')) return;
     resetAllStats();
     alert('Stats reset.');
+  }
+
+  function handleExport() {
+    const data = exportPokedexState();
+    const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = 'pokedex-export.json';
+    a.click();
+    URL.revokeObjectURL(url);
+  }
+
+  function handleImport() {
+    const input = document.createElement('input');
+    input.type = 'file';
+    input.accept = '.json';
+    input.onchange = () => {
+      const file = input.files?.[0];
+      if (!file) return;
+      const reader = new FileReader();
+      reader.onload = () => {
+        try {
+          const parsed = JSON.parse(reader.result as string);
+          if (typeof parsed !== 'object' || parsed === null) {
+            alert('Invalid file: not a JSON object.');
+            return;
+          }
+          if (!confirm('This will overwrite your current pokedex state (movesets, disabled flags, allowed moves). Continue?')) return;
+          const { pokemonCount, warnings } = importPokedexState(parsed);
+          onDataLoaded();
+          const parts = [`Imported ${pokemonCount} Pokemon.`];
+          if (warnings.length > 0) parts.push('\nWarnings:\n' + warnings.join('\n'));
+          alert(parts.join(''));
+        } catch {
+          alert('Failed to parse file. Make sure it is valid JSON.');
+        }
+      };
+      reader.readAsText(file);
+    };
+    input.click();
   }
 
   return (
@@ -223,6 +266,17 @@ export default function SettingsPage({ onBack, onDataLoaded }: Props) {
           <p style={{ fontSize: '0.8rem', color: 'var(--text-muted)', marginTop: '0.4rem' }}>
             Clears all cached data. You'll need to re-download.
           </p>
+        </div>
+      </div>
+
+      <div className="card" style={{ marginBottom: '1.5rem' }}>
+        <h2 style={{ marginBottom: '0.75rem', color: 'var(--text)' }}>Export / Import</h2>
+        <p style={{ color: 'var(--text-muted)', marginBottom: '1rem', fontSize: '0.9rem' }}>
+          Export your pokedex configuration (movesets, disabled flags, ELO, allowed moves) to a file, or import from a previously exported file.
+        </p>
+        <div style={{ display: 'flex', gap: '1rem', flexWrap: 'wrap' }}>
+          <button className="btn-primary" onClick={handleExport}>Export to File</button>
+          <button className="btn-primary" onClick={handleImport}>Import from File</button>
         </div>
       </div>
 

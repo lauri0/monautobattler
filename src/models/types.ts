@@ -26,6 +26,8 @@ export interface MoveEffect {
   confuses?: boolean;       // true if move can confuse the target
   confusionChance?: number; // 1–100 percentage chance; 0 = always
   firstTurnOnly?: boolean;  // move fails if not the first turn (Fake Out)
+  doublePowerIfHit?: boolean; // doubles base power if user took damage from foe earlier this turn (Revenge)
+  doublePowerIfTargetStatus?: boolean; // doubles base power if target has a major status condition (Hex)
 }
 
 export interface StatStages {
@@ -80,7 +82,7 @@ export interface PokemonPersisted {
   elo: number;
   wins: number;
   losses: number;
-  moveset: number[]; // 4 move IDs
+  moveset: number[]; // 3 move IDs
   disabled: boolean;
 }
 

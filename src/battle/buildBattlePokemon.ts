@@ -7,31 +7,24 @@ export function buildBattlePokemon(pokemonData: PokemonData): BattlePokemon {
   const level50Stats = calcLevel50Stats(pokemonData.baseStats);
   const allowedIds = getAllowedMoveIds();
 
-  // Resolve moveset: use persisted IDs filtered to allowed moves, fall back to top 4 allowed by power
+  // Resolve moveset: use persisted IDs filtered to allowed moves, fall back to top 3 allowed by power
   const moveMap = new Map(pokemonData.availableMoves.map(m => [m.id, m]));
   let moves = persisted.moveset
     .map(id => moveMap.get(id))
     .filter(m => m && allowedIds.includes(m.id)) as typeof pokemonData.availableMoves;
 
-  if (moves.length < 4) {
+  if (moves.length < 3) {
     const used = new Set(moves.map(m => m.id));
     const sorted = [...pokemonData.availableMoves]
       .filter(m => allowedIds.includes(m.id))
       .sort((a, b) => b.power - a.power);
     for (const m of sorted) {
-      if (moves.length >= 4) break;
+      if (moves.length >= 3) break;
       if (!used.has(m.id)) moves.push(m);
     }
   }
 
-  // Last-resort fallback: if the allowed-move filter leaves this Pokemon with
-  // no moves at all, ignore the ban for this Pokemon so battles can still run.
-  // (Better to fight with a "banned" move than to crash the battle engine,
-  // which assumes a non-empty moveset.)
-  if (moves.length === 0 && pokemonData.availableMoves.length > 0) {
-    const sorted = [...pokemonData.availableMoves].sort((a, b) => b.power - a.power);
-    moves = sorted.slice(0, 4);
-  }
+  // If no allowed moves remain, the battle engine falls back to Struggle via usableMoves()
 
   return {
     data: pokemonData,

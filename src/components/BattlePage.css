@@ -68,6 +68,23 @@
   text-transform: capitalize;
 }
 
+.battler-ailments {
+  display: flex;
+  gap: 4px;
+  justify-content: center;
+  margin-bottom: 6px;
+}
+
+.ailment-badge {
+  font-size: 0.7rem;
+  font-weight: 800;
+  letter-spacing: 0.05em;
+  color: #fff;
+  padding: 0.15rem 0.5rem;
+  border-radius: 4px;
+  text-shadow: 0 1px 1px rgba(0,0,0,0.4);
+}
+
 .battler-moves {
   display: flex;
   flex-wrap: wrap;

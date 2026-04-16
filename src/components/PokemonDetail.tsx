@@ -25,20 +25,25 @@ export default function PokemonDetail({ pokemon, onBack }: Props) {
   const allowedIds = getAllowedMoveIds();
 
   const [moveset, setMoveset] = useState<number[]>(() => {
-    const stored = persisted.moveset.length === 4
+    const stored = persisted.moveset.length === 3
       ? persisted.moveset
-      : pokemon.availableMoves.slice(0, 4).map(m => m.id);
+      : pokemon.availableMoves.slice(0, 3).map(m => m.id);
     // Keep only allowed moves; fill remaining slots from allowed list
     const valid = stored.filter(id => allowedIds.includes(id));
-    if (valid.length < 4) {
+    if (valid.length < 3) {
       const used = new Set(valid);
       for (const m of pokemon.availableMoves) {
-        if (valid.length >= 4) break;
+        if (valid.length >= 3) break;
         if (allowedIds.includes(m.id) && !used.has(m.id)) {
           valid.push(m.id);
           used.add(m.id);
         }
       }
+    }
+    // If still under 3 (fewer unique allowed moves than slots), fill with first allowed move
+    const firstAllowed = pokemon.availableMoves.find(m => allowedIds.includes(m.id));
+    while (valid.length < 3 && firstAllowed) {
+      valid.push(firstAllowed.id);
     }
     return valid;
   });
@@ -123,7 +128,7 @@ export default function PokemonDetail({ pokemon, onBack }: Props) {
                         <div className="stat-bar-bg">
                           <div className="stat-bar-fill" style={{
                             width: `${pct}%`,
-                            background: pct > 66 ? '#27ae60' : pct > 33 ? '#f39c12' : '#e74c3c'
+                            background: pct > 70 ? '#8b00ff' : pct > 60 ? '#0055ff' : pct > 50 ? '#00bcd4' : pct > 40 ? '#27ae60' : pct > 30 ? '#f1c40f' : pct > 20 ? '#FD7D12' : '#e74c3c'
                           }} />
                         </div>
                       </td>
@@ -180,7 +185,7 @@ export default function PokemonDetail({ pokemon, onBack }: Props) {
           <div className="card" style={{ marginBottom: '1rem' }}>
             <h3 className="section-title">Moveset</h3>
             <div className="moveset-slots">
-              {[0, 1, 2, 3].map(slot => {
+              {[0, 1, 2].map(slot => {
                 const selectedMove = moveMap.get(moveset[slot]);
                 return (
                   <div key={slot} className="move-slot">
