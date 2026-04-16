@@ -29,9 +29,9 @@ function scoreLeaf(aiP: BattlePokemon, oppP: BattlePokemon, aiWasLastAttacker?: 
   const aiHpFrac = Math.max(0, aiP.currentHp) / aiP.level50Stats.hp;
   const oppHpFrac = Math.max(0, oppP.currentHp) / oppP.level50Stats.hp;
   let faintTerm = (oppP.currentHp <= 0 ? 1 : 0) - (aiP.currentHp <= 0 ? 1 : 0);
-  // Both fainted (recoil KO): the attacker loses
+  // Both fainted (recoil KO): the attacker wins
   if (aiP.currentHp <= 0 && oppP.currentHp <= 0 && aiWasLastAttacker !== undefined) {
-    faintTerm = aiWasLastAttacker ? -1 : 1;
+    faintTerm = aiWasLastAttacker ? 1 : -1;
   }
   const hpScore = (aiHpFrac - oppHpFrac) * 0.5;
   const stageScore = (sumStages(aiP) - sumStages(oppP)) * 0.02;

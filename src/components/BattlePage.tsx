@@ -82,9 +82,9 @@ export default function BattlePage({ allPokemon, onBack }: Props) {
       } else if (p2After.currentHp > 0) {
         winner = p2After; loser = p1After;
       } else {
-        const defenderIsP1 = lastAttackerIsP1 === false;
-        winner = defenderIsP1 ? p1After : p2After;
-        loser = defenderIsP1 ? p2After : p1After;
+        const attackerIsP1 = lastAttackerIsP1 === true;
+        winner = attackerIsP1 ? p1After : p2After;
+        loser = attackerIsP1 ? p2After : p1After;
       }
       const wP = getPokemonPersisted(winner.data.id);
       const lP = getPokemonPersisted(loser.data.id);

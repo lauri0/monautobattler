@@ -626,10 +626,10 @@ export function runFullBattle(
   } else if (p2.currentHp > 0) {
     winner = p2; loser = p1;
   } else {
-    // Both fainted (recoil KO) — the defender wins
-    const defenderIsP1 = lastAttackerIsP1 === false;
-    winner = defenderIsP1 ? p1 : p2;
-    loser = defenderIsP1 ? p2 : p1;
+    // Both fainted (recoil KO) — the attacker wins
+    const attackerIsP1 = lastAttackerIsP1 === true;
+    winner = attackerIsP1 ? p1 : p2;
+    loser = attackerIsP1 ? p2 : p1;
   }
   return { winner, loser, log: allEvents };
 }
