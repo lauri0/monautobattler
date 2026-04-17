@@ -60,6 +60,8 @@ export default function PokedexPage({ allPokemon, onSelectPokemon, onBack }: Pro
         </div>
       </div>
 
+      <p className="pokedex-count">Showing {filtered.length} of {allPokemon.length} Pokemon</p>
+
       <div className="pokedex-grid">
         {filtered.map(p => {
           const persisted = getPokemonPersisted(p.id);

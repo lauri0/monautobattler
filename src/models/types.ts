@@ -28,6 +28,7 @@ export interface MoveEffect {
   firstTurnOnly?: boolean;  // move fails if not the first turn (Fake Out)
   doublePowerIfHit?: boolean; // doubles base power if user took damage from foe earlier this turn (Revenge)
   doublePowerIfTargetStatus?: boolean; // doubles base power if target has a major status condition (Hex)
+  superEffectiveAgainst?: TypeName[];  // extra types this move is super effective against (Freeze-Dry vs Water)
 }
 
 export interface StatStages {

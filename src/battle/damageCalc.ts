@@ -33,7 +33,7 @@ export function calcDamage(
     }
   }
 
-  const effectiveness = getTypeEffectiveness(move.type, defender.data.types);
+  const effectiveness = getTypeEffectiveness(move.type, defender.data.types, move.effect?.superEffectiveAgainst);
   if (effectiveness === 0) {
     return { damage: 0, isCrit: false, missed: false, effectiveness: 0 };
   }
@@ -74,7 +74,7 @@ export function calcMinDamage(
   defender: BattlePokemon,
   move: Move
 ): number {
-  const effectiveness = getTypeEffectiveness(move.type, defender.data.types);
+  const effectiveness = getTypeEffectiveness(move.type, defender.data.types, move.effect?.superEffectiveAgainst);
   if (effectiveness === 0) return 0;
 
   let A: number;
@@ -99,7 +99,7 @@ export function calcExpectedDamage(
   defender: BattlePokemon,
   move: Move
 ): number {
-  const effectiveness = getTypeEffectiveness(move.type, defender.data.types);
+  const effectiveness = getTypeEffectiveness(move.type, defender.data.types, move.effect?.superEffectiveAgainst);
   if (effectiveness === 0) return 0;
 
   let A: number;

@@ -63,5 +63,9 @@ export function effectSummary(move: Move): string {
     parts.push('2× vs status');
   }
 
+  if (eff.superEffectiveAgainst?.length) {
+    parts.push(`SE vs ${eff.superEffectiveAgainst.join('/')}`);
+  }
+
   return parts.join(' · ');
 }

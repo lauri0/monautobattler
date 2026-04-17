@@ -19,9 +19,9 @@ type Phase = 'select' | 'battle' | 'end';
 
 function effectivenessText(e: number): string {
   if (e === 0) return "It had no effect!";
-  if (e >= 4) return "It's super effective!! (×4)";
+  if (e >= 4) return "It's extremely effective!";
   if (e >= 2) return "It's super effective!";
-  if (e <= 0.25) return "It's not very effective... (×0.25)";
+  if (e <= 0.25) return "It's mostly ineffective...";
   if (e < 1) return "It's not very effective...";
   return '';
 }

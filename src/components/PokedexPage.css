@@ -1,3 +1,9 @@
+.pokedex-count {
+  color: var(--text-muted);
+  font-size: 0.85rem;
+  margin: 0 0 0.75rem;
+}
+
 .pokedex-filters {
   display: flex;
   flex-direction: column;

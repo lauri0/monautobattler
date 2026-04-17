@@ -1,3 +1,36 @@
+.detail-nav {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 0.75rem;
+}
+
+.detail-nav-arrows {
+  display: flex;
+  gap: 0.5rem;
+}
+
+.nav-btn {
+  background: var(--surface2);
+  color: var(--text);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 0.4rem 0.75rem;
+  font-size: 0.82rem;
+  font-weight: 600;
+  cursor: pointer;
+  text-transform: capitalize;
+  transition: background 0.15s;
+}
+.nav-btn:hover:not(:disabled) {
+  background: var(--accent);
+  color: #fff;
+}
+.nav-btn:disabled {
+  opacity: 0.3;
+  cursor: default;
+}
+
 .detail-layout {
   display: grid;
   grid-template-columns: 260px 1fr;

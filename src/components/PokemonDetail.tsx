@@ -9,7 +9,9 @@ import './PokemonDetail.css';
 
 interface Props {
   pokemon: PokemonData;
+  allPokemon: PokemonData[];
   onBack: () => void;
+  onNavigate: (id: number) => void;
 }
 
 const STAT_LABELS: Record<string, string> = {
@@ -20,7 +22,11 @@ const STAT_MAX = 255;
 
 import { effectSummary } from '../utils/moveEffectSummary';
 
-export default function PokemonDetail({ pokemon, onBack }: Props) {
+export default function PokemonDetail({ pokemon, allPokemon, onBack, onNavigate }: Props) {
+  const sorted = [...allPokemon].sort((a, b) => a.id - b.id);
+  const idx = sorted.findIndex(p => p.id === pokemon.id);
+  const prevPokemon = idx > 0 ? sorted[idx - 1] : null;
+  const nextPokemon = idx < sorted.length - 1 ? sorted[idx + 1] : null;
   const persisted = getPokemonPersisted(pokemon.id);
   const allowedIds = getAllowedMoveIds();
 
@@ -73,7 +79,25 @@ export default function PokemonDetail({ pokemon, onBack }: Props) {
 
   return (
     <div className="page">
-      <button className="back-btn" onClick={onBack}>← Back</button>
+      <div className="detail-nav">
+        <button className="back-btn" onClick={onBack}>← Back</button>
+        <div className="detail-nav-arrows">
+          <button
+            className="nav-btn"
+            disabled={!prevPokemon}
+            onClick={() => prevPokemon && onNavigate(prevPokemon.id)}
+          >
+            ← {prevPokemon?.name ?? ''}
+          </button>
+          <button
+            className="nav-btn"
+            disabled={!nextPokemon}
+            onClick={() => nextPokemon && onNavigate(nextPokemon.id)}
+          >
+            {nextPokemon?.name ?? ''} →
+          </button>
+        </div>
+      </div>
 
       <div className="detail-layout">
         {/* Left panel */}

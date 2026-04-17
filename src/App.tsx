@@ -84,8 +84,11 @@ export default function App() {
     if (pokemon) {
       return (
         <PokemonDetail
+          key={pokemon.id}
           pokemon={pokemon}
+          allPokemon={allPokemon}
           onBack={() => setPage('pokedex')}
+          onNavigate={(id) => setSelectedPokemonId(id)}
         />
       );
     }

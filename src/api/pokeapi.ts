@@ -115,6 +115,11 @@ async function fetchMoveData(moveUrl: string): Promise<Move | null> {
       effect = { ...effect, doublePowerIfTargetStatus: true };
     }
 
+    // Freeze-Dry: super effective against Water in addition to normal Ice effectiveness
+    if (data.name === 'freeze-dry') {
+      effect = { ...effect, superEffectiveAgainst: ['water'] };
+    }
+
     return {
       id: data.id,
       name: data.name,
