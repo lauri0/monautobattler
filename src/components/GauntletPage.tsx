@@ -5,6 +5,7 @@ import { runFullBattle } from '../battle/battleEngine';
 import { expectiminimaxAI } from '../ai/expectiminimaxAI';
 import { getPokemonPersisted } from '../persistence/userStorage';
 import TypeBadge from './TypeBadge';
+import { formatPokemonName } from '../utils/formatName';
 import './GauntletPage.css';
 
 interface Props {
@@ -40,7 +41,7 @@ export default function GauntletPage({ allPokemon, onBack }: Props) {
     // Skip opponents (and abort if self) with zero available moves — they
     // can't participate in a battle.
     if (myData.availableMoves.length === 0) {
-      alert(`${myData.name} has no available moves to battle with.`);
+      alert(`${formatPokemonName(myData.name)} has no available moves to battle with.`);
       return;
     }
     const opponents = enabled.filter(
@@ -83,7 +84,7 @@ export default function GauntletPage({ allPokemon, onBack }: Props) {
     }
 
     setResults(records);
-    setResultsHeader({ name: myData.name, battlesPer });
+    setResultsHeader({ name: formatPokemonName(myData.name), battlesPer });
     setRunning(false);
   }
 
@@ -138,7 +139,7 @@ export default function GauntletPage({ allPokemon, onBack }: Props) {
               className="gauntlet-select"
             >
               {enabled.map(p => (
-                <option key={p.id} value={p.id}>#{p.id} {p.name}</option>
+                <option key={p.id} value={p.id}>#{p.id} {formatPokemonName(p.name)}</option>
               ))}
             </select>
             {selectedData && (
@@ -251,7 +252,7 @@ export default function GauntletPage({ allPokemon, onBack }: Props) {
                         <div className="pokemon-cell">
                           <img src={r.spriteUrl} alt={r.name} className="sim-sprite" />
                           <div>
-                            <div className="sim-pokemon-name">{r.name}</div>
+                            <div className="sim-pokemon-name">{formatPokemonName(r.name)}</div>
                             <div style={{ display: 'flex', gap: 3 }}>
                               {r.types.map(t => <TypeBadge key={t} type={t} />)}
                             </div>

@@ -1,5 +1,6 @@
 import { useState, useRef, useEffect } from 'react';
 import type { PokemonData, BattlePokemon, TurnEvent } from '../models/types';
+import { formatPokemonName } from '../utils/formatName';
 import { buildBattlePokemon } from '../battle/buildBattlePokemon';
 import { resolveTurn, runFullBattle } from '../battle/battleEngine';
 import { expectiminimaxAI } from '../ai/expectiminimaxAI';
@@ -71,7 +72,7 @@ export default function TournamentMatchView({ pokemonAData, pokemonBData, matchL
 
       {battleOver && winner && (
         <div className="winner-banner card">
-          <h2 style={{ color: '#f1c40f' }}>{winner.data.name} wins!</h2>
+          <h2 style={{ color: '#f1c40f' }}>{formatPokemonName(winner.data.name)} wins!</h2>
           <div style={{ display: 'flex', gap: '0.75rem', marginTop: '1rem', justifyContent: 'center' }}>
             <button className="btn-primary" onClick={() => onMatchComplete(winnerId!)}>
               Back to Tournament

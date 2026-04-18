@@ -2,6 +2,7 @@ import type { BattlePokemon } from '../models/types';
 import HpBar from './HpBar';
 import TypeBadge from './TypeBadge';
 import { getTypeColor } from '../utils/typeColors';
+import { formatPokemonName } from '../utils/formatName';
 
 const STATUS_STYLES: Record<string, { label: string; bg: string }> = {
   burn:      { label: 'BRN', bg: '#e94560' },
@@ -16,7 +17,7 @@ export default function BattlerPanel({ pokemon }: { pokemon: BattlePokemon }) {
   return (
     <div className="battler-panel card">
       <img src={pokemon.data.spriteUrl} alt={pokemon.data.name} className="battler-sprite" />
-      <div className="battler-name">{pokemon.data.name}</div>
+      <div className="battler-name">{formatPokemonName(pokemon.data.name)}</div>
       <div style={{ display: 'flex', gap: 4, justifyContent: 'center', marginBottom: 8 }}>
         {pokemon.data.types.map(t => <TypeBadge key={t} type={t} />)}
       </div>

@@ -6,6 +6,7 @@ import { expectiminimaxAI } from '../ai/expectiminimaxAI';
 import { applyEloResult } from '../utils/eloCalc';
 import { getPokemonPersisted, setManyPokemonPersisted } from '../persistence/userStorage';
 import TypeBadge from './TypeBadge';
+import { formatPokemonName } from '../utils/formatName';
 import './MassSimPage.css';
 
 interface Props {
@@ -226,7 +227,7 @@ export default function MassSimPage({ allPokemon, onBack }: Props) {
                         <div className="pokemon-cell">
                           <img src={r.spriteUrl} alt={r.name} className="sim-sprite" />
                           <div>
-                            <div className="sim-pokemon-name">{r.name}</div>
+                            <div className="sim-pokemon-name">{formatPokemonName(r.name)}</div>
                             <div style={{ display: 'flex', gap: 3 }}>
                               {r.types.map(t => <TypeBadge key={t} type={t} />)}
                             </div>

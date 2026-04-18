@@ -1,4 +1,5 @@
 import type { KnockoutMatch, TournamentPokemon } from '../models/types';
+import { formatPokemonName } from '../utils/formatName';
 
 interface Props {
   matches: KnockoutMatch[];
@@ -12,7 +13,7 @@ function BracketSlot({ pokemon, isWinner }: { pokemon: TournamentPokemon | null;
   return (
     <div className={`bracket-entry ${isWinner ? 'bracket-winner' : ''}`}>
       <img src={pokemon.spriteUrl} alt={pokemon.name} className="bracket-sprite" />
-      <span>{pokemon.name}</span>
+      <span>{formatPokemonName(pokemon.name)}</span>
     </div>
   );
 }

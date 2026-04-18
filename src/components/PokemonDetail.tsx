@@ -21,6 +21,7 @@ const STAT_LABELS: Record<string, string> = {
 const STAT_MAX = 255;
 
 import { effectSummary } from '../utils/moveEffectSummary';
+import { formatPokemonName } from '../utils/formatName';
 
 export default function PokemonDetail({ pokemon, allPokemon, onBack, onNavigate }: Props) {
   const sorted = [...allPokemon].sort((a, b) => a.id - b.id);
@@ -88,14 +89,14 @@ export default function PokemonDetail({ pokemon, allPokemon, onBack, onNavigate 
             disabled={!prevPokemon}
             onClick={() => prevPokemon && onNavigate(prevPokemon.id)}
           >
-            ← {prevPokemon?.name ?? ''}
+            ← {prevPokemon ? formatPokemonName(prevPokemon.name) : ''}
           </button>
           <button
             className="nav-btn"
             disabled={!nextPokemon}
             onClick={() => nextPokemon && onNavigate(nextPokemon.id)}
           >
-            {nextPokemon?.name ?? ''} →
+            {nextPokemon ? formatPokemonName(nextPokemon.name) : ''} →
           </button>
         </div>
       </div>
@@ -106,7 +107,7 @@ export default function PokemonDetail({ pokemon, allPokemon, onBack, onNavigate 
           <div className="card detail-hero">
             <span className="detail-num">#{String(pokemon.id).padStart(3, '0')}</span>
             <img src={pokemon.spriteUrl} alt={pokemon.name} className="detail-artwork" />
-            <h1 className="detail-name">{pokemon.name}</h1>
+            <h1 className="detail-name">{formatPokemonName(pokemon.name)}</h1>
             <div style={{ display: 'flex', gap: 6, justifyContent: 'center' }}>
               {pokemon.types.map(t => <TypeBadge key={t} type={t} />)}
             </div>

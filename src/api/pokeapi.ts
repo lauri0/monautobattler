@@ -123,6 +123,21 @@ async function fetchMoveData(moveUrl: string): Promise<Move | null> {
       effect = { ...effect, superEffectiveAgainst: ['water'] };
     }
 
+    // Tri Attack: 20% chance to confuse the target
+    if (data.name === 'tri-attack') {
+      effect = { ...effect, confuses: true, confusionChance: 20 };
+    }
+
+    // Foul Play: uses the defender's Attack stat for damage
+    if (data.name === 'foul-play') {
+      effect = { ...effect, useFoeAttack: true };
+    }
+
+    // Outrage / Petal Dance / Thrash: always confuse the user after use
+    if (data.name === 'outrage' || data.name === 'petal-dance' || data.name === 'thrash') {
+      effect = { ...effect, confusesUser: true };
+    }
+
     return {
       id: data.id,
       name: data.name,

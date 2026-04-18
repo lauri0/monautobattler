@@ -6,6 +6,7 @@ import { getPokemonPersisted } from '../persistence/userStorage';
 import TournamentGroupView from './TournamentGroupView';
 import TournamentBracketView from './TournamentBracketView';
 import TournamentMatchView from './TournamentMatchView';
+import { formatPokemonName } from '../utils/formatName';
 import './TournamentPage.css';
 
 interface Props {
@@ -138,7 +139,7 @@ export default function TournamentPage({ allPokemon, onBack }: Props) {
             {tournament.champion && (
               <>
                 <img src={tournament.champion.spriteUrl} alt={tournament.champion.name} className="podium-sprite" />
-                <div className="podium-name">{tournament.champion.name}</div>
+                <div className="podium-name">{formatPokemonName(tournament.champion.name)}</div>
               </>
             )}
           </div>
@@ -147,7 +148,7 @@ export default function TournamentPage({ allPokemon, onBack }: Props) {
             {tournament.runnerUp && (
               <>
                 <img src={tournament.runnerUp.spriteUrl} alt={tournament.runnerUp.name} className="podium-sprite" />
-                <div className="podium-name">{tournament.runnerUp.name}</div>
+                <div className="podium-name">{formatPokemonName(tournament.runnerUp.name)}</div>
               </>
             )}
           </div>
@@ -156,7 +157,7 @@ export default function TournamentPage({ allPokemon, onBack }: Props) {
             {tournament.thirdPlace && (
               <>
                 <img src={tournament.thirdPlace.spriteUrl} alt={tournament.thirdPlace.name} className="podium-sprite" />
-                <div className="podium-name">{tournament.thirdPlace.name}</div>
+                <div className="podium-name">{formatPokemonName(tournament.thirdPlace.name)}</div>
               </>
             )}
           </div>
@@ -196,10 +197,10 @@ export default function TournamentPage({ allPokemon, onBack }: Props) {
               <span className="next-match-label">{label}:</span>
               <div className="next-match-pokemon">
                 <img src={nextPokemonA.spriteUrl} alt={nextPokemonA.name} className="next-match-sprite" />
-                <span>{nextPokemonA.name}</span>
+                <span>{formatPokemonName(nextPokemonA.name)}</span>
                 <span className="next-match-vs">vs</span>
                 <img src={nextPokemonB.spriteUrl} alt={nextPokemonB.name} className="next-match-sprite" />
-                <span>{nextPokemonB.name}</span>
+                <span>{formatPokemonName(nextPokemonB.name)}</span>
               </div>
               <button className="btn-primary" onClick={() => setPhase('battle')}>
                 Start Match

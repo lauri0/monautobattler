@@ -47,8 +47,10 @@ export function calcDamage(
   let D: number;
 
   if (move.damageClass === 'physical') {
-    A = attacker.level50Stats.attack * statStageMult(attacker.statStages.attack);
-    if (attacker.statusCondition === 'burn') A *= 0.5;
+    A = move.effect?.useFoeAttack
+      ? defender.level50Stats.attack * statStageMult(defender.statStages.attack)
+      : attacker.level50Stats.attack * statStageMult(attacker.statStages.attack);
+    if (!move.effect?.useFoeAttack && attacker.statusCondition === 'burn') A *= 0.5;
     D = defender.level50Stats.defense * statStageMult(defender.statStages.defense);
   } else {
     A = attacker.level50Stats.specialAttack * statStageMult(attacker.statStages['special-attack']);
@@ -81,7 +83,9 @@ export function calcMinDamage(
   let D: number;
 
   if (move.damageClass === 'physical') {
-    A = attacker.level50Stats.attack * statStageMult(attacker.statStages.attack);
+    A = move.effect?.useFoeAttack
+      ? defender.level50Stats.attack * statStageMult(defender.statStages.attack)
+      : attacker.level50Stats.attack * statStageMult(attacker.statStages.attack);
     D = defender.level50Stats.defense * statStageMult(defender.statStages.defense);
   } else {
     A = attacker.level50Stats.specialAttack * statStageMult(attacker.statStages['special-attack']);
@@ -106,7 +110,9 @@ export function calcExpectedDamage(
   let D: number;
 
   if (move.damageClass === 'physical') {
-    A = attacker.level50Stats.attack * statStageMult(attacker.statStages.attack);
+    A = move.effect?.useFoeAttack
+      ? defender.level50Stats.attack * statStageMult(defender.statStages.attack)
+      : attacker.level50Stats.attack * statStageMult(attacker.statStages.attack);
     D = defender.level50Stats.defense * statStageMult(defender.statStages.defense);
   } else {
     A = attacker.level50Stats.specialAttack * statStageMult(attacker.statStages['special-attack']);

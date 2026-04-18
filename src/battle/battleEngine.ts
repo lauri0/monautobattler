@@ -214,7 +214,7 @@ function applySecondaryEffects(
     defenderFlinched = true;
   }
 
-  // Confusion
+  // Confusion on defender
   if (eff.confuses && !defender.confused) {
     const chance = eff.confusionChance ?? 0;
     if (chance === 0 || Math.random() * 100 < chance) {
@@ -222,6 +222,13 @@ function applySecondaryEffects(
       events.push({ kind: 'confused', turn, pokemonName: defender.data.name });
       defender = { ...defender, confused: true, confusionTurnsLeft: turns };
     }
+  }
+
+  // Self-confusion on attacker (Outrage, Petal Dance, Thrash)
+  if (eff.confusesUser && !attacker.confused) {
+    const turns = 2 + Math.floor(Math.random() * 4);
+    events.push({ kind: 'confused', turn, pokemonName: attacker.data.name });
+    attacker = { ...attacker, confused: true, confusionTurnsLeft: turns };
   }
 
   return { attacker, defender, defenderFlinched };
@@ -385,6 +392,9 @@ export function simulateTurnDeterministic(
       }
       if (effects.confusion && move.effect?.confuses && !defender.confused) {
         defender = { ...defender, confused: true, confusionTurnsLeft: 3 }; // use average ~3 turns
+      }
+      if (move.effect?.confusesUser && !attacker.confused) {
+        attacker = { ...attacker, confused: true, confusionTurnsLeft: 3 };
       }
     }
 

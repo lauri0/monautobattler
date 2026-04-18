@@ -67,5 +67,13 @@ export function effectSummary(move: Move): string {
     parts.push(`SE vs ${eff.superEffectiveAgainst.join('/')}`);
   }
 
+  if (eff.useFoeAttack) {
+    parts.push('uses foe Atk');
+  }
+
+  if (eff.confusesUser) {
+    parts.push('confuse self');
+  }
+
   return parts.join(' · ');
 }

@@ -29,6 +29,8 @@ export interface MoveEffect {
   doublePowerIfHit?: boolean; // doubles base power if user took damage from foe earlier this turn (Revenge)
   doublePowerIfTargetStatus?: boolean; // doubles base power if target has a major status condition (Hex)
   superEffectiveAgainst?: TypeName[];  // extra types this move is super effective against (Freeze-Dry vs Water)
+  useFoeAttack?: boolean;  // use the defender's Attack stat for damage instead of the attacker's (Foul Play)
+  confusesUser?: boolean;  // confuses the user after hitting (Outrage, Petal Dance, Thrash)
 }
 
 export interface StatStages {

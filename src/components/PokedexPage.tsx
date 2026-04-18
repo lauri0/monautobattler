@@ -2,6 +2,7 @@ import { useState, useMemo, useEffect } from 'react';
 import type { PokemonData, TypeName } from '../models/types';
 import { ALL_TYPES } from '../utils/typeChart';
 import { getPokemonPersisted, setPokemonPersisted } from '../persistence/userStorage';
+import { formatPokemonName } from '../utils/formatName';
 import TypeBadge from './TypeBadge';
 import { getTypeColor } from '../utils/typeColors';
 import './PokedexPage.css';
@@ -37,7 +38,7 @@ export default function PokedexPage({ allPokemon, onSelectPokemon, onBack }: Pro
 
   const filtered = useMemo(() => {
     return allPokemon
-      .filter(p => p.name.toLowerCase().includes(search.toLowerCase()))
+      .filter(p => p.name.toLowerCase().includes(search.toLowerCase()) || formatPokemonName(p.name).toLowerCase().includes(search.toLowerCase()))
       .filter(p => !typeFilter || p.types.includes(typeFilter))
       .filter(p => showDisabled || !getPokemonPersisted(p.id).disabled)
       .sort((a, b) => a.id - b.id);
@@ -125,7 +126,7 @@ export default function PokedexPage({ allPokemon, onSelectPokemon, onBack }: Pro
                 loading="lazy"
                 onError={e => { (e.target as HTMLImageElement).style.opacity = '0.3'; }}
               />
-              <span className="pokedex-name">{p.name}</span>
+              <span className="pokedex-name">{formatPokemonName(p.name)}</span>
               <div className="pokedex-types">
                 {p.types.map(t => <TypeBadge key={t} type={t} />)}
               </div>

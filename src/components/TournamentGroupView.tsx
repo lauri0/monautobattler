@@ -1,4 +1,5 @@
 import type { TournamentGroup, GroupMatch } from '../models/types';
+import { formatPokemonName } from '../utils/formatName';
 
 interface Props {
   groups: TournamentGroup[];
@@ -28,7 +29,7 @@ export default function TournamentGroupView({ groups, nextMatch }: Props) {
                   <tr key={s.pokemon.id} className={idx < 2 ? 'group-qualifying' : ''}>
                     <td className="group-pokemon-cell">
                       <img src={s.pokemon.spriteUrl} alt={s.pokemon.name} className="group-sprite" />
-                      <span>{s.pokemon.name}</span>
+                      <span>{formatPokemonName(s.pokemon.name)}</span>
                     </td>
                     <td>{s.played}</td>
                     <td>{s.wins}</td>
@@ -43,10 +44,10 @@ export default function TournamentGroupView({ groups, nextMatch }: Props) {
               const isNext = nextMatch === m;
               return (
                 <div key={i} className={`group-match-row ${isNext ? 'group-match-next' : ''} ${m.winnerId ? 'group-match-done' : ''}`}>
-                  <span className={m.winnerId === m.pokemonA.id ? 'group-match-winner' : ''}>{m.pokemonA.name}</span>
+                  <span className={m.winnerId === m.pokemonA.id ? 'group-match-winner' : ''}>{formatPokemonName(m.pokemonA.name)}</span>
                   <span className="group-match-vs">vs</span>
-                  <span className={m.winnerId === m.pokemonB.id ? 'group-match-winner' : ''}>{m.pokemonB.name}</span>
-                  {m.winnerId && <span className="group-match-result">W: {m.winnerId === m.pokemonA.id ? m.pokemonA.name : m.pokemonB.name}</span>}
+                  <span className={m.winnerId === m.pokemonB.id ? 'group-match-winner' : ''}>{formatPokemonName(m.pokemonB.name)}</span>
+                  {m.winnerId && <span className="group-match-result">W: {formatPokemonName(m.winnerId === m.pokemonA.id ? m.pokemonA.name : m.pokemonB.name)}</span>}
                   {isNext && <span className="group-match-badge">NEXT</span>}
                 </div>
               );

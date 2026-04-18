@@ -7,6 +7,7 @@ import { applyEloResult } from '../utils/eloCalc';
 import { getPokemonPersisted, setPokemonPersisted, getBattleSelection, setBattleSelection } from '../persistence/userStorage';
 import BattlerPanel from './BattlerPanel';
 import LogEntry from './LogEntry';
+import { formatPokemonName } from '../utils/formatName';
 import './BattlePage.css';
 
 interface Props {
@@ -82,8 +83,8 @@ export default function BattlePage({ allPokemon, onBack }: Props) {
       setPokemonPersisted({ ...wP, elo: newWinnerElo, wins: wP.wins + 1 });
       setPokemonPersisted({ ...lP, elo: newLoserElo, losses: lP.losses + 1 });
       setEloMsg([
-        `${winner.data.name}: ${wP.elo} → ${newWinnerElo} (+${newWinnerElo - wP.elo})`,
-        `${loser.data.name}: ${lP.elo} → ${newLoserElo} (${newLoserElo - lP.elo})`,
+        `${formatPokemonName(winner.data.name)}: ${wP.elo} → ${newWinnerElo} (+${newWinnerElo - wP.elo})`,
+        `${formatPokemonName(loser.data.name)}: ${lP.elo} → ${newLoserElo} (${newLoserElo - lP.elo})`,
       ]);
     }
   }
@@ -113,7 +114,7 @@ export default function BattlePage({ allPokemon, onBack }: Props) {
               <label className="picker-label">Pokemon A</label>
               <select value={selA} onChange={e => setSelA(Number(e.target.value))}>
                 {enabled.map(p => (
-                  <option key={p.id} value={p.id}>#{p.id} {p.name}</option>
+                  <option key={p.id} value={p.id}>#{p.id} {formatPokemonName(p.name)}</option>
                 ))}
               </select>
             </div>
@@ -122,7 +123,7 @@ export default function BattlePage({ allPokemon, onBack }: Props) {
               <label className="picker-label">Pokemon B</label>
               <select value={selB} onChange={e => setSelB(Number(e.target.value))}>
                 {enabled.map(p => (
-                  <option key={p.id} value={p.id}>#{p.id} {p.name}</option>
+                  <option key={p.id} value={p.id}>#{p.id} {formatPokemonName(p.name)}</option>
                 ))}
               </select>
             </div>
@@ -154,7 +155,7 @@ export default function BattlePage({ allPokemon, onBack }: Props) {
 
       {phase === 'end' && winner && (
         <div className="winner-banner card">
-          <h2 style={{ color: '#f1c40f' }}>🏆 {winner.data.name} wins!</h2>
+          <h2 style={{ color: '#f1c40f' }}>🏆 {formatPokemonName(winner.data.name)} wins!</h2>
           {eloMsg.map((msg, i) => <p key={i} style={{ color: 'var(--text-muted)', fontSize: '0.9rem' }}>{msg}</p>)}
           <div style={{ display: 'flex', gap: '0.75rem', marginTop: '1rem' }}>
             <button className="btn-primary" onClick={rematch}>Rematch</button>
