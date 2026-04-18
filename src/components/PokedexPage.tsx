@@ -1,7 +1,7 @@
-import { useState, useMemo } from 'react';
+import { useState, useMemo, useEffect } from 'react';
 import type { PokemonData, TypeName } from '../models/types';
 import { ALL_TYPES } from '../utils/typeChart';
-import { getPokemonPersisted } from '../persistence/userStorage';
+import { getPokemonPersisted, setPokemonPersisted } from '../persistence/userStorage';
 import TypeBadge from './TypeBadge';
 import { getTypeColor } from '../utils/typeColors';
 import './PokedexPage.css';
@@ -14,10 +14,26 @@ interface Props {
 
 export default function PokedexPage({ allPokemon, onSelectPokemon, onBack }: Props) {
   const [search, setSearch] = useState('');
-  const [typeFilter, setTypeFilter] = useState<TypeName | null>(null);
+  const [typeFilter, setTypeFilter] = useState<TypeName | null>(() => {
+    try { return localStorage.getItem('pokedex_type_filter') as TypeName | null; } catch { return null; }
+  });
   const [showDisabled, setShowDisabled] = useState(() => {
     try { return localStorage.getItem('pokedex_show_disabled') !== 'false'; } catch { return true; }
   });
+  const [hoveredId, setHoveredId] = useState<number | null>(null);
+  const [tick, setTick] = useState(0);
+
+  useEffect(() => {
+    function handleKeyDown(e: KeyboardEvent) {
+      if (e.key !== 'd' || hoveredId === null) return;
+      if (e.target instanceof HTMLInputElement) return;
+      const persisted = getPokemonPersisted(hoveredId);
+      setPokemonPersisted({ ...persisted, disabled: !persisted.disabled });
+      setTick(t => t + 1);
+    }
+    document.addEventListener('keydown', handleKeyDown);
+    return () => document.removeEventListener('keydown', handleKeyDown);
+  }, [hoveredId]);
 
   const filtered = useMemo(() => {
     return allPokemon
@@ -25,7 +41,8 @@ export default function PokedexPage({ allPokemon, onSelectPokemon, onBack }: Pro
       .filter(p => !typeFilter || p.types.includes(typeFilter))
       .filter(p => showDisabled || !getPokemonPersisted(p.id).disabled)
       .sort((a, b) => a.id - b.id);
-  }, [allPokemon, search, typeFilter, showDisabled]);
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [allPokemon, search, typeFilter, showDisabled, tick]);
 
   const hiddenCount = filtered.filter(p => getPokemonPersisted(p.id).disabled).length;
   const visibleCount = filtered.length - hiddenCount;
@@ -42,35 +59,41 @@ export default function PokedexPage({ allPokemon, onSelectPokemon, onBack }: Pro
       <h1 className="page-title">Pokedex</h1>
 
       <div className="pokedex-filters">
-        <input
-          type="text"
-          placeholder="Search by name..."
-          value={search}
-          onChange={e => setSearch(e.target.value)}
-          style={{ flex: 1, minWidth: 200 }}
-        />
-        <label style={{ display: 'flex', alignItems: 'center', gap: '0.4rem', fontSize: '0.9rem', cursor: 'pointer', whiteSpace: 'nowrap' }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
           <input
-            type="checkbox"
-            checked={showDisabled}
-            onChange={e => {
-              setShowDisabled(e.target.checked);
-              try { localStorage.setItem('pokedex_show_disabled', String(e.target.checked)); } catch {}
-            }}
+            type="text"
+            placeholder="Search by name..."
+            value={search}
+            onChange={e => setSearch(e.target.value)}
+            style={{ flex: 1, minWidth: 200 }}
           />
-          Show disabled
-        </label>
+          <label style={{ display: 'flex', alignItems: 'center', gap: '0.4rem', fontSize: '0.9rem', cursor: 'pointer', whiteSpace: 'nowrap' }}>
+            <input
+              type="checkbox"
+              checked={showDisabled}
+              onChange={e => {
+                setShowDisabled(e.target.checked);
+                try { localStorage.setItem('pokedex_show_disabled', String(e.target.checked)); } catch {}
+              }}
+            />
+            Show disabled
+          </label>
+        </div>
         <div className="type-filter-row">
           <button
             className={typeFilter === null ? 'type-filter-btn active' : 'type-filter-btn'}
-            onClick={() => setTypeFilter(null)}
+            onClick={() => { setTypeFilter(null); try { localStorage.removeItem('pokedex_type_filter'); } catch {} }}
           >All</button>
           {usedTypes.map(t => (
             <button
               key={t}
               className={typeFilter === t ? 'type-filter-btn active' : 'type-filter-btn'}
               style={typeFilter === t ? { background: getTypeColor(t), borderColor: getTypeColor(t) } : {}}
-              onClick={() => setTypeFilter(t === typeFilter ? null : t)}
+              onClick={() => {
+                const next = t === typeFilter ? null : t;
+                setTypeFilter(next);
+                try { next ? localStorage.setItem('pokedex_type_filter', next) : localStorage.removeItem('pokedex_type_filter'); } catch {}
+              }}
             >
               {t}
             </button>
@@ -91,6 +114,8 @@ export default function PokedexPage({ allPokemon, onSelectPokemon, onBack }: Pro
               key={p.id}
               className={`pokedex-card ${persisted.disabled ? 'disabled' : ''}`}
               onClick={() => onSelectPokemon(p.id)}
+              onMouseEnter={() => setHoveredId(p.id)}
+              onMouseLeave={() => setHoveredId(null)}
             >
               <span className="pokedex-num">#{String(p.id).padStart(3, '0')}</span>
               <img

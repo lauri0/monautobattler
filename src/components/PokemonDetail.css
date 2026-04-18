@@ -113,8 +113,8 @@
 .bst-label { font-size: 0.8rem; font-weight: 700; color: var(--text-muted); }
 .bst-value { font-size: 1rem; font-weight: 800; color: var(--text); }
 
-.matchup-row { display: flex; gap: 0.5rem; align-items: flex-start; margin-bottom: 0.5rem; flex-wrap: wrap; }
-.matchup-label { font-size: 0.75rem; font-weight: 700; color: var(--text-muted); min-width: 100px; padding-top: 2px; }
+.matchup-row { display: grid; grid-template-columns: 52px 1fr; gap: 0.4rem; align-items: start; margin-bottom: 0.5rem; }
+.matchup-label { font-size: 0.75rem; font-weight: 700; color: var(--text-muted); padding-top: 3px; }
 .matchup-badges { display: flex; flex-wrap: wrap; gap: 4px; }
 .matchup-badge {
   padding: 0.15rem 0.5rem;
