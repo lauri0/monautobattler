@@ -11,7 +11,10 @@
       "Bash(curl -s \"https://pokeapi.co/api/v2/version-group/brilliant-diamond-shining-pearl\")",
       "Bash(python -c \"import json,sys; d=json.load\\(sys.stdin\\); print\\('Pokedexes:', [p['name'] for p in d['pokedexes']]\\)\")",
       "Bash(curl -s \"https://pokeapi.co/api/v2/pokemon/1\")",
-      "Bash(python -c \"import json,sys; d=json.load\\(sys.stdin\\); vgs=set\\(\\); [vgs.add\\(v['version_group']['name']\\) for m in d['moves'] for v in m['version_group_details']]; print\\('BDSP in moves?', 'brilliant-diamond-shining-pearl' in vgs\\)\")"
+      "Bash(python -c \"import json,sys; d=json.load\\(sys.stdin\\); vgs=set\\(\\); [vgs.add\\(v['version_group']['name']\\) for m in d['moves'] for v in m['version_group_details']]; print\\('BDSP in moves?', 'brilliant-diamond-shining-pearl' in vgs\\)\")",
+      "Bash(wc -l /c/Users/lauri/PokemonBattler/src/**/*.ts /c/Users/lauri/PokemonBattler/src/**/*.tsx)",
+      "Bash(curl -s http://localhost:5174/)",
+      "Bash(npx vite *)"
     ]
   }
 }

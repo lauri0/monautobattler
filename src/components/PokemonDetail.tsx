@@ -2,7 +2,7 @@ import { useState } from 'react';
 import type { PokemonData, Move } from '../models/types';
 import { getPokemonPersisted, setPokemonPersisted, getAllowedMoveIds } from '../persistence/userStorage';
 import { calcLevel50Stats } from '../utils/statCalc';
-import { getDefensiveMatchups } from '../utils/typeChart';
+import { getDetailedDefensiveMatchups } from '../utils/typeChart';
 import { getTypeColor } from '../utils/typeColors';
 import TypeBadge from './TypeBadge';
 import './PokemonDetail.css';
@@ -57,8 +57,9 @@ export default function PokemonDetail({ pokemon, allPokemon, onBack, onNavigate 
   const [saved, setSaved] = useState(false);
 
   const stats = calcLevel50Stats(pokemon.baseStats);
-  const { weaknesses, resistances, immunities } = getDefensiveMatchups(pokemon.types);
+  const matchups = getDetailedDefensiveMatchups(pokemon.types);
   const moveMap = new Map<number, Move>(pokemon.availableMoves.map(m => [m.id, m]));
+  const bst = Object.values(pokemon.baseStats).reduce((sum: number, v: number) => sum + v, 0);
 
   function handleMoveChange(slot: number, moveId: number) {
     const next = [...moveset];
@@ -131,6 +132,60 @@ export default function PokemonDetail({ pokemon, allPokemon, onBack, onNavigate 
               </div>
             </div>
           </div>
+
+          <div className="card" style={{ marginTop: '1rem' }}>
+            <h3 className="section-title">Defensive Type Matchups</h3>
+            {matchups.immune.length > 0 && (
+              <div className="matchup-row">
+                <span className="matchup-label">0x:</span>
+                <div className="matchup-badges">
+                  {matchups.immune.map(type => (
+                    <span key={type} className="matchup-badge" style={{ background: getTypeColor(type) }}>{type}</span>
+                  ))}
+                </div>
+              </div>
+            )}
+            {matchups.stronglyResists.length > 0 && (
+              <div className="matchup-row">
+                <span className="matchup-label">0.25x:</span>
+                <div className="matchup-badges">
+                  {matchups.stronglyResists.map(type => (
+                    <span key={type} className="matchup-badge" style={{ background: getTypeColor(type) }}>{type}</span>
+                  ))}
+                </div>
+              </div>
+            )}
+            {matchups.resists.length > 0 && (
+              <div className="matchup-row">
+                <span className="matchup-label">0.5x:</span>
+                <div className="matchup-badges">
+                  {matchups.resists.map(type => (
+                    <span key={type} className="matchup-badge" style={{ background: getTypeColor(type) }}>{type}</span>
+                  ))}
+                </div>
+              </div>
+            )}
+            {matchups.weakTo.length > 0 && (
+              <div className="matchup-row">
+                <span className="matchup-label">2x:</span>
+                <div className="matchup-badges">
+                  {matchups.weakTo.map(type => (
+                    <span key={type} className="matchup-badge" style={{ background: getTypeColor(type) }}>{type}</span>
+                  ))}
+                </div>
+              </div>
+            )}
+            {matchups.veryWeakTo.length > 0 && (
+              <div className="matchup-row">
+                <span className="matchup-label">4x:</span>
+                <div className="matchup-badges">
+                  {matchups.veryWeakTo.map(type => (
+                    <span key={type} className="matchup-badge" style={{ background: getTypeColor(type) }}>{type}</span>
+                  ))}
+                </div>
+              </div>
+            )}
+          </div>
         </div>
 
         {/* Right panel */}
@@ -162,47 +217,10 @@ export default function PokemonDetail({ pokemon, allPokemon, onBack, onNavigate 
                 })}
               </tbody>
             </table>
-          </div>
-
-          {/* Type matchups */}
-          <div className="card" style={{ marginBottom: '1rem' }}>
-            <h3 className="section-title">Type Matchups</h3>
-            {weaknesses.length > 0 && (
-              <div className="matchup-row">
-                <span className="matchup-label">Weak to:</span>
-                <div className="matchup-badges">
-                  {weaknesses.map(({ type, mult }) => (
-                    <span key={type} className="matchup-badge" style={{ background: getTypeColor(type) }}>
-                      {type} ×{mult}
-                    </span>
-                  ))}
-                </div>
-              </div>
-            )}
-            {resistances.length > 0 && (
-              <div className="matchup-row">
-                <span className="matchup-label">Resists:</span>
-                <div className="matchup-badges">
-                  {resistances.map(({ type, mult }) => (
-                    <span key={type} className="matchup-badge" style={{ background: getTypeColor(type), opacity: 0.75 }}>
-                      {type} ×{mult}
-                    </span>
-                  ))}
-                </div>
-              </div>
-            )}
-            {immunities.length > 0 && (
-              <div className="matchup-row">
-                <span className="matchup-label">Immune:</span>
-                <div className="matchup-badges">
-                  {immunities.map(type => (
-                    <span key={type} className="matchup-badge" style={{ background: '#555' }}>
-                      {type} ×0
-                    </span>
-                  ))}
-                </div>
-              </div>
-            )}
+            <div className="bst-row">
+              <span className="bst-label">Stat Total</span>
+              <span className="bst-value">{bst}</span>
+            </div>
           </div>
 
           {/* Moveset */}

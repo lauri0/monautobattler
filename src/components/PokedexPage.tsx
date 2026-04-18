@@ -15,13 +15,20 @@ interface Props {
 export default function PokedexPage({ allPokemon, onSelectPokemon, onBack }: Props) {
   const [search, setSearch] = useState('');
   const [typeFilter, setTypeFilter] = useState<TypeName | null>(null);
+  const [showDisabled, setShowDisabled] = useState(() => {
+    try { return localStorage.getItem('pokedex_show_disabled') !== 'false'; } catch { return true; }
+  });
 
   const filtered = useMemo(() => {
     return allPokemon
       .filter(p => p.name.toLowerCase().includes(search.toLowerCase()))
       .filter(p => !typeFilter || p.types.includes(typeFilter))
+      .filter(p => showDisabled || !getPokemonPersisted(p.id).disabled)
       .sort((a, b) => a.id - b.id);
-  }, [allPokemon, search, typeFilter]);
+  }, [allPokemon, search, typeFilter, showDisabled]);
+
+  const hiddenCount = filtered.filter(p => getPokemonPersisted(p.id).disabled).length;
+  const visibleCount = filtered.length - hiddenCount;
 
   const usedTypes = useMemo(() => {
     const set = new Set<TypeName>();
@@ -42,6 +49,17 @@ export default function PokedexPage({ allPokemon, onSelectPokemon, onBack }: Pro
           onChange={e => setSearch(e.target.value)}
           style={{ flex: 1, minWidth: 200 }}
         />
+        <label style={{ display: 'flex', alignItems: 'center', gap: '0.4rem', fontSize: '0.9rem', cursor: 'pointer', whiteSpace: 'nowrap' }}>
+          <input
+            type="checkbox"
+            checked={showDisabled}
+            onChange={e => {
+              setShowDisabled(e.target.checked);
+              try { localStorage.setItem('pokedex_show_disabled', String(e.target.checked)); } catch {}
+            }}
+          />
+          Show disabled
+        </label>
         <div className="type-filter-row">
           <button
             className={typeFilter === null ? 'type-filter-btn active' : 'type-filter-btn'}
@@ -60,7 +78,10 @@ export default function PokedexPage({ allPokemon, onSelectPokemon, onBack }: Pro
         </div>
       </div>
 
-      <p className="pokedex-count">Showing {filtered.length} of {allPokemon.length} Pokemon</p>
+      <p className="pokedex-count">
+        Showing {visibleCount}
+        {hiddenCount > 0 && <> + {hiddenCount} hidden</>} of {allPokemon.length} Pokemon
+      </p>
 
       <div className="pokedex-grid">
         {filtered.map(p => {

@@ -102,8 +102,19 @@
 .stat-bar-fill { height: 100%; border-radius: 99px; }
 .stat-lv50 { font-size: 0.8rem; color: var(--text-muted); width: 36px; text-align: right; padding-left: 8px; }
 
+.bst-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-top: 0.6rem;
+  padding-top: 0.5rem;
+  border-top: 1px solid var(--border);
+}
+.bst-label { font-size: 0.8rem; font-weight: 700; color: var(--text-muted); }
+.bst-value { font-size: 1rem; font-weight: 800; color: var(--text); }
+
 .matchup-row { display: flex; gap: 0.5rem; align-items: flex-start; margin-bottom: 0.5rem; flex-wrap: wrap; }
-.matchup-label { font-size: 0.8rem; font-weight: 700; color: var(--text-muted); min-width: 70px; padding-top: 2px; }
+.matchup-label { font-size: 0.75rem; font-weight: 700; color: var(--text-muted); min-width: 100px; padding-top: 2px; }
 .matchup-badges { display: flex; flex-wrap: wrap; gap: 4px; }
 .matchup-badge {
   padding: 0.15rem 0.5rem;

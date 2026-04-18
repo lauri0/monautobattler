@@ -9,11 +9,14 @@ import {
   setMoveLearnSettings,
   getSelectedGame,
   setSelectedGame,
+  getVariantSettings,
+  setVariantSettings,
   GAME_VERSIONS,
   exportPokedexState,
   importPokedexState,
   type MoveLearnSettings,
   type GameVersion,
+  type VariantSettings,
 } from '../persistence/userStorage';
 
 interface Props {
@@ -23,7 +26,7 @@ interface Props {
 
 export default function SettingsPage({ onBack, onDataLoaded }: Props) {
   const [fromId, setFromId] = useState(1);
-  const [toId, setToId] = useState(20);
+  const [toId, setToId] = useState(149);
   const [loading, setLoading] = useState(false);
   const [progress, setProgress] = useState(0);
   const [progressMsg, setProgressMsg] = useState('');
@@ -31,6 +34,9 @@ export default function SettingsPage({ onBack, onDataLoaded }: Props) {
   const [summary, setSummary] = useState('');
   const [learnSettings, setLearnSettingsState] = useState<MoveLearnSettings>(() =>
     getMoveLearnSettings()
+  );
+  const [variantSettings, setVariantSettingsState] = useState<VariantSettings>(() =>
+    getVariantSettings()
   );
   const [game, setGameState] = useState<GameVersion>(() => getSelectedGame());
   const gameLabel = GAME_VERSIONS.find(g => g.id === game)?.label ?? game;
@@ -46,6 +52,14 @@ export default function SettingsPage({ onBack, onDataLoaded }: Props) {
     setLearnSettingsState(updated);
     setMoveLearnSettings(updated);
   }
+
+  function toggleVariant(key: keyof VariantSettings) {
+    const updated = { ...variantSettings, [key]: !variantSettings[key] };
+    setVariantSettingsState(updated);
+    setVariantSettings(updated);
+  }
+
+  const isLgpe = game === 'lgpe';
 
   const anyLearnEnabled = Object.values(learnSettings).some(Boolean);
 
@@ -212,6 +226,59 @@ export default function SettingsPage({ onBack, onDataLoaded }: Props) {
           <p style={{ fontSize: '0.75rem', color: 'var(--text-muted)', marginTop: '0.4rem' }}>
             Applies when loading new Pokemon. Already-loaded Pokemon keep their previously fetched moves.
           </p>
+        </div>
+
+        <div style={{ marginBottom: '1rem' }}>
+          <span style={{
+            fontSize: '0.78rem', fontWeight: 700, textTransform: 'uppercase',
+            letterSpacing: '0.05em', color: 'var(--text-muted)', display: 'block', marginBottom: '0.5rem',
+          }}>
+            Variants (Let's Go only)
+          </span>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
+            <label style={{
+              display: 'flex', alignItems: 'center', gap: '0.4rem',
+              cursor: (!isLgpe || loading) ? 'not-allowed' : 'pointer',
+              fontSize: '0.9rem',
+              opacity: isLgpe ? 1 : 0.4,
+            }}>
+              <input
+                type="checkbox"
+                checked={variantSettings.useAlolan}
+                onChange={() => toggleVariant('useAlolan')}
+                disabled={!isLgpe || loading}
+              />
+              Replace with Alolan forms (e.g. Meowth → Dark-type Alolan Meowth)
+            </label>
+            <label style={{
+              display: 'flex', alignItems: 'center', gap: '0.4rem',
+              cursor: (!isLgpe || loading) ? 'not-allowed' : 'pointer',
+              fontSize: '0.9rem',
+              opacity: isLgpe ? 1 : 0.4,
+            }}>
+              <input
+                type="checkbox"
+                checked={variantSettings.includeMegas}
+                onChange={() => toggleVariant('includeMegas')}
+                disabled={!isLgpe || loading}
+              />
+              Include Mega Evolutions as separate Pokédex entries
+            </label>
+            <label style={{
+              display: 'flex', alignItems: 'center', gap: '0.4rem',
+              cursor: (!isLgpe || loading) ? 'not-allowed' : 'pointer',
+              fontSize: '0.9rem',
+              opacity: isLgpe ? 1 : 0.4,
+            }}>
+              <input
+                type="checkbox"
+                checked={variantSettings.swapMegaDrain}
+                onChange={() => toggleVariant('swapMegaDrain')}
+                disabled={!isLgpe || loading}
+              />
+              Replace Mega Drain with Giga Drain (75 power) in move pools
+            </label>
+          </div>
         </div>
 
         <div style={{ display: 'flex', gap: '1rem', alignItems: 'center', flexWrap: 'wrap', marginBottom: '1rem' }}>

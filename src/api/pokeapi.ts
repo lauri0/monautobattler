@@ -4,9 +4,12 @@ import {
   addToLoadedRange,
   getMoveLearnSettings,
   getSelectedGameInfo,
+  getVariantSettings,
   type MoveLearnSettings,
   type GameVersionInfo,
+  type VariantSettings,
 } from '../persistence/userStorage';
+import { buildFetchIds } from './variants';
 
 const BASE = 'https://pokeapi.co/api/v2';
 
@@ -140,12 +143,14 @@ export async function fetchAndStorePokemon(
   id: number,
   onProgress?: (msg: string) => void,
   learnSettings?: MoveLearnSettings,
-  game?: GameVersionInfo
+  game?: GameVersionInfo,
+  variants?: VariantSettings
 ): Promise<PokemonData | null> {
   onProgress?.(`Fetching Pokemon #${id}...`);
   const raw = await fetchJson<RawPokemon>(`${BASE}/pokemon/${id}`);
   const settings = learnSettings ?? getMoveLearnSettings();
   const gameInfo = game ?? getSelectedGameInfo();
+  const variantInfo = variants ?? getVariantSettings();
   const versionGroup = gameInfo.versionGroup;
 
   // Skip Pokemon not available in the selected game.
@@ -177,6 +182,17 @@ export async function fetchAndStorePokemon(
 
   // Sort by power descending for default moveset selection
   moves.sort((a, b) => b.power - a.power);
+
+  if (variantInfo.swapMegaDrain) {
+    const idx = moves.findIndex(m => m.name === 'mega-drain');
+    if (idx !== -1) {
+      const gigaDrain = await fetchMoveData(`${BASE}/move/giga-drain`);
+      if (gigaDrain) {
+        moves[idx] = gigaDrain;
+        await saveMove(gigaDrain);
+      }
+    }
+  }
 
   const baseStats = parseStats(raw.stats);
   const localSpriteUrl = `/sprites/${id}.png`;
@@ -237,7 +253,9 @@ export async function fetchAndStoreRange(
 ): Promise<{ loaded: number[]; skipped: number[] }> {
   const settings = getMoveLearnSettings();
   const game = getSelectedGameInfo();
-  const allIds = Array.from({ length: to - from + 1 }, (_, i) => from + i);
+  const variantSettings = getVariantSettings();
+  const baseIds = Array.from({ length: to - from + 1 }, (_, i) => from + i);
+  const allIds = buildFetchIds(baseIds, variantSettings);
   const loaded: number[] = [];
   const skipped: number[] = [];
   let done = 0;
@@ -247,7 +265,8 @@ export async function fetchAndStoreRange(
       id,
       (msg) => onProgress?.(msg, done, allIds.length),
       settings,
-      game
+      game,
+      variantSettings
     );
     if (result) {
       loaded.push(id);

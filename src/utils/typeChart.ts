@@ -58,3 +58,31 @@ export function getDefensiveMatchups(pokemonTypes: TypeName[]): {
 
   return { weaknesses, resistances, immunities };
 }
+
+export function getDetailedDefensiveMatchups(pokemonTypes: TypeName[]): {
+  immune: TypeName[];
+  stronglyResists: TypeName[];
+  resists: TypeName[];
+  neutral: TypeName[];
+  weakTo: TypeName[];
+  veryWeakTo: TypeName[];
+} {
+  const immune: TypeName[] = [];
+  const stronglyResists: TypeName[] = [];
+  const resists: TypeName[] = [];
+  const neutral: TypeName[] = [];
+  const weakTo: TypeName[] = [];
+  const veryWeakTo: TypeName[] = [];
+
+  for (const attackType of ALL_TYPES) {
+    const mult = getTypeEffectiveness(attackType, pokemonTypes);
+    if (mult === 0) immune.push(attackType);
+    else if (mult <= 0.25) stronglyResists.push(attackType);
+    else if (mult <= 0.5) resists.push(attackType);
+    else if (mult >= 4) veryWeakTo.push(attackType);
+    else if (mult >= 2) weakTo.push(attackType);
+    else neutral.push(attackType);
+  }
+
+  return { immune, stronglyResists, resists, neutral, weakTo, veryWeakTo };
+}

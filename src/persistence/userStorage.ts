@@ -175,6 +175,34 @@ export function setAllowedMoveIds(ids: number[]): void {
   localStorage.setItem(ALLOWED_MOVES_KEY, JSON.stringify(ids));
 }
 
+const VARIANT_SETTINGS_KEY = 'variant_settings';
+
+export interface VariantSettings {
+  useAlolan: boolean;
+  includeMegas: boolean;
+  swapMegaDrain: boolean;
+}
+
+const DEFAULT_VARIANT_SETTINGS: VariantSettings = {
+  useAlolan: false,
+  includeMegas: false,
+  swapMegaDrain: false,
+};
+
+export function getVariantSettings(): VariantSettings {
+  try {
+    const raw = localStorage.getItem(VARIANT_SETTINGS_KEY);
+    if (!raw) return { ...DEFAULT_VARIANT_SETTINGS };
+    return { ...DEFAULT_VARIANT_SETTINGS, ...JSON.parse(raw) };
+  } catch {
+    return { ...DEFAULT_VARIANT_SETTINGS };
+  }
+}
+
+export function setVariantSettings(settings: VariantSettings): void {
+  localStorage.setItem(VARIANT_SETTINGS_KEY, JSON.stringify(settings));
+}
+
 // ── Export / Import ──────────────────────────────────────────────────────────
 
 export interface PokedexExport {

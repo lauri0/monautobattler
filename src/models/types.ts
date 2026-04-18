@@ -145,3 +145,52 @@ export interface AIStrategy {
   // AIs that model first-turn-only moves should use it to prune correctly.
   selectMove(attacker: BattlePokemon, defender: BattlePokemon, turnNumber?: number): Move;
 }
+
+// ── Tournament Types ──
+
+export interface TournamentPokemon {
+  id: number;
+  name: string;
+  spriteUrl: string;
+  types: TypeName[];
+}
+
+export interface GroupStanding {
+  pokemon: TournamentPokemon;
+  played: number;
+  wins: number;
+  losses: number;
+  points: number;
+}
+
+export interface TournamentGroup {
+  label: string;
+  members: TournamentPokemon[];
+  standings: GroupStanding[];
+  matches: GroupMatch[];
+}
+
+export interface GroupMatch {
+  pokemonA: TournamentPokemon;
+  pokemonB: TournamentPokemon;
+  winnerId: number | null;
+}
+
+export interface KnockoutMatch {
+  round: 'ro16' | 'quarter' | 'semi' | 'third' | 'final';
+  slot: number;
+  pokemonA: TournamentPokemon | null;
+  pokemonB: TournamentPokemon | null;
+  winnerId: number | null;
+  loserId: number | null;
+}
+
+export interface TournamentState {
+  phase: 'group' | 'knockout' | 'finished';
+  groups: TournamentGroup[];
+  knockoutMatches: KnockoutMatch[];
+  currentMatchIndex: number;
+  champion: TournamentPokemon | null;
+  runnerUp: TournamentPokemon | null;
+  thirdPlace: TournamentPokemon | null;
+}
