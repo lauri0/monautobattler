@@ -1,5 +1,6 @@
 import type { TournamentGroup, GroupMatch } from '../models/types';
 import { formatPokemonName } from '../utils/formatName';
+import { getPokemonPersisted } from '../persistence/userStorage';
 
 interface Props {
   groups: TournamentGroup[];
@@ -20,6 +21,7 @@ export default function TournamentGroupView({ groups, nextMatch }: Props) {
                 <th>W</th>
                 <th>L</th>
                 <th>Pts</th>
+                <th>ELO</th>
               </tr>
             </thead>
             <tbody>
@@ -35,6 +37,7 @@ export default function TournamentGroupView({ groups, nextMatch }: Props) {
                     <td>{s.wins}</td>
                     <td>{s.losses}</td>
                     <td className="group-points">{s.points}</td>
+                    <td className="group-elo">{Math.round(getPokemonPersisted(s.pokemon.id).elo)}</td>
                   </tr>
                 ))}
             </tbody>

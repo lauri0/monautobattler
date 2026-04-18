@@ -1,9 +1,8 @@
-import { useState, useRef } from 'react';
+import { useState } from 'react';
 import type { PokemonData } from '../models/types';
 import { buildBattlePokemon } from '../battle/buildBattlePokemon';
 import { runFullBattle } from '../battle/battleEngine';
 import { expectiminimaxAI } from '../ai/expectiminimaxAI';
-import { applyEloResult } from '../utils/eloCalc';
 import { getPokemonPersisted, setManyPokemonPersisted } from '../persistence/userStorage';
 import TypeBadge from './TypeBadge';
 import { formatPokemonName } from '../utils/formatName';
@@ -21,10 +20,9 @@ interface SimRecord {
   types: PokemonData['types'];
   wins: number;
   losses: number;
-  elo: number;
 }
 
-type SortKey = 'winPct' | 'elo' | 'wins' | 'losses';
+type SortKey = 'winPct' | 'wins' | 'losses';
 
 const BATTLE_COUNTS = [100, 1000, 10000];
 
@@ -36,8 +34,6 @@ export default function MassSimPage({ allPokemon, onBack }: Props) {
   const [sortKey, setSortKey] = useState<SortKey>('winPct');
   const [sortAsc, setSortAsc] = useState(false);
   const [unsaved, setUnsaved] = useState(false);
-  // Store ELO state during sim (not yet persisted)
-  const simEloRef = useRef<Map<number, number>>(new Map());
 
   const enabled = allPokemon.filter(p => !getPokemonPersisted(p.id).disabled);
 
@@ -48,16 +44,12 @@ export default function MassSimPage({ allPokemon, onBack }: Props) {
     setProgress(0);
 
     // Initialize per-sim state
-    const eloMap = new Map<number, number>();
     const winsMap = new Map<number, number>();
     const lossesMap = new Map<number, number>();
     for (const p of enabled) {
-      const persisted = getPokemonPersisted(p.id);
-      eloMap.set(p.id, persisted.elo);
       winsMap.set(p.id, 0);
       lossesMap.set(p.id, 0);
     }
-    simEloRef.current = eloMap;
 
     const total = battleCount;
     const CHUNK = 50;
@@ -79,11 +71,6 @@ export default function MassSimPage({ allPokemon, onBack }: Props) {
       const winnerId = result.winner.data.id;
       const loserId = result.loser.data.id;
 
-      const wElo = eloMap.get(winnerId) ?? 1500;
-      const lElo = eloMap.get(loserId) ?? 1500;
-      const { newWinnerElo, newLoserElo } = applyEloResult(wElo, lElo);
-      eloMap.set(winnerId, newWinnerElo);
-      eloMap.set(loserId, newLoserElo);
       winsMap.set(winnerId, (winsMap.get(winnerId) ?? 0) + 1);
       lossesMap.set(loserId, (lossesMap.get(loserId) ?? 0) + 1);
 
@@ -103,13 +90,11 @@ export default function MassSimPage({ allPokemon, onBack }: Props) {
       types: p.types,
       wins: winsMap.get(p.id) ?? 0,
       losses: lossesMap.get(p.id) ?? 0,
-      elo: eloMap.get(p.id) ?? 1500,
     }));
 
     setResults(records);
     setRunning(false);
     setUnsaved(true);
-    simEloRef.current = eloMap;
   }
 
   function handleSave() {
@@ -118,7 +103,6 @@ export default function MassSimPage({ allPokemon, onBack }: Props) {
       const persisted = getPokemonPersisted(r.id);
       return {
         ...persisted,
-        elo: r.elo,
         wins: persisted.wins + r.wins,
         losses: persisted.losses + r.losses,
       };
@@ -136,7 +120,6 @@ export default function MassSimPage({ allPokemon, onBack }: Props) {
   const sorted = results ? [...results].sort((a, b) => {
     const getVal = (r: SimRecord) => {
       if (sortKey === 'winPct') return (r.wins + r.losses) > 0 ? r.wins / (r.wins + r.losses) : 0;
-      if (sortKey === 'elo') return r.elo;
       if (sortKey === 'wins') return r.wins;
       return r.losses;
     };
@@ -211,9 +194,6 @@ export default function MassSimPage({ allPokemon, onBack }: Props) {
                   <th className="sortable" onClick={() => handleSort('winPct')}>
                     Win% {sortKey === 'winPct' ? (sortAsc ? '↑' : '↓') : ''}
                   </th>
-                  <th className="sortable" onClick={() => handleSort('elo')}>
-                    ELO {sortKey === 'elo' ? (sortAsc ? '↑' : '↓') : ''}
-                  </th>
                 </tr>
               </thead>
               <tbody>
@@ -237,7 +217,6 @@ export default function MassSimPage({ allPokemon, onBack }: Props) {
                       <td style={{ color: '#27ae60', fontWeight: 700 }}>{r.wins}</td>
                       <td style={{ color: '#e94560', fontWeight: 700 }}>{r.losses}</td>
                       <td style={{ fontWeight: 700 }}>{winPct}%</td>
-                      <td style={{ color: '#a64dff', fontWeight: 700 }}>{r.elo}</td>
                     </tr>
                   );
                 })}

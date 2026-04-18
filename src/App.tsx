@@ -10,8 +10,9 @@ import SettingsPage from './components/SettingsPage';
 import MoveBanPage from './components/MoveBanPage';
 import GauntletPage from './components/GauntletPage';
 import TournamentPage from './components/TournamentPage';
+import StatisticsPage from './components/StatisticsPage';
 
-type Page = 'menu' | 'pokedex' | 'pokedex-detail' | 'battle' | 'masssim' | 'gauntlet' | 'tournament' | 'settings' | 'moveban';
+type Page = 'menu' | 'pokedex' | 'pokedex-detail' | 'battle' | 'masssim' | 'gauntlet' | 'tournament' | 'settings' | 'moveban' | 'statistics';
 
 export default function App() {
   const [page, setPage] = useState<Page>('menu');
@@ -113,6 +114,10 @@ export default function App() {
 
   if (page === 'moveban') {
     return <MoveBanPage onBack={() => setPage('menu')} />;
+  }
+
+  if (page === 'statistics') {
+    return <StatisticsPage allPokemon={allPokemon} onBack={() => setPage('menu')} />;
   }
 
   return <MainMenu onNavigate={(p) => setPage(p as Page)} />;

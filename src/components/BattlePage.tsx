@@ -3,7 +3,6 @@ import type { PokemonData, BattlePokemon, TurnEvent } from '../models/types';
 import { buildBattlePokemon } from '../battle/buildBattlePokemon';
 import { resolveTurn } from '../battle/battleEngine';
 import { expectiminimaxAI } from '../ai/expectiminimaxAI';
-import { applyEloResult } from '../utils/eloCalc';
 import { getPokemonPersisted, setPokemonPersisted, getBattleSelection, setBattleSelection } from '../persistence/userStorage';
 import BattlerPanel from './BattlerPanel';
 import LogEntry from './LogEntry';
@@ -33,7 +32,6 @@ export default function BattlePage({ allPokemon, onBack }: Props) {
   const [log, setLog] = useState<TurnEvent[]>([]);
   const [turn, setTurn] = useState(1);
   const [battleOver, setBattleOver] = useState(false);
-  const [eloMsg, setEloMsg] = useState<string[]>([]);
   const logRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -52,7 +50,6 @@ export default function BattlePage({ allPokemon, onBack }: Props) {
     setLog([]);
     setTurn(1);
     setBattleOver(false);
-    setEloMsg([]);
     setPhase('battle');
   }
 
@@ -79,13 +76,8 @@ export default function BattlePage({ allPokemon, onBack }: Props) {
       }
       const wP = getPokemonPersisted(winner.data.id);
       const lP = getPokemonPersisted(loser.data.id);
-      const { newWinnerElo, newLoserElo } = applyEloResult(wP.elo, lP.elo);
-      setPokemonPersisted({ ...wP, elo: newWinnerElo, wins: wP.wins + 1 });
-      setPokemonPersisted({ ...lP, elo: newLoserElo, losses: lP.losses + 1 });
-      setEloMsg([
-        `${formatPokemonName(winner.data.name)}: ${wP.elo} → ${newWinnerElo} (+${newWinnerElo - wP.elo})`,
-        `${formatPokemonName(loser.data.name)}: ${lP.elo} → ${newLoserElo} (${newLoserElo - lP.elo})`,
-      ]);
+      setPokemonPersisted({ ...wP, wins: wP.wins + 1 });
+      setPokemonPersisted({ ...lP, losses: lP.losses + 1 });
     }
   }
 
@@ -99,7 +91,6 @@ export default function BattlePage({ allPokemon, onBack }: Props) {
     setLog([]);
     setTurn(1);
     setBattleOver(false);
-    setEloMsg([]);
     setPhase('battle');
   }
 
@@ -156,7 +147,6 @@ export default function BattlePage({ allPokemon, onBack }: Props) {
       {phase === 'end' && winner && (
         <div className="winner-banner card">
           <h2 style={{ color: '#f1c40f' }}>🏆 {formatPokemonName(winner.data.name)} wins!</h2>
-          {eloMsg.map((msg, i) => <p key={i} style={{ color: 'var(--text-muted)', fontSize: '0.9rem' }}>{msg}</p>)}
           <div style={{ display: 'flex', gap: '0.75rem', marginTop: '1rem' }}>
             <button className="btn-primary" onClick={rematch}>Rematch</button>
             <button className="btn-secondary" onClick={() => setPhase('select')}>New Battle</button>

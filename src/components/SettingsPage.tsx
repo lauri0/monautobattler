@@ -11,6 +11,10 @@ import {
   setSelectedGame,
   getVariantSettings,
   setVariantSettings,
+  getAutoDisableBstThreshold,
+  setAutoDisableBstThreshold,
+  getAutoDisableOverwrite,
+  setAutoDisableOverwrite,
   GAME_VERSIONS,
   exportPokedexState,
   importPokedexState,
@@ -38,6 +42,8 @@ export default function SettingsPage({ onBack, onDataLoaded }: Props) {
   const [variantSettings, setVariantSettingsState] = useState<VariantSettings>(() =>
     getVariantSettings()
   );
+  const [bstThreshold, setBstThresholdState] = useState(() => getAutoDisableBstThreshold());
+  const [autoDisableOverwrite, setAutoDisableOverwriteState] = useState(() => getAutoDisableOverwrite());
   const [game, setGameState] = useState<GameVersion>(() => getSelectedGame());
   const gameLabel = GAME_VERSIONS.find(g => g.id === game)?.label ?? game;
   const loadedRange = getLoadedRange();
@@ -279,6 +285,55 @@ export default function SettingsPage({ onBack, onDataLoaded }: Props) {
               Replace Mega Drain with Giga Drain (75 power) in move pools
             </label>
           </div>
+        </div>
+
+        <div style={{ marginBottom: '1rem' }}>
+          <span style={{
+            fontSize: '0.78rem', fontWeight: 700, textTransform: 'uppercase',
+            letterSpacing: '0.05em', color: 'var(--text-muted)', display: 'block', marginBottom: '0.5rem',
+          }}>
+            Auto-disable threshold
+          </span>
+          <label style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', fontSize: '0.9rem' }}>
+            Disable Pokemon with BST below
+            <input
+              type="number"
+              min={0}
+              max={999}
+              value={bstThreshold}
+              onChange={e => {
+                const val = Number(e.target.value);
+                if (isFinite(val) && val >= 0) {
+                  setBstThresholdState(val);
+                  setAutoDisableBstThreshold(val);
+                }
+              }}
+              style={{ width: 70 }}
+              disabled={loading}
+            />
+          </label>
+          <label style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', fontSize: '0.9rem', marginTop: '0.6rem', cursor: loading ? 'not-allowed' : 'pointer' }}>
+            <input
+              type="checkbox"
+              checked={autoDisableOverwrite}
+              onChange={e => {
+                setAutoDisableOverwriteState(e.target.checked);
+                setAutoDisableOverwrite(e.target.checked);
+              }}
+              disabled={loading}
+            />
+            Always overwrite enable/disable state on load
+          </label>
+          {autoDisableOverwrite && (
+            <p style={{ fontSize: '0.75rem', color: '#f1c40f', marginTop: '0.4rem' }}>
+              ⚠ When enabled, loading Pokemon will overwrite their current enable/disable state based on the BST threshold above.
+            </p>
+          )}
+          {!autoDisableOverwrite && (
+            <p style={{ fontSize: '0.75rem', color: 'var(--text-muted)', marginTop: '0.4rem' }}>
+              Applied only to newly loaded Pokemon with no prior data.
+            </p>
+          )}
         </div>
 
         <div style={{ display: 'flex', gap: '1rem', alignItems: 'center', flexWrap: 'wrap', marginBottom: '1rem' }}>

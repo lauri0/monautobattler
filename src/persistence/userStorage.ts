@@ -175,6 +175,34 @@ export function setAllowedMoveIds(ids: number[]): void {
   localStorage.setItem(ALLOWED_MOVES_KEY, JSON.stringify(ids));
 }
 
+const AUTO_DISABLE_BST_KEY = 'auto_disable_bst_threshold';
+const DEFAULT_AUTO_DISABLE_BST = 400;
+
+export function getAutoDisableBstThreshold(): number {
+  try {
+    const raw = localStorage.getItem(AUTO_DISABLE_BST_KEY);
+    if (raw === null) return DEFAULT_AUTO_DISABLE_BST;
+    const n = Number(raw);
+    return isFinite(n) && n >= 0 ? n : DEFAULT_AUTO_DISABLE_BST;
+  } catch {
+    return DEFAULT_AUTO_DISABLE_BST;
+  }
+}
+
+export function setAutoDisableBstThreshold(value: number): void {
+  localStorage.setItem(AUTO_DISABLE_BST_KEY, String(value));
+}
+
+const AUTO_DISABLE_OVERWRITE_KEY = 'auto_disable_overwrite';
+
+export function getAutoDisableOverwrite(): boolean {
+  try { return localStorage.getItem(AUTO_DISABLE_OVERWRITE_KEY) === 'true'; } catch { return false; }
+}
+
+export function setAutoDisableOverwrite(value: boolean): void {
+  localStorage.setItem(AUTO_DISABLE_OVERWRITE_KEY, String(value));
+}
+
 const VARIANT_SETTINGS_KEY = 'variant_settings';
 
 export interface VariantSettings {

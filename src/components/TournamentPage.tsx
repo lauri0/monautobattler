@@ -2,7 +2,8 @@ import { useState } from 'react';
 import type { PokemonData, TournamentState, GroupMatch, KnockoutMatch } from '../models/types';
 import { createTournament, getNextMatch, getMatchLabel, getProgress, applyMatchResult } from '../tournament/tournamentEngine';
 import { saveTournament, loadTournament, clearTournament } from '../tournament/tournamentStorage';
-import { getPokemonPersisted } from '../persistence/userStorage';
+import { getPokemonPersisted, setPokemonPersisted } from '../persistence/userStorage';
+import { applyEloResult } from '../utils/eloCalc';
 import TournamentGroupView from './TournamentGroupView';
 import TournamentBracketView from './TournamentBracketView';
 import TournamentMatchView from './TournamentMatchView';
@@ -53,6 +54,20 @@ export default function TournamentPage({ allPokemon, onBack }: Props) {
 
   function handleMatchComplete(winnerId: number) {
     if (!tournament) return;
+    const next = getNextMatch(tournament);
+    if (next) {
+      const m = next.match;
+      const pokemonA = m.pokemonA;
+      const pokemonB = m.pokemonB;
+      if (pokemonA && pokemonB) {
+        const loserId = pokemonA.id === winnerId ? pokemonB.id : pokemonA.id;
+        const wP = getPokemonPersisted(winnerId);
+        const lP = getPokemonPersisted(loserId);
+        const { newWinnerElo, newLoserElo } = applyEloResult(wP.elo, lP.elo);
+        setPokemonPersisted({ ...wP, elo: newWinnerElo, wins: wP.wins + 1 });
+        setPokemonPersisted({ ...lP, elo: newLoserElo, losses: lP.losses + 1 });
+      }
+    }
     const updated = applyMatchResult(tournament, winnerId);
     setTournament(updated);
     saveTournament(updated);

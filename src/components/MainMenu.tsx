@@ -1,6 +1,6 @@
 import './MainMenu.css';
 
-type Page = 'menu' | 'pokedex' | 'battle' | 'masssim' | 'gauntlet' | 'tournament' | 'settings' | 'moveban';
+type Page = 'menu' | 'pokedex' | 'battle' | 'masssim' | 'gauntlet' | 'tournament' | 'settings' | 'moveban' | 'statistics';
 
 interface Props {
   onNavigate: (page: Page) => void;
@@ -38,6 +38,10 @@ export default function MainMenu({ onNavigate }: Props) {
         <button className="menu-btn" onClick={() => onNavigate('moveban')}>
           <span className="menu-btn-icon">🚫</span>
           <span>Move Ban Pool</span>
+        </button>
+        <button className="menu-btn" onClick={() => onNavigate('statistics')}>
+          <span className="menu-btn-icon">📊</span>
+          <span>Statistics</span>
         </button>
         <button className="menu-btn" onClick={() => onNavigate('settings')}>
           <span className="menu-btn-icon">⚙️</span>

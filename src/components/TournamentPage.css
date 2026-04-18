@@ -160,6 +160,11 @@
   color: var(--accent);
 }
 
+.group-elo {
+  font-weight: 700;
+  color: #a64dff;
+}
+
 .group-matches {
   display: flex;
   flex-direction: column;
@@ -276,6 +281,13 @@
   padding: 0.2rem 0;
   font-size: 0.8rem;
   color: var(--text-muted);
+}
+
+.bracket-elo {
+  margin-left: auto;
+  font-size: 0.72rem;
+  color: #a64dff;
+  font-weight: 600;
 }
 
 .bracket-entry + .bracket-entry {

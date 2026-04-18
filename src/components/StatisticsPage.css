@@ -1,0 +1,125 @@
+.stats-tabs {
+  display: flex;
+  gap: 0.5rem;
+  margin-bottom: 1.5rem;
+  flex-wrap: wrap;
+}
+
+.stats-tab {
+  padding: 0.5rem 1.25rem;
+  border: 1px solid var(--border);
+  background: var(--surface);
+  color: var(--text-muted);
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 0.9rem;
+  font-weight: 600;
+  transition: color 0.15s, border-color 0.15s, background 0.15s;
+}
+
+.stats-tab:hover {
+  color: var(--text);
+  border-color: var(--text-muted);
+}
+
+.stats-tab.active {
+  background: var(--accent, #a64dff);
+  color: #fff;
+  border-color: var(--accent, #a64dff);
+}
+
+.stats-desc {
+  font-size: 0.85rem;
+  color: var(--text-muted);
+  margin-bottom: 1rem;
+}
+
+.stats-table-wrapper {
+  overflow-x: auto;
+}
+
+.stats-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.9rem;
+}
+
+.stats-table th {
+  text-align: left;
+  padding: 0.5rem 0.75rem;
+  font-size: 0.78rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--text-muted);
+  border-bottom: 1px solid var(--border);
+}
+
+.stats-table td {
+  padding: 0.6rem 0.75rem;
+  border-bottom: 1px solid var(--border);
+  vertical-align: middle;
+}
+
+.stats-table tr:last-child td { border-bottom: none; }
+.stats-table tr:hover td { background: var(--surface2); }
+
+.stats-move-class {
+  font-size: 1rem;
+  text-align: center;
+  color: var(--text-muted);
+}
+
+.stats-move-name {
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+.stats-move-num {
+  text-align: right;
+  color: var(--text-muted);
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}
+
+.stats-move-effects {
+  font-size: 0.8rem;
+  color: var(--text-muted);
+  white-space: nowrap;
+}
+
+.stats-priority {
+  display: inline-block;
+  margin-right: 0.4em;
+  font-weight: 700;
+  color: var(--text-muted);
+}
+
+.stats-count {
+  font-weight: 700;
+}
+
+.stats-pokemon-name {
+  font-weight: 700;
+  text-transform: capitalize;
+  margin-bottom: 3px;
+}
+
+.coverage-bar-bg {
+  width: 120px;
+  height: 12px;
+  background: var(--surface2);
+  border-radius: 4px;
+  overflow: hidden;
+}
+
+.coverage-bar-fill {
+  height: 100%;
+  border-radius: 4px;
+}
+
+.stats-empty {
+  text-align: center;
+  color: var(--text-muted);
+  padding: 2rem 0.75rem;
+}

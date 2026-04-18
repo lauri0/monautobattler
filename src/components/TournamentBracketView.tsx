@@ -1,5 +1,6 @@
 import type { KnockoutMatch, TournamentPokemon } from '../models/types';
 import { formatPokemonName } from '../utils/formatName';
+import { getPokemonPersisted } from '../persistence/userStorage';
 
 interface Props {
   matches: KnockoutMatch[];
@@ -10,10 +11,12 @@ function BracketSlot({ pokemon, isWinner }: { pokemon: TournamentPokemon | null;
   if (!pokemon) {
     return <div className="bracket-entry bracket-tbd">TBD</div>;
   }
+  const elo = Math.round(getPokemonPersisted(pokemon.id).elo);
   return (
     <div className={`bracket-entry ${isWinner ? 'bracket-winner' : ''}`}>
       <img src={pokemon.spriteUrl} alt={pokemon.name} className="bracket-sprite" />
       <span>{formatPokemonName(pokemon.name)}</span>
+      <span className="bracket-elo">{elo}</span>
     </div>
   );
 }
