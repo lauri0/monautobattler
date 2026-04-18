@@ -132,11 +132,15 @@ export default function TournamentPage({ allPokemon, onBack }: Props) {
     const dataB = allPokemon.find(p => p.id === pokemonB.id);
     if (!dataA || !dataB) return null;
 
+    const persA = getPokemonPersisted(pokemonA.id);
+    const persB = getPokemonPersisted(pokemonB.id);
     return (
       <TournamentMatchView
         key={`${pokemonA.id}-${pokemonB.id}-${getMatchLabel(tournament)}`}
         pokemonAData={dataA}
         pokemonBData={dataB}
+        pokemonAElo={persA.elo}
+        pokemonBElo={persB.elo}
         matchLabel={getMatchLabel(tournament)}
         onMatchComplete={handleMatchComplete}
       />

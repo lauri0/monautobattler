@@ -4,17 +4,20 @@ import { formatPokemonName } from '../utils/formatName';
 import { buildBattlePokemon } from '../battle/buildBattlePokemon';
 import { resolveTurn, runFullBattle } from '../battle/battleEngine';
 import { expectiminimaxAI } from '../ai/expectiminimaxAI';
+import { applyEloResult } from '../utils/eloCalc';
 import BattlerPanel from './BattlerPanel';
 import LogEntry from './LogEntry';
 
 interface Props {
   pokemonAData: PokemonData;
   pokemonBData: PokemonData;
+  pokemonAElo: number;
+  pokemonBElo: number;
   matchLabel: string;
   onMatchComplete: (winnerId: number) => void;
 }
 
-export default function TournamentMatchView({ pokemonAData, pokemonBData, matchLabel, onMatchComplete }: Props) {
+export default function TournamentMatchView({ pokemonAData, pokemonBData, pokemonAElo, pokemonBElo, matchLabel, onMatchComplete }: Props) {
   const [p1, setP1] = useState<BattlePokemon>(() => buildBattlePokemon(pokemonAData));
   const [p2, setP2] = useState<BattlePokemon>(() => buildBattlePokemon(pokemonBData));
   const [log, setLog] = useState<TurnEvent[]>([]);
@@ -59,6 +62,10 @@ export default function TournamentMatchView({ pokemonAData, pokemonBData, matchL
   }
 
   const winner = battleOver ? (p1.currentHp > 0 ? p1 : p2) : null;
+  const loser = battleOver ? (p1.currentHp > 0 ? p2 : p1) : null;
+  const winnerElo = winner?.data.id === pokemonAData.id ? pokemonAElo : pokemonBElo;
+  const loserElo = loser?.data.id === pokemonAData.id ? pokemonAElo : pokemonBElo;
+  const eloResult = battleOver ? applyEloResult(winnerElo, loserElo) : null;
 
   return (
     <div className="page">
@@ -70,9 +77,23 @@ export default function TournamentMatchView({ pokemonAData, pokemonBData, matchL
         <BattlerPanel pokemon={p2} />
       </div>
 
-      {battleOver && winner && (
+      {battleOver && winner && loser && eloResult && (
         <div className="winner-banner card">
           <h2 style={{ color: '#f1c40f' }}>{formatPokemonName(winner.data.name)} wins!</h2>
+          <div style={{ marginTop: '0.75rem', fontSize: '0.9rem', color: 'var(--text-muted)', display: 'flex', gap: '2rem', justifyContent: 'center' }}>
+            <span>
+              {formatPokemonName(winner.data.name)}: {winnerElo} → {eloResult.newWinnerElo}
+              <span style={{ color: '#2ecc71', marginLeft: '0.4rem' }}>
+                (+{eloResult.newWinnerElo - winnerElo})
+              </span>
+            </span>
+            <span>
+              {formatPokemonName(loser.data.name)}: {loserElo} → {eloResult.newLoserElo}
+              <span style={{ color: '#e74c3c', marginLeft: '0.4rem' }}>
+                ({eloResult.newLoserElo - loserElo})
+              </span>
+            </span>
+          </div>
           <div style={{ display: 'flex', gap: '0.75rem', marginTop: '1rem', justifyContent: 'center' }}>
             <button className="btn-primary" onClick={() => onMatchComplete(winnerId!)}>
               Back to Tournament

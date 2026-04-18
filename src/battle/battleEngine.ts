@@ -362,7 +362,7 @@ export function simulateTurnDeterministic(
     if (hit) {
       const effectiveMove = effectivePowerMove(move, defender, foeHitUserThisTurn);
       const rawDmg = expectedDamageWithCrit(attacker, defender, effectiveMove);
-      const dmg = Math.max(1, Math.floor(rawDmg * fraction));
+      const dmg = rawDmg > 0 ? Math.max(1, Math.floor(rawDmg * fraction)) : 0;
       dealtDamage = dmg > 0;
 
       // Drain / recoil (deterministic)
@@ -382,16 +382,19 @@ export function simulateTurnDeterministic(
       if (effects.statChange && move.effect?.statChanges) {
         const result = applyStatChangesSilent(attacker, defender, move);
         attacker = result.attacker;
-        defender = result.defender;
+        // Only apply foe-targeting stat changes if the defender is still alive
+        if (defender.currentHp > 0) defender = result.defender;
       }
-      if (effects.ailment && move.effect?.ailment && !defender.statusCondition && !isImmuneToAilment(defender, move.effect.ailment)) {
-        defender = { ...defender, statusCondition: move.effect.ailment };
-      }
-      if (effects.flinch && move.effect?.flinchChance) {
-        flinched = true;
-      }
-      if (effects.confusion && move.effect?.confuses && !defender.confused) {
-        defender = { ...defender, confused: true, confusionTurnsLeft: 3 }; // use average ~3 turns
+      if (defender.currentHp > 0) {
+        if (effects.ailment && move.effect?.ailment && !defender.statusCondition && !isImmuneToAilment(defender, move.effect.ailment)) {
+          defender = { ...defender, statusCondition: move.effect.ailment };
+        }
+        if (effects.flinch && move.effect?.flinchChance) {
+          flinched = true;
+        }
+        if (effects.confusion && move.effect?.confuses && !defender.confused) {
+          defender = { ...defender, confused: true, confusionTurnsLeft: 3 };
+        }
       }
       if (move.effect?.confusesUser && !attacker.confused) {
         attacker = { ...attacker, confused: true, confusionTurnsLeft: 3 };
