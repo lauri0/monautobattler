@@ -91,6 +91,32 @@
 .team-slot-active-0 { flex-direction: row; }
 .team-slot-active-1 { flex-direction: row-reverse; }
 
+.team-slot-active-wrap {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.active-moves-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.4rem;
+  justify-content: center;
+  padding: 0.5rem 0.75rem;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+}
+
+.active-move-chip {
+  padding: 0.25rem 0.6rem;
+  border-radius: 6px;
+  border: 1px solid var(--border);
+  font-size: 0.78rem;
+  text-transform: capitalize;
+  background: rgba(255, 255, 255, 0.03);
+}
+
 .base-stats-panel {
   flex: 0 0 150px;
   display: flex;

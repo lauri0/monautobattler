@@ -12,7 +12,7 @@ const STATUS_STYLES: Record<string, { label: string; bg: string }> = {
   freeze:    { label: 'FRZ', bg: '#4fc3f7' },
 };
 
-export default function BattlerPanel({ pokemon }: { pokemon: BattlePokemon }) {
+export default function BattlerPanel({ pokemon, hideMoves }: { pokemon: BattlePokemon; hideMoves?: boolean }) {
   const status = pokemon.statusCondition ? STATUS_STYLES[pokemon.statusCondition] : null;
   return (
     <div className="battler-panel card">
@@ -30,13 +30,15 @@ export default function BattlerPanel({ pokemon }: { pokemon: BattlePokemon }) {
         {pokemon.data.types.map(t => <TypeBadge key={t} type={t} />)}
       </div>
       <HpBar current={pokemon.currentHp} max={pokemon.level50Stats.hp} />
-      <div className="battler-moves">
-        {pokemon.moves.map(m => (
-          <span key={m.id} className="battler-move-chip" style={{ borderColor: getTypeColor(m.type) }}>
-            {m.name}
-          </span>
-        ))}
-      </div>
+      {!hideMoves && (
+        <div className="battler-moves">
+          {pokemon.moves.map(m => (
+            <span key={m.id} className="battler-move-chip" style={{ borderColor: getTypeColor(m.type) }}>
+              {m.name}
+            </span>
+          ))}
+        </div>
+      )}
     </div>
   );
 }

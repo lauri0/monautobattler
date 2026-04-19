@@ -354,14 +354,27 @@ function TeamView({
             key={i}
             className={
               'team-slot-view ' +
-              (isActive ? `team-slot-active team-slot-active-${side} ` : '') +
+              (isActive ? 'team-slot-active-wrap ' : '') +
               (fainted ? 'team-slot-fainted' : '')
             }
           >
             {isActive ? (
               <>
-                <BattlerPanel pokemon={p} />
-                <BaseStatsPanel data={p.data} />
+                <div className={`team-slot-active team-slot-active-${side}`}>
+                  <BattlerPanel pokemon={p} hideMoves />
+                  <BaseStatsPanel data={p.data} />
+                </div>
+                <div className="active-moves-row">
+                  {p.moves.map(m => (
+                    <span
+                      key={m.id}
+                      className="active-move-chip"
+                      style={{ borderColor: getTypeColor(m.type) }}
+                    >
+                      {m.name}
+                    </span>
+                  ))}
+                </div>
               </>
             ) : (
               <div className="team-bench-mini">
