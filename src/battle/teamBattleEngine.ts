@@ -10,11 +10,13 @@ import type {
   TeamAIStrategy,
   TeamSlotIndex,
   TeamTurnEvent,
+  TurnEvent,
   SideIndex,
   StatStages,
 } from '../models/types';
 import { buildBattlePokemon } from './buildBattlePokemon';
-import { resolveTurnWithMoves, usableMoves } from './battleEngine';
+import { applyEndOfTurnStatus, resolveSingleAttack, usableMoves } from './battleEngine';
+import { effectiveSpeed } from './damageCalc';
 
 const MAX_TURNS = 500;
 
@@ -67,19 +69,29 @@ function mustReplace(state: TeamBattleState, side: SideIndex): boolean {
   return false;
 }
 
+function mustPivot(state: TeamBattleState, side: SideIndex): boolean {
+  return (state.phase === 'pivot0' && side === 0) || (state.phase === 'pivot1' && side === 1);
+}
+
+export function sideNeedsAction(state: TeamBattleState, side: SideIndex): boolean {
+  return state.phase === 'choose' || mustReplace(state, side) || mustPivot(state, side);
+}
+
 export function legalActions(state: TeamBattleState, side: SideIndex): TeamAction[] {
   const team = state.teams[side];
   const bench = aliveBenchSlots(team);
 
-  if (mustReplace(state, side)) {
+  if (mustReplace(state, side) || mustPivot(state, side)) {
     return bench.map(idx => ({ kind: 'switch', targetIdx: idx }));
   }
 
-  // In a replace phase where this side is NOT the one replacing: no action.
+  // In a replace/pivot phase where this side is NOT the one acting: no action.
   if (state.phase !== 'choose') return [];
 
   const active = team.pokemon[team.activeIdx];
   const moveActions: TeamAction[] = usableMoves(active, state.turn).map(m => ({ kind: 'move', move: m }));
+  // Locked into a forced move (Outrage/Petal Dance/Thrash): no switching.
+  if (active.lockedMove) return moveActions;
   const switchActions: TeamAction[] = bench.map(idx => ({ kind: 'switch', targetIdx: idx }));
   return [...moveActions, ...switchActions];
 }
@@ -92,6 +104,7 @@ function onSwitchOut(p: BattlePokemon): BattlePokemon {
     statStages: { ...ZERO_STAGES },
     confused: false,
     confusionTurnsLeft: undefined,
+    lockedMove: undefined,
     sleepTurnsUsed: p.statusCondition === 'sleep' ? 0 : undefined,
     frozenTurnsUsed: p.statusCondition === 'freeze' ? 0 : undefined,
   };
@@ -140,6 +153,91 @@ export function battleWinner(state: TeamBattleState): SideIndex | null {
  * In a replace phase, only the side(s) that must replace provide actions
  * (the other side's action is ignored).
  */
+// Tag TurnEvents produced by a single attack with side attributions by matching
+// pokemon names against the known attacker. Same-species collisions are
+// pre-existing ambiguity and degrade gracefully (attacker wins the tie).
+function tagAttackEvents(
+  inner: TurnEvent[],
+  attackerName: string,
+  attackerSide: SideIndex,
+  defenderSide: SideIndex,
+  out: TeamTurnEvent[],
+): void {
+  for (const ev of inner) {
+    const evName = 'attackerName' in ev ? ev.attackerName : 'pokemonName' in ev ? ev.pokemonName : '';
+    const side: SideIndex = evName === attackerName ? attackerSide : defenderSide;
+    out.push({ side, ...ev });
+  }
+}
+
+function tagTickEvents(
+  inner: TurnEvent[],
+  side0Name: string,
+  out: TeamTurnEvent[],
+): void {
+  for (const ev of inner) {
+    const evName = 'pokemonName' in ev ? ev.pokemonName : '';
+    const side: SideIndex = evName === side0Name ? 0 : 1;
+    out.push({ side, ...ev });
+  }
+}
+
+// Apply end-of-turn burn/poison ticks to both actives, then compute the next
+// phase (replace*/choose). Advances the turn counter. Used whenever a turn is
+// fully resolved — either straight out of 'choose' phase, or after a pivot
+// sequence finishes.
+function completeTurn(
+  teams: [Team, Team],
+  turn: number,
+  events: TeamTurnEvent[],
+): { next: TeamBattleState; events: TeamTurnEvent[] } {
+  const inner: TurnEvent[] = [];
+  const a0 = teams[0].pokemon[teams[0].activeIdx];
+  const a1 = teams[1].pokemon[teams[1].activeIdx];
+  const a0Ticked = applyEndOfTurnStatus(a0, turn, inner);
+  const a1Ticked = applyEndOfTurnStatus(a1, turn, inner);
+  teams[0] = writeActive(teams[0], a0Ticked);
+  teams[1] = writeActive(teams[1], a1Ticked);
+  tagTickEvents(inner, a0.data.name, events);
+  const phase = computePhaseAfterAttack(teams);
+  return { next: { teams, turn: turn + 1, phase }, events };
+}
+
+// Resolve a single attack against the current active on `defenderSide`. Writes
+// the updated pokemon back into teams. Returns the SingleAttackResult so the
+// caller can inspect flinch / pivot / damage flags.
+function runOneAttack(
+  teams: [Team, Team],
+  attackerSide: SideIndex,
+  move: Move,
+  turn: number,
+  ctx: { preFlinched: boolean; foeHitUserThisTurn: boolean },
+  events: TeamTurnEvent[],
+): { dealtDamage: boolean; defenderFlinched: boolean; pivotTriggered: boolean } {
+  const defenderSide: SideIndex = attackerSide === 0 ? 1 : 0;
+  const attacker = teams[attackerSide].pokemon[teams[attackerSide].activeIdx];
+  const defender = teams[defenderSide].pokemon[teams[defenderSide].activeIdx];
+  const inner: TurnEvent[] = [];
+  const r = resolveSingleAttack(attacker, defender, move, turn, ctx, inner);
+  teams[attackerSide] = writeActive(teams[attackerSide], r.attacker);
+  teams[defenderSide] = writeActive(teams[defenderSide], r.defender);
+  tagAttackEvents(inner, attacker.data.name, attackerSide, defenderSide, events);
+  return {
+    dealtDamage: r.dealtDamage,
+    defenderFlinched: r.defenderFlinched,
+    pivotTriggered: r.pivotTriggered,
+  };
+}
+
+// Figure out which side acts first. Only meaningful when both have a move.
+function speedOrder(teams: [Team, Team], m0: Move, m1: Move): SideIndex {
+  if (m0.priority !== m1.priority) return m0.priority > m1.priority ? 0 : 1;
+  const s0 = effectiveSpeed(teams[0].pokemon[teams[0].activeIdx]);
+  const s1 = effectiveSpeed(teams[1].pokemon[teams[1].activeIdx]);
+  if (s0 !== s1) return s0 > s1 ? 0 : 1;
+  return Math.random() < 0.5 ? 0 : 1;
+}
+
 export function applyActions(
   state: TeamBattleState,
   action0: TeamAction | null,
@@ -147,7 +245,45 @@ export function applyActions(
 ): { next: TeamBattleState; events: TeamTurnEvent[] } {
   const events: TeamTurnEvent[] = [];
 
-  // Replace phases: perform requested switch(es) only, don't advance turn.
+  // ── Pivot phase ───────────────────────────────────────────────────────────
+  // The pivoting side picks a replacement; then any pending opponent attack
+  // resolves against the new active. Opponent may themselves pivot, chaining.
+  if (state.phase === 'pivot0' || state.phase === 'pivot1') {
+    const pivotSide: SideIndex = state.phase === 'pivot0' ? 0 : 1;
+    const action = pivotSide === 0 ? action0 : action1;
+    if (!action || action.kind !== 'switch') {
+      throw new Error(`Pivot phase requires a switch action for side ${pivotSide}`);
+    }
+
+    let teams = state.teams.slice() as [Team, Team];
+    const team = teams[pivotSide];
+    const outgoing = onSwitchOut(team.pokemon[team.activeIdx]);
+    const incoming = team.pokemon[action.targetIdx];
+    teams[pivotSide] = setActive(team, action.targetIdx, outgoing);
+    events.push({
+      kind: 'switch', turn: state.turn, side: pivotSide,
+      outName: outgoing.data.name, inName: incoming.data.name,
+    });
+
+    const pending = state.pendingAttack;
+    if (pending) {
+      const pendingAttacker = teams[pending.side].pokemon[teams[pending.side].activeIdx];
+      if (pendingAttacker.currentHp > 0) {
+        const r = runOneAttack(teams, pending.side, pending.move, state.turn, {
+          preFlinched: false,
+          foeHitUserThisTurn: false,
+        }, events);
+        if (r.pivotTriggered && aliveBenchSlots(teams[pending.side]).length > 0) {
+          const nextPhase: TeamBattlePhase = pending.side === 0 ? 'pivot0' : 'pivot1';
+          return { next: { teams, turn: state.turn, phase: nextPhase }, events };
+        }
+      }
+    }
+
+    return completeTurn(teams, state.turn, events);
+  }
+
+  // ── Replace phases ────────────────────────────────────────────────────────
   if (state.phase !== 'choose') {
     let teams = state.teams.slice() as [Team, Team];
     const replacers: [SideIndex, TeamAction | null][] =
@@ -162,7 +298,6 @@ export function applyActions(
       const team = teams[side];
       const outgoing = team.pokemon[team.activeIdx];
       const incoming = team.pokemon[action.targetIdx];
-      // Outgoing is fainted; no volatile reset needed, but keep structure consistent.
       const newTeam = setActive(team, action.targetIdx, outgoing);
       teams[side] = newTeam;
       events.push({
@@ -172,7 +307,6 @@ export function applyActions(
     }
 
     const phase = computePhaseAfterAttack(teams);
-    // If a team has no alive Pokemon at all, battle is effectively over; phase stays as-is.
     return { next: { teams, turn: state.turn, phase }, events };
   }
 
@@ -197,30 +331,54 @@ export function applyActions(
     });
   }
 
-  // Determine attacking moves (null if that side switched).
   const move0: Move | null = action0.kind === 'move' ? action0.move : null;
   const move1: Move | null = action1.kind === 'move' ? action1.move : null;
 
-  if (move0 !== null || move1 !== null) {
-    const active0 = teams[0].pokemon[teams[0].activeIdx];
-    const active1 = teams[1].pokemon[teams[1].activeIdx];
-
-    const { events: innerEvents, p1After, p2After } = resolveTurnWithMoves(
-      active0, active1, move0, move1, state.turn,
-    );
-    const name1 = active1.data.name;
-    for (const ev of innerEvents) {
-      const evName = 'attackerName' in ev ? ev.attackerName : 'pokemonName' in ev ? ev.pokemonName : '';
-      const side: SideIndex = evName === name1 ? 1 : 0;
-      events.push({ side, ...ev });
-    }
-
-    teams[0] = writeActive(teams[0], p1After);
-    teams[1] = writeActive(teams[1], p2After);
+  if (move0 === null && move1 === null) {
+    return completeTurn(teams, state.turn, events);
   }
 
-  const phase = computePhaseAfterAttack(teams);
-  return { next: { teams, turn: state.turn + 1, phase }, events };
+  // Determine attack order. When only one side attacks, that side goes first.
+  let firstSide: SideIndex;
+  if (move0 && move1) {
+    firstSide = speedOrder(teams, move0, move1);
+  } else {
+    firstSide = move0 ? 0 : 1;
+  }
+  const secondSide: SideIndex = firstSide === 0 ? 1 : 0;
+  const firstMove = firstSide === 0 ? move0 : move1;
+  const secondMove = secondSide === 0 ? move0 : move1;
+
+  // First attack.
+  const r1 = runOneAttack(teams, firstSide, firstMove!, state.turn, {
+    preFlinched: false,
+    foeHitUserThisTurn: false,
+  }, events);
+
+  // If first attacker pivots (U-turn), suspend the turn and wait for them to
+  // pick a replacement. The second side's move (if any) is carried as pending.
+  if (r1.pivotTriggered && aliveBenchSlots(teams[firstSide]).length > 0) {
+    const pendingAttack = secondMove ? { side: secondSide, move: secondMove } : undefined;
+    const phase: TeamBattlePhase = firstSide === 0 ? 'pivot0' : 'pivot1';
+    return { next: { teams, turn: state.turn, phase, pendingAttack }, events };
+  }
+
+  // Second attack, if the second attacker still has a move and is alive.
+  if (secondMove) {
+    const secondAttacker = teams[secondSide].pokemon[teams[secondSide].activeIdx];
+    if (secondAttacker.currentHp > 0) {
+      const r2 = runOneAttack(teams, secondSide, secondMove, state.turn, {
+        preFlinched: r1.defenderFlinched,
+        foeHitUserThisTurn: r1.dealtDamage,
+      }, events);
+      if (r2.pivotTriggered && aliveBenchSlots(teams[secondSide]).length > 0) {
+        const phase: TeamBattlePhase = secondSide === 0 ? 'pivot0' : 'pivot1';
+        return { next: { teams, turn: state.turn, phase }, events };
+      }
+    }
+  }
+
+  return completeTurn(teams, state.turn, events);
 }
 
 // ── Top-level driver ──────────────────────────────────────────────────────────
@@ -235,8 +393,8 @@ export function runFullTeamBattle(
   let guard = 0;
 
   while (battleWinner(state) === null && guard < MAX_TURNS) {
-    const a0 = mustReplace(state, 0) || state.phase === 'choose' ? ai0.selectAction(state, 0) : null;
-    const a1 = mustReplace(state, 1) || state.phase === 'choose' ? ai1.selectAction(state, 1) : null;
+    const a0 = sideNeedsAction(state, 0) ? ai0.selectAction(state, 0) : null;
+    const a1 = sideNeedsAction(state, 1) ? ai1.selectAction(state, 1) : null;
     const { next, events } = applyActions(state, a0, a1);
     log.push(...events);
     state = next;

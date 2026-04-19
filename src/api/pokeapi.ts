@@ -143,6 +143,11 @@ async function fetchMoveData(moveUrl: string): Promise<Move | null> {
       effect = { ...effect, confusesUser: true };
     }
 
+    // U-turn / Volt Switch / Flip Turn: user switches out after hitting
+    if (data.name === 'u-turn' || data.name === 'volt-switch' || data.name === 'flip-turn') {
+      effect = { ...effect, pivotSwitch: true };
+    }
+
     return {
       id: data.id,
       name: data.name,

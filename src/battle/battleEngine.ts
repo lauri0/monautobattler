@@ -21,6 +21,10 @@ export const STRUGGLE: Move = {
  * Falls back to Struggle when no moves are available.
  */
 export function usableMoves(p: BattlePokemon, turnNumber: number): Move[] {
+  if (p.lockedMove) {
+    const locked = p.moves.find(m => m.id === p.lockedMove!.moveId);
+    return locked ? [locked] : [STRUGGLE];
+  }
   const moves = turnNumber <= 1 ? p.moves : p.moves.filter(m => !m.effect?.firstTurnOnly);
   return moves.length > 0 ? moves : [STRUGGLE];
 }
@@ -162,7 +166,7 @@ function isImmuneToAilment(defender: BattlePokemon, ailment: import('../models/t
 function applySecondaryEffects(
   attacker: BattlePokemon,
   defender: BattlePokemon,
-  move: { effect?: import('../models/types').MoveEffect },
+  move: Move,
   damage: number,
   turn: number,
   events: TurnEvent[]
@@ -224,17 +228,18 @@ function applySecondaryEffects(
     }
   }
 
-  // Self-confusion on attacker (Outrage, Petal Dance, Thrash)
-  if (eff.confusesUser && !attacker.confused) {
-    const turns = 2 + Math.floor(Math.random() * 4);
-    events.push({ kind: 'confused', turn, pokemonName: attacker.data.name });
-    attacker = { ...attacker, confused: true, confusionTurnsLeft: turns };
+  // Self-lock (Outrage, Petal Dance, Thrash): on first successful use, lock
+  // the user into this move for 1-2 additional turns (2-3 total). Confusion is
+  // applied only when the lock expires — see the tick in resolveTurnWithMoves.
+  if (eff.confusesUser && !attacker.lockedMove && !attacker.confused) {
+    const turnsLeft = 1 + Math.floor(Math.random() * 2);
+    attacker = { ...attacker, lockedMove: { moveId: move.id, turnsLeft } };
   }
 
   return { attacker, defender, defenderFlinched };
 }
 
-function applyEndOfTurnStatus(
+export function applyEndOfTurnStatus(
   p: BattlePokemon,
   turn: number,
   events: TurnEvent[]
@@ -396,8 +401,19 @@ export function simulateTurnDeterministic(
           defender = { ...defender, confused: true, confusionTurnsLeft: 3 };
         }
       }
-      if (move.effect?.confusesUser && !attacker.confused) {
-        attacker = { ...attacker, confused: true, confusionTurnsLeft: 3 };
+      // Self-lock tick: mirror the runtime behavior so the search tree sees
+      // Outrage-users correctly forced in subsequent turns and eventually
+      // confused. Uses deterministic turnsLeft = 1 after first use (2 total).
+      const wasLockedBefore = !!attacker.lockedMove && attacker.lockedMove.moveId === move.id;
+      if (wasLockedBefore && attacker.lockedMove) {
+        const turnsLeft = attacker.lockedMove.turnsLeft - 1;
+        if (turnsLeft <= 0) {
+          attacker = { ...attacker, lockedMove: undefined, confused: true, confusionTurnsLeft: 3 };
+        } else {
+          attacker = { ...attacker, lockedMove: { ...attacker.lockedMove, turnsLeft } };
+        }
+      } else if (move.effect?.confusesUser && !attacker.lockedMove && !attacker.confused) {
+        attacker = { ...attacker, lockedMove: { moveId: move.id, turnsLeft: 1 } };
       }
     }
 
@@ -448,6 +464,90 @@ export function simulateTurnDeterministic(
   }
 
   return { p1After: p1, p2After: p2, battleOver, lastAttackerIsP1 };
+}
+
+export interface SingleAttackResult {
+  attacker: BattlePokemon;
+  defender: BattlePokemon;
+  dealtDamage: boolean;
+  defenderFlinched: boolean;
+  // True when the attacker used a successful pivot-switch move (U-turn etc.)
+  // and is still alive. The caller (team engine) should prompt the attacker
+  // to choose a replacement.
+  pivotTriggered: boolean;
+}
+
+/**
+ * Resolve one attacker's action for a turn, mutating the passed event array.
+ * Shared between the 1v1 engine (which calls it twice per turn) and the team
+ * engine (which drives attacks one-by-one so it can interleave pivot switches).
+ */
+export function resolveSingleAttack(
+  attacker: BattlePokemon,
+  defender: BattlePokemon,
+  move: Move,
+  turnNumber: number,
+  ctx: { preFlinched: boolean; foeHitUserThisTurn: boolean },
+  events: TurnEvent[],
+): SingleAttackResult {
+  if (ctx.preFlinched) {
+    events.push({ kind: 'cant_move', turn: turnNumber, pokemonName: attacker.data.name, reason: 'flinch' });
+    return { attacker, defender, dealtDamage: false, defenderFlinched: false, pivotTriggered: false };
+  }
+  if (move.effect?.firstTurnOnly && turnNumber > 1) {
+    events.push({ kind: 'move_failed', turn: turnNumber, pokemonName: attacker.data.name, moveName: move.name });
+    return { attacker, defender, dealtDamage: false, defenderFlinched: false, pivotTriggered: false };
+  }
+
+  const { canAct: acts, updated: attackerChecked } = canAct(attacker, turnNumber, events);
+  attacker = attackerChecked;
+  if (!acts) {
+    return { attacker, defender, dealtDamage: false, defenderFlinched: false, pivotTriggered: false };
+  }
+
+  const wasLockedBefore = !!attacker.lockedMove && attacker.lockedMove.moveId === move.id;
+  const effMove = effectivePowerMove(move, defender, ctx.foeHitUserThisTurn);
+  const result = calcDamage(attacker, defender, effMove);
+  const newDefHp = Math.max(0, defender.currentHp - result.damage);
+  defender = { ...defender, currentHp: newDefHp };
+
+  events.push({
+    kind: 'attack', turn: turnNumber,
+    attackerName: attacker.data.name, defenderName: defender.data.name,
+    moveName: move.name, moveType: move.type,
+    damage: result.damage, isCrit: result.isCrit,
+    missed: result.missed, effectiveness: result.effectiveness,
+    attackerHpAfter: attacker.currentHp, defenderHpAfter: newDefHp,
+  });
+
+  let dealtDamage = false;
+  let defenderFlinched = false;
+  const connected = !result.missed && result.effectiveness !== 0;
+  if (connected) {
+    if (result.damage > 0) dealtDamage = true;
+    const eff = applySecondaryEffects(attacker, defender, move, result.damage, turnNumber, events);
+    attacker = eff.attacker;
+    defender = eff.defender;
+    defenderFlinched = eff.defenderFlinched;
+  }
+
+  // Tick an existing forced-move lock. Skip on the turn the lock is first set.
+  if (wasLockedBefore && attacker.lockedMove) {
+    const turnsLeft = attacker.lockedMove.turnsLeft - 1;
+    if (turnsLeft <= 0) {
+      const turns = 2 + Math.floor(Math.random() * 4);
+      events.push({ kind: 'confused', turn: turnNumber, pokemonName: attacker.data.name });
+      attacker = { ...attacker, lockedMove: undefined, confused: true, confusionTurnsLeft: turns };
+    } else {
+      attacker = { ...attacker, lockedMove: { ...attacker.lockedMove, turnsLeft } };
+    }
+  }
+
+  const pivotTriggered = !!(
+    move.effect?.pivotSwitch && connected && attacker.currentHp > 0
+  );
+
+  return { attacker, defender, dealtDamage, defenderFlinched, pivotTriggered };
 }
 
 export function resolveTurn(
@@ -523,39 +623,15 @@ export function resolveTurnWithMoves(
     let attacker = isP1 ? p1 : p2;
     let defender = isP1 ? p2 : p1;
 
-    if (!isFirst && secondFlinched) {
-      events.push({ kind: 'cant_move', turn: turnNumber, pokemonName: attacker.data.name, reason: 'flinch' });
-    } else if (move.effect?.firstTurnOnly && turnNumber > 1) {
-      events.push({ kind: 'move_failed', turn: turnNumber, pokemonName: attacker.data.name, moveName: move.name });
-    } else {
-      const { canAct: acts, updated: attackerChecked } = canAct(attacker, turnNumber, events);
-      attacker = attackerChecked;
-
-      if (acts) {
-        const foeHitUserThisTurn = !isFirst && firstDealtDamage;
-        const effMove = effectivePowerMove(move, defender, foeHitUserThisTurn);
-        const result = calcDamage(attacker, defender, effMove);
-        const newDefHp = Math.max(0, defender.currentHp - result.damage);
-        defender = { ...defender, currentHp: newDefHp };
-
-        events.push({
-          kind: 'attack', turn: turnNumber,
-          attackerName: attacker.data.name, defenderName: defender.data.name,
-          moveName: move.name, moveType: move.type,
-          damage: result.damage, isCrit: result.isCrit,
-          missed: result.missed, effectiveness: result.effectiveness,
-          attackerHpAfter: attacker.currentHp, defenderHpAfter: newDefHp,
-        });
-
-        if (!result.missed && result.effectiveness !== 0) {
-          if (isFirst && result.damage > 0) firstDealtDamage = true;
-          const eff = applySecondaryEffects(attacker, defender, move, result.damage, turnNumber, events);
-          attacker = eff.attacker;
-          defender = eff.defender;
-          // Flinch from second attacker has no effect this turn.
-          if (isFirst) secondFlinched = eff.defenderFlinched;
-        }
-      }
+    const r = resolveSingleAttack(attacker, defender, move, turnNumber, {
+      preFlinched: !isFirst && secondFlinched,
+      foeHitUserThisTurn: !isFirst && firstDealtDamage,
+    }, events);
+    attacker = r.attacker;
+    defender = r.defender;
+    if (isFirst) {
+      firstDealtDamage = r.dealtDamage;
+      secondFlinched = r.defenderFlinched;
     }
 
     if (isP1) { p1 = attacker; p2 = defender; }

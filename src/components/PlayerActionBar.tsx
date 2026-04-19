@@ -15,16 +15,22 @@ export default function PlayerActionBar({ state, thinking, onAction }: Props) {
   const active = team.pokemon[team.activeIdx];
   const moves = actions.filter(a => a.kind === 'move');
   const forcedReplace = state.phase === 'replace0' || state.phase === 'replaceBoth';
+  const forcedPivot = state.phase === 'pivot0';
 
-  if (moves.length === 0 && !forcedReplace && !thinking) return null;
+  if (moves.length === 0 && !forcedReplace && !forcedPivot && !thinking) return null;
+
+  let label: string;
+  if (forcedReplace) {
+    label = `${formatPokemonName(active.data.name)} fainted — pick a replacement from the bench.`;
+  } else if (forcedPivot) {
+    label = `${formatPokemonName(active.data.name)} is switching out — pick a replacement from the bench.`;
+  } else {
+    label = `Your move — ${formatPokemonName(active.data.name)}`;
+  }
 
   return (
     <div className="player-action-bar card">
-      <div className="action-label">
-        {forcedReplace
-          ? `${formatPokemonName(active.data.name)} fainted — pick a replacement from the bench.`
-          : `Your move — ${formatPokemonName(active.data.name)}`}
-      </div>
+      <div className="action-label">{label}</div>
       {moves.length > 0 && (
         <div className="action-row">
           {moves.map((a, i) => {

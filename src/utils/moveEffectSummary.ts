@@ -75,5 +75,9 @@ export function effectSummary(move: Move): string {
     parts.push('confuse self');
   }
 
+  if (eff.pivotSwitch) {
+    parts.push('switch out');
+  }
+
   return parts.join(' · ');
 }

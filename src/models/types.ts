@@ -31,6 +31,7 @@ export interface MoveEffect {
   superEffectiveAgainst?: TypeName[];  // extra types this move is super effective against (Freeze-Dry vs Water)
   useFoeAttack?: boolean;  // use the defender's Attack stat for damage instead of the attacker's (Foul Play)
   confusesUser?: boolean;  // confuses the user after hitting (Outrage, Petal Dance, Thrash)
+  pivotSwitch?: boolean;   // user switches out after hitting (U-turn, Volt Switch, Flip Turn)
 }
 
 export interface StatStages {
@@ -100,6 +101,10 @@ export interface BattlePokemon {
   frozenTurnsUsed?: number;   // turns elapsed while frozen (0-based)
   confused?: boolean;
   confusionTurnsLeft?: number;
+  // Forced-move lock (Outrage, Petal Dance, Thrash). turnsLeft is the number
+  // of additional forced turns AFTER the current turn. When it ticks to 0 the
+  // lock clears and the user becomes confused.
+  lockedMove?: { moveId: number; turnsLeft: number };
   statStages: StatStages;
 }
 
@@ -162,12 +167,16 @@ export type TeamAction =
   | { kind: 'move'; move: Move }
   | { kind: 'switch'; targetIdx: TeamSlotIndex };
 
-export type TeamBattlePhase = 'choose' | 'replace0' | 'replace1' | 'replaceBoth';
+export type TeamBattlePhase = 'choose' | 'replace0' | 'replace1' | 'replaceBoth' | 'pivot0' | 'pivot1';
 
 export interface TeamBattleState {
   teams: [Team, Team];
   turn: number;
   phase: TeamBattlePhase;
+  // During pivot0/pivot1, holds the opponent's still-to-resolve attack (if any).
+  // The opponent attack is resolved against the new active after the pivoting
+  // side picks a replacement. Cleared once the turn finishes.
+  pendingAttack?: { side: SideIndex; move: Move };
 }
 
 export type TeamTurnEvent =
