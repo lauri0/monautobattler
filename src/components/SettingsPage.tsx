@@ -13,6 +13,8 @@ import {
   setVariantSettings,
   getAutoDisableBstThreshold,
   setAutoDisableBstThreshold,
+  getAutoDisableBstMaxThreshold,
+  setAutoDisableBstMaxThreshold,
   getAutoDisableOverwrite,
   setAutoDisableOverwrite,
   GAME_VERSIONS,
@@ -43,6 +45,7 @@ export default function SettingsPage({ onBack, onDataLoaded }: Props) {
     getVariantSettings()
   );
   const [bstThreshold, setBstThresholdState] = useState(() => getAutoDisableBstThreshold());
+  const [bstMaxThreshold, setBstMaxThresholdState] = useState(() => getAutoDisableBstMaxThreshold());
   const [autoDisableOverwrite, setAutoDisableOverwriteState] = useState(() => getAutoDisableOverwrite());
   const [game, setGameState] = useState<GameVersion>(() => getSelectedGame());
   const gameLabel = GAME_VERSIONS.find(g => g.id === game)?.label ?? game;
@@ -306,6 +309,24 @@ export default function SettingsPage({ onBack, onDataLoaded }: Props) {
                 if (isFinite(val) && val >= 0) {
                   setBstThresholdState(val);
                   setAutoDisableBstThreshold(val);
+                }
+              }}
+              style={{ width: 70 }}
+              disabled={loading}
+            />
+          </label>
+          <label style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', fontSize: '0.9rem', marginTop: '0.4rem' }}>
+            Disable Pokemon with BST above
+            <input
+              type="number"
+              min={0}
+              max={999}
+              value={bstMaxThreshold}
+              onChange={e => {
+                const val = Number(e.target.value);
+                if (isFinite(val) && val >= 0) {
+                  setBstMaxThresholdState(val);
+                  setAutoDisableBstMaxThreshold(val);
                 }
               }}
               style={{ width: 70 }}

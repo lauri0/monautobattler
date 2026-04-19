@@ -6,6 +6,7 @@ import {
   getSelectedGameInfo,
   getVariantSettings,
   getAutoDisableBstThreshold,
+  getAutoDisableBstMaxThreshold,
   getAutoDisableOverwrite,
   getPokemonPersisted,
   setPokemonPersisted,
@@ -229,11 +230,12 @@ export async function fetchAndStorePokemon(
 
   const bst = Object.values(baseStats).reduce((sum, v) => sum + v, 0);
   const bstThreshold = getAutoDisableBstThreshold();
+  const bstMaxThreshold = getAutoDisableBstMaxThreshold();
   const overwrite = getAutoDisableOverwrite();
   const existing = getPokemonPersisted(pokemon.id);
   const isNew = existing.wins === 0 && existing.losses === 0 && existing.elo === 1500 && existing.moveset.length === 0 && !existing.disabled;
   if (overwrite || isNew) {
-    setPokemonPersisted({ ...existing, disabled: bst < bstThreshold });
+    setPokemonPersisted({ ...existing, disabled: bst < bstThreshold || bst > bstMaxThreshold });
   }
 
   await ensureSpriteOnDisk(id, raw.name, onProgress);

@@ -193,6 +193,24 @@ export function setAutoDisableBstThreshold(value: number): void {
   localStorage.setItem(AUTO_DISABLE_BST_KEY, String(value));
 }
 
+const AUTO_DISABLE_BST_MAX_KEY = 'auto_disable_bst_max_threshold';
+const DEFAULT_AUTO_DISABLE_BST_MAX = 999;
+
+export function getAutoDisableBstMaxThreshold(): number {
+  try {
+    const raw = localStorage.getItem(AUTO_DISABLE_BST_MAX_KEY);
+    if (raw === null) return DEFAULT_AUTO_DISABLE_BST_MAX;
+    const n = Number(raw);
+    return isFinite(n) && n >= 0 ? n : DEFAULT_AUTO_DISABLE_BST_MAX;
+  } catch {
+    return DEFAULT_AUTO_DISABLE_BST_MAX;
+  }
+}
+
+export function setAutoDisableBstMaxThreshold(value: number): void {
+  localStorage.setItem(AUTO_DISABLE_BST_MAX_KEY, String(value));
+}
+
 const AUTO_DISABLE_OVERWRITE_KEY = 'auto_disable_overwrite';
 
 export function getAutoDisableOverwrite(): boolean {
