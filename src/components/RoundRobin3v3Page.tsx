@@ -1,0 +1,560 @@
+import { useState, useEffect, useMemo, useRef } from 'react';
+import type { PokemonData, TeamBattleState } from '../models/types';
+import {
+  createPlayTournament,
+  createSpectateTournament,
+  applyDraftPick,
+  applyMatchResult,
+  findNextPlayerMatchIdx,
+  isPlayerPairing,
+  RR_MIN_POOL_PLAY,
+  RR_MIN_POOL_SPECTATE,
+  RR_MATCH_SIZE,
+  RR_ROSTER_SIZE,
+  RR_TOTAL_MATCHES,
+} from '../tournament/roundRobin3v3Engine';
+import type { RR3v3State, RR3v3MatchResult } from '../tournament/roundRobin3v3Engine';
+import {
+  saveRoundRobin3v3,
+  loadRoundRobin3v3,
+  clearRoundRobin3v3,
+} from '../persistence/roundRobin3v3Storage';
+import { pickRoster } from '../tournament/rosterPicker';
+import {
+  buildTeamBattleState,
+  runFullTeamBattle,
+} from '../battle/teamBattleEngine';
+import { mctsTeamAI } from '../ai/mctsTeamAI';
+import { getPokemonPersisted } from '../persistence/userStorage';
+import TeamView from './TeamView';
+import PlayerActionBar from './PlayerActionBar';
+import TypeBadge from './TypeBadge';
+import { renderTeamEvent } from './TeamEventLog';
+import { useTeamBattleController } from './useTeamBattleController';
+import DraftPhase from './DraftPhase';
+import RoundRobinStandingsView from './RoundRobinStandingsView';
+import { formatPokemonName } from '../utils/formatName';
+import './RoundRobin3v3Page.css';
+
+interface Props {
+  allPokemon: PokemonData[];
+  onBack: () => void;
+}
+
+// Local page-level phase that layers on top of the persisted tournament phase.
+type LocalPhase = 'setup' | 'draft' | 'overview' | 'preMatch' | 'match' | 'finished';
+
+interface PendingMatch {
+  pairing: { a: number; b: number };
+  initial: TeamBattleState;
+  rosterA: [number, number, number]; // pokemon ids picked by team A
+  rosterB: [number, number, number];
+  interactive: 'play' | 'spectate';
+  // When true, battle side 0 is pairing team B (player always sits on side 0
+  // during play). Map winner/survived back to pairing order on result.
+  swapped: boolean;
+}
+
+export default function RoundRobin3v3Page({ allPokemon, onBack }: Props) {
+  const byId = useMemo(() => new Map(allPokemon.map(p => [p.id, p])), [allPokemon]);
+  const enabledCount = useMemo(
+    () => allPokemon.filter(p => !getPokemonPersisted(p.id).disabled && p.availableMoves.length > 0).length,
+    [allPokemon],
+  );
+
+  const [state, setState] = useState<RR3v3State | null>(() => loadRoundRobin3v3());
+  const [localPhase, setLocalPhase] = useState<LocalPhase>(() => {
+    const loaded = loadRoundRobin3v3();
+    if (!loaded) return 'setup';
+    if (loaded.phase === 'draft') return 'draft';
+    if (loaded.phase === 'finished') return 'finished';
+    return 'overview';
+  });
+  const [pending, setPending] = useState<PendingMatch | null>(null);
+
+  useEffect(() => {
+    if (state) saveRoundRobin3v3(state);
+  }, [state]);
+
+  function startPlay() {
+    try {
+      const s = createPlayTournament(allPokemon);
+      setState(s);
+      setLocalPhase('draft');
+    } catch (e) {
+      alert((e as Error).message);
+    }
+  }
+
+  function startSpectate() {
+    try {
+      const s = createSpectateTournament(allPokemon);
+      setState(s);
+      setLocalPhase('overview');
+    } catch (e) {
+      alert((e as Error).message);
+    }
+  }
+
+  function abandonTournament() {
+    if (!confirm('Abandon the current tournament? Progress will be lost.')) return;
+    clearRoundRobin3v3();
+    setState(null);
+    setPending(null);
+    setLocalPhase('setup');
+  }
+
+  function launchBattleWithPlayerPick(playerPick: [number, number, number]) {
+    if (!state) return;
+    const pair = state.schedule[state.currentMatchIdx];
+    const teamA = state.teams[pair.a];
+    const teamB = state.teams[pair.b];
+    const rosterAData = teamA.roster.map(id => byId.get(id)!).filter(Boolean);
+    const rosterBData = teamB.roster.map(id => byId.get(id)!).filter(Boolean);
+
+    let aPick: [number, number, number];
+    let bPick: [number, number, number];
+    if (teamA.isPlayer) {
+      aPick = playerPick;
+      bPick = pickRoster(rosterBData, rosterAData);
+    } else {
+      aPick = pickRoster(rosterAData, rosterBData);
+      bPick = playerPick;
+    }
+
+    const aIds: [number, number, number] = [teamA.roster[aPick[0]], teamA.roster[aPick[1]], teamA.roster[aPick[2]]];
+    const bIds: [number, number, number] = [teamB.roster[bPick[0]], teamB.roster[bPick[1]], teamB.roster[bPick[2]]];
+    // Player is always on battle side 0 so the action bar and left-side TeamView
+    // map to their controls. Swap the build order when the player is team B.
+    const swapped = teamB.isPlayer;
+    const initial = swapped
+      ? buildTeamBattleState(bIds, aIds, allPokemon)
+      : buildTeamBattleState(aIds, bIds, allPokemon);
+    setPending({ pairing: pair, initial, rosterA: aIds, rosterB: bIds, interactive: 'play', swapped });
+    setLocalPhase('match');
+  }
+
+  function launchSpectateBattle() {
+    if (!state) return;
+    const pair = state.schedule[state.currentMatchIdx];
+    const teamA = state.teams[pair.a];
+    const teamB = state.teams[pair.b];
+    const rosterAData = teamA.roster.map(id => byId.get(id)!).filter(Boolean);
+    const rosterBData = teamB.roster.map(id => byId.get(id)!).filter(Boolean);
+    const aPick = pickRoster(rosterAData, rosterBData);
+    const bPick = pickRoster(rosterBData, rosterAData);
+    const aIds: [number, number, number] = [teamA.roster[aPick[0]], teamA.roster[aPick[1]], teamA.roster[aPick[2]]];
+    const bIds: [number, number, number] = [teamB.roster[bPick[0]], teamB.roster[bPick[1]], teamB.roster[bPick[2]]];
+    const initial = buildTeamBattleState(aIds, bIds, allPokemon);
+    setPending({ pairing: pair, initial, rosterA: aIds, rosterB: bIds, interactive: 'spectate', swapped: false });
+    setLocalPhase('match');
+  }
+
+  function onMatchEnd(result: RR3v3MatchResult) {
+    if (!state) return;
+    const next = applyMatchResult(state, result);
+    setState(next);
+    setPending(null);
+    if (next.phase === 'finished') setLocalPhase('finished');
+    else setLocalPhase('overview');
+  }
+
+  function simulateUntilPlayer(simulateAll = false) {
+    if (!state) return;
+    let current = state;
+    while (current.phase !== 'finished' && current.currentMatchIdx < current.schedule.length) {
+      const pair = current.schedule[current.currentMatchIdx];
+      const teamA = current.teams[pair.a];
+      const teamB = current.teams[pair.b];
+      const isPlayerMatch = teamA.isPlayer || teamB.isPlayer;
+      if (!simulateAll && isPlayerMatch) break;
+
+      const rosterAData = teamA.roster.map(id => byId.get(id)!).filter(Boolean);
+      const rosterBData = teamB.roster.map(id => byId.get(id)!).filter(Boolean);
+      const aPick = pickRoster(rosterAData, rosterBData);
+      const bPick = pickRoster(rosterBData, rosterAData);
+      const aIds: [number, number, number] = [teamA.roster[aPick[0]], teamA.roster[aPick[1]], teamA.roster[aPick[2]]];
+      const bIds: [number, number, number] = [teamB.roster[bPick[0]], teamB.roster[bPick[1]], teamB.roster[bPick[2]]];
+      const initial = buildTeamBattleState(aIds, bIds, allPokemon);
+      const battle = runFullTeamBattle(initial, mctsTeamAI, mctsTeamAI);
+      const survivedA = battle.finalState.teams[0].pokemon.filter(p => p.currentHp > 0).length;
+      const survivedB = battle.finalState.teams[1].pokemon.filter(p => p.currentHp > 0).length;
+      current = applyMatchResult(current, {
+        winner: battle.winner === 0 ? 0 : 1,
+        rosterA: aIds,
+        rosterB: bIds,
+        pokemonSurvivedA: survivedA,
+        pokemonSurvivedB: survivedB,
+      });
+    }
+    setState(current);
+    if (current.phase === 'finished') setLocalPhase('finished');
+  }
+
+  // ── Rendering ──────────────────────────────────────────────────────────────
+
+  if (!state || localPhase === 'setup') {
+    return (
+      <div className="page">
+        <button className="back-btn" onClick={onBack}>← Back</button>
+        <h1 className="page-title">3v3 Round Robin</h1>
+        <div className="rr-setup card">
+          <p>
+            Ten teams of four Pokemon compete in a full round-robin ({RR_TOTAL_MATCHES} matches).
+            Before each match, each team picks 3 of their 4 Pokemon to bring in.
+          </p>
+          <div className="rr-setup-info">
+            <div>Play mode: draft 4 Pokemon from curated offers (min {RR_MIN_POOL_PLAY} enabled).</div>
+            <div>Spectate mode: watch 10 randomly-generated teams (min {RR_MIN_POOL_SPECTATE} enabled).</div>
+            <div>Currently enabled: <strong>{enabledCount}</strong></div>
+          </div>
+          <div className="rr-setup-buttons">
+            <button
+              className="btn-primary"
+              onClick={startPlay}
+              disabled={enabledCount < RR_MIN_POOL_PLAY}
+            >Play (with draft)</button>
+            <button
+              className="btn-secondary"
+              onClick={startSpectate}
+              disabled={enabledCount < RR_MIN_POOL_SPECTATE}
+            >Spectate whole tournament</button>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  if (localPhase === 'draft' && state.draft) {
+    return (
+      <div className="page">
+        <button className="back-btn" onClick={abandonTournament}>← Abandon</button>
+        <h1 className="page-title">3v3 Round Robin — Draft</h1>
+        <DraftPhase
+          allPokemon={allPokemon}
+          offeredIds={state.draft.offered}
+          pickedIds={state.draft.picked}
+          round={state.draft.round}
+          onPick={(id) => {
+            const next = applyDraftPick(state, id);
+            setState(next);
+            if (next.phase === 'overview') setLocalPhase('overview');
+          }}
+        />
+      </div>
+    );
+  }
+
+  if (localPhase === 'preMatch') {
+    return (
+      <PreMatchView
+        state={state}
+        byId={byId}
+        onSelect={launchBattleWithPlayerPick}
+        onCancel={() => setLocalPhase('overview')}
+      />
+    );
+  }
+
+  if (localPhase === 'match' && pending) {
+    return (
+      <MatchView
+        tournamentState={state}
+        pending={pending}
+        onEnd={onMatchEnd}
+        onBack={onBack}
+      />
+    );
+  }
+
+  if (localPhase === 'finished') {
+    return (
+      <FinishedView
+        state={state}
+        allPokemon={allPokemon}
+        onBack={onBack}
+        onReset={abandonTournament}
+      />
+    );
+  }
+
+  // Default: overview
+  const nextIdx = state.currentMatchIdx;
+  const nextPairing = nextIdx < state.schedule.length ? state.schedule[nextIdx] : null;
+  const teamA = nextPairing ? state.teams[nextPairing.a] : null;
+  const teamB = nextPairing ? state.teams[nextPairing.b] : null;
+  const nextIsPlayer = nextPairing ? isPlayerPairing(state, nextIdx) : false;
+  const nextPlayerIdx = findNextPlayerMatchIdx(state);
+  const aiMatchesUntilPlayer = nextPlayerIdx !== null ? nextPlayerIdx - state.currentMatchIdx : null;
+
+  return (
+    <div className="page">
+      <button className="back-btn" onClick={onBack}>← Back</button>
+      <h1 className="page-title">3v3 Round Robin</h1>
+
+      <div className="rr-progress card">
+        <div>Progress: <strong>{state.currentMatchIdx} / {state.schedule.length}</strong> matches played</div>
+        <button className="btn-secondary btn-small" onClick={abandonTournament}>Abandon</button>
+      </div>
+
+      {nextPairing && teamA && teamB && (
+        <div className="rr-next-match card">
+          <h3 className="section-title">Next Match — #{nextIdx + 1}</h3>
+          <div className="rr-next-pair">
+            <TeamRosterMini team={teamA} byId={byId} />
+            <div className="rr-vs">VS</div>
+            <TeamRosterMini team={teamB} byId={byId} />
+          </div>
+          <div className="rr-next-actions">
+            {state.mode === 'play' && nextIsPlayer && (
+              <button className="btn-primary" onClick={() => setLocalPhase('preMatch')}>Play my match</button>
+            )}
+            {(state.mode === 'spectate' || !nextIsPlayer) && (
+              <button className="btn-secondary" onClick={launchSpectateBattle}>Spectate this match</button>
+            )}
+            {state.mode === 'play' && !nextIsPlayer && aiMatchesUntilPlayer !== null && aiMatchesUntilPlayer > 0 && (
+              <button className="btn-primary" onClick={() => simulateUntilPlayer(false)}>
+                Simulate {aiMatchesUntilPlayer} AI match{aiMatchesUntilPlayer === 1 ? '' : 'es'} until mine
+              </button>
+            )}
+            {state.mode === 'spectate' && (
+              <button className="btn-primary" onClick={() => simulateUntilPlayer(true)}>
+                Simulate remaining matches
+              </button>
+            )}
+          </div>
+        </div>
+      )}
+
+      <div className="card">
+        <RoundRobinStandingsView state={state} allPokemon={allPokemon} />
+      </div>
+    </div>
+  );
+}
+
+// ── Sub-views ────────────────────────────────────────────────────────────────
+
+function TeamRosterMini({ team, byId }: { team: RR3v3State['teams'][number]; byId: Map<number, PokemonData> }) {
+  return (
+    <div className="rr-team-mini">
+      <div className="rr-team-mini-name">{team.name}</div>
+      <div className="rr-team-mini-sprites">
+        {team.roster.map(id => {
+          const p = byId.get(id);
+          return p ? (
+            <div key={id} className="rr-team-mini-slot">
+              <img src={p.spriteUrl} alt={p.name} title={formatPokemonName(p.name)} />
+              <div className="rr-team-mini-types">
+                {p.types.map(t => <TypeBadge key={t} type={t} />)}
+              </div>
+            </div>
+          ) : null;
+        })}
+      </div>
+    </div>
+  );
+}
+
+function PreMatchView(props: {
+  state: RR3v3State;
+  byId: Map<number, PokemonData>;
+  onSelect: (pickedIndices: [number, number, number]) => void;
+  onCancel: () => void;
+}) {
+  const { state, byId, onCancel, onSelect } = props;
+  const pair = state.schedule[state.currentMatchIdx];
+  const playerSide = state.teams[pair.a].isPlayer ? 'a' : 'b';
+  const playerTeam = playerSide === 'a' ? state.teams[pair.a] : state.teams[pair.b];
+  const oppTeam = playerSide === 'a' ? state.teams[pair.b] : state.teams[pair.a];
+
+  const [selected, setSelected] = useState<number[]>([]);
+
+  function toggle(idx: number) {
+    if (selected.includes(idx)) setSelected(selected.filter(i => i !== idx));
+    else if (selected.length < RR_MATCH_SIZE) setSelected([...selected, idx]);
+  }
+
+  const confirmable = selected.length === RR_MATCH_SIZE;
+
+  return (
+    <div className="page">
+      <button className="back-btn" onClick={onCancel}>← Back to Overview</button>
+      <h1 className="page-title">Pick Your 3 — Match #{state.currentMatchIdx + 1}</h1>
+
+      <div className="rr-prematch-opp card">
+        <h3 className="section-title">Opponent: {oppTeam.name}</h3>
+        <div className="rr-prematch-roster">
+          {oppTeam.roster.map(id => {
+            const p = byId.get(id);
+            if (!p) return null;
+            return (
+              <div key={id} className="rr-prematch-card">
+                <img src={p.spriteUrl} alt={p.name} />
+                <div>{formatPokemonName(p.name)}</div>
+                <div className="rr-prematch-types">
+                  {p.types.map(t => <TypeBadge key={t} type={t} />)}
+                </div>
+              </div>
+            );
+          })}
+        </div>
+      </div>
+
+      <div className="rr-prematch-own card">
+        <h3 className="section-title">Your Roster — pick 3 of {RR_ROSTER_SIZE}</h3>
+        <div className="rr-prematch-roster">
+          {playerTeam.roster.map((id, idx) => {
+            const p = byId.get(id);
+            if (!p) return null;
+            const picked = selected.includes(idx);
+            return (
+              <button
+                key={id}
+                className={'rr-prematch-card rr-pick-btn' + (picked ? ' rr-pick-selected' : '')}
+                onClick={() => toggle(idx)}
+              >
+                <img src={p.spriteUrl} alt={p.name} />
+                <div>{formatPokemonName(p.name)}</div>
+                <div className="rr-prematch-types">
+                  {p.types.map(t => <TypeBadge key={t} type={t} />)}
+                </div>
+                {picked && <div className="rr-pick-badge">Selected</div>}
+              </button>
+            );
+          })}
+        </div>
+        <button
+          className="btn-primary"
+          disabled={!confirmable}
+          onClick={() => onSelect([selected[0], selected[1], selected[2]])}
+        >
+          Confirm & Start Battle
+        </button>
+      </div>
+    </div>
+  );
+}
+
+function MatchView(props: {
+  tournamentState: RR3v3State;
+  pending: PendingMatch;
+  onEnd: (result: RR3v3MatchResult) => void;
+  onBack: () => void;
+}) {
+  const { tournamentState, pending, onEnd, onBack } = props;
+  const { state, log, thinking, winner, done, nextTurn, submitPlayerAction } =
+    useTeamBattleController(pending.initial);
+  const logRef = useRef<HTMLDivElement>(null);
+
+  const teamA = tournamentState.teams[pending.pairing.a];
+  const teamB = tournamentState.teams[pending.pairing.b];
+  const mode: 'play' | 'spectate' = pending.interactive;
+
+  useEffect(() => {
+    if (logRef.current) logRef.current.scrollTop = logRef.current.scrollHeight;
+  }, [log]);
+
+  function handleContinue() {
+    if (!done || winner === null) return;
+    const survivedSide0 = state.teams[0].pokemon.filter(p => p.currentHp > 0).length;
+    const survivedSide1 = state.teams[1].pokemon.filter(p => p.currentHp > 0).length;
+    const pairingWinner: 0 | 1 = pending.swapped
+      ? (winner === 0 ? 1 : 0)
+      : (winner === 0 ? 0 : 1);
+    const survivedA = pending.swapped ? survivedSide1 : survivedSide0;
+    const survivedB = pending.swapped ? survivedSide0 : survivedSide1;
+    onEnd({
+      winner: pairingWinner,
+      rosterA: pending.rosterA,
+      rosterB: pending.rosterB,
+      pokemonSurvivedA: survivedA,
+      pokemonSurvivedB: survivedB,
+    });
+  }
+
+  // Player always sits on battle side 0 during play (see launchBattleWithPlayerPick).
+  const playerControlsSide0 = mode === 'play';
+  // Left side of the UI shows whichever pairing team landed on battle side 0.
+  const leftTeam = pending.swapped ? teamB : teamA;
+  const rightTeam = pending.swapped ? teamA : teamB;
+
+  return (
+    <div className="page">
+      <button className="back-btn" onClick={onBack}>← Menu</button>
+      <h1 className="page-title">
+        Match #{tournamentState.currentMatchIdx + 1}: {leftTeam.name} vs {rightTeam.name}
+      </h1>
+
+      <div className="team-arena">
+        <TeamView
+          state={state}
+          side={0}
+          onSwitch={playerControlsSide0 && !thinking
+            ? (slot) => submitPlayerAction({ kind: 'switch', targetIdx: slot })
+            : undefined}
+        />
+        <div className="arena-vs">VS</div>
+        <TeamView state={state} side={1} />
+      </div>
+
+      {done && winner !== null && (
+        <div className="winner-banner card">
+          <h2 style={{ color: '#f1c40f' }}>
+            🏆 {winner === 0 ? leftTeam.name : rightTeam.name} wins!
+          </h2>
+          <div style={{ display: 'flex', gap: '0.75rem', marginTop: '1rem', justifyContent: 'center' }}>
+            <button className="btn-primary" onClick={handleContinue}>Continue to Standings →</button>
+          </div>
+        </div>
+      )}
+
+      {!done && mode === 'spectate' && (
+        <div style={{ textAlign: 'center', margin: '1rem 0' }}>
+          <button className="btn-primary" onClick={nextTurn} disabled={thinking}>
+            {thinking ? 'Thinking…' : 'Next Turn →'}
+          </button>
+        </div>
+      )}
+
+      {!done && playerControlsSide0 && (
+        <PlayerActionBar
+          state={state}
+          thinking={thinking}
+          onAction={submitPlayerAction}
+        />
+      )}
+
+      <div className="card battle-log" ref={logRef}>
+        <h3 className="section-title" style={{ marginBottom: '0.75rem' }}>Battle Log</h3>
+        {log.length === 0 && (
+          <p style={{ color: 'var(--text-muted)', fontSize: '0.85rem' }}>
+            {mode === 'spectate' ? 'Press "Next Turn" to start.' : 'Choose your action.'}
+          </p>
+        )}
+        {log.map((ev, i) => renderTeamEvent(ev, i))}
+      </div>
+    </div>
+  );
+}
+
+function FinishedView(props: {
+  state: RR3v3State;
+  allPokemon: PokemonData[];
+  onBack: () => void;
+  onReset: () => void;
+}) {
+  const { state, allPokemon, onBack, onReset } = props;
+  return (
+    <div className="page">
+      <button className="back-btn" onClick={onBack}>← Back</button>
+      <h1 className="page-title">🏆 Tournament Finished</h1>
+      <div className="card">
+        <RoundRobinStandingsView state={state} allPokemon={allPokemon} />
+      </div>
+      <div style={{ textAlign: 'center', marginTop: '1rem' }}>
+        <button className="btn-primary" onClick={onReset}>Start New Tournament</button>
+      </div>
+    </div>
+  );
+}

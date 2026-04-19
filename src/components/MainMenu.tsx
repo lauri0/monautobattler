@@ -1,6 +1,6 @@
 import './MainMenu.css';
 
-type Page = 'menu' | 'pokedex' | 'battle' | 'battle3v3' | 'masssim' | 'gauntlet' | 'tournament' | 'settings' | 'moveban' | 'statistics';
+type Page = 'menu' | 'pokedex' | 'battle' | 'battle3v3' | 'roundrobin3v3' | 'masssim' | 'gauntlet' | 'tournament' | 'settings' | 'moveban' | 'statistics';
 
 interface Props {
   onNavigate: (page: Page) => void;
@@ -34,6 +34,10 @@ export default function MainMenu({ onNavigate }: Props) {
         <button className="menu-btn" onClick={() => onNavigate('tournament')}>
           <span className="menu-btn-icon">🏟️</span>
           <span>1v1 Tournament</span>
+        </button>
+        <button className="menu-btn" onClick={() => onNavigate('roundrobin3v3')}>
+          <span className="menu-btn-icon">🏆</span>
+          <span>3v3 Round Robin</span>
         </button>
         <button className="menu-btn" onClick={() => onNavigate('masssim')}>
           <span className="menu-btn-icon">🏆</span>
