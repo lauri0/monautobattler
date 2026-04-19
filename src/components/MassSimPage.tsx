@@ -130,7 +130,7 @@ export default function MassSimPage({ allPokemon, onBack }: Props) {
   return (
     <div className="page">
       <button className="back-btn" onClick={onBack}>← Back</button>
-      <h1 className="page-title">Mass Simulator</h1>
+      <h1 className="page-title">1v1 Mass Simulator</h1>
 
       <div className="card" style={{ marginBottom: '1.5rem' }}>
         <div className="sim-config">

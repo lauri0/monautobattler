@@ -467,33 +467,45 @@ export function resolveTurn(
     pokemon1,
     turnNumber,
   );
+  return resolveTurnWithMoves(pokemon1, pokemon2, move1, move2, turnNumber);
+}
 
-  // Determine order
-  let first: BattlePokemon, second: BattlePokemon;
-  let firstMove: typeof move1, secondMove: typeof move2;
-
-  if (move1.priority !== move2.priority) {
-    if (move1.priority > move2.priority) {
-      [first, second, firstMove, secondMove] = [pokemon1, pokemon2, move1, move2];
+/**
+ * Resolves a single 1v1 turn with pre-selected moves. A `null` move means that
+ * side skips its attack this turn (used by the 3v3 engine when a side switches
+ * while the other attacks). End-of-turn status ticks still apply to both sides.
+ */
+export function resolveTurnWithMoves(
+  pokemon1: BattlePokemon,
+  pokemon2: BattlePokemon,
+  move1: Move | null,
+  move2: Move | null,
+  turnNumber: number,
+): { events: TurnEvent[]; p1After: BattlePokemon; p2After: BattlePokemon; battleOver: boolean; lastAttackerIsP1?: boolean } {
+  // Build the ordered list of attackers. Zero, one, or two entries.
+  type Attacker = { isP1: boolean; move: Move };
+  const attackers: Attacker[] = [];
+  if (move1 && move2) {
+    let p1First: boolean;
+    if (move1.priority !== move2.priority) {
+      p1First = move1.priority > move2.priority;
     } else {
-      [first, second, firstMove, secondMove] = [pokemon2, pokemon1, move2, move1];
+      const spd1 = effectiveSpeed(pokemon1);
+      const spd2 = effectiveSpeed(pokemon2);
+      if (spd1 !== spd2) p1First = spd1 > spd2;
+      else p1First = Math.random() < 0.5;
     }
-  } else {
-    const spd1 = effectiveSpeed(pokemon1);
-    const spd2 = effectiveSpeed(pokemon2);
-    if (spd1 !== spd2) {
-      if (spd1 > spd2) {
-        [first, second, firstMove, secondMove] = [pokemon1, pokemon2, move1, move2];
-      } else {
-        [first, second, firstMove, secondMove] = [pokemon2, pokemon1, move2, move1];
-      }
+    if (p1First) {
+      attackers.push({ isP1: true, move: move1 });
+      attackers.push({ isP1: false, move: move2 });
     } else {
-      if (Math.random() < 0.5) {
-        [first, second, firstMove, secondMove] = [pokemon1, pokemon2, move1, move2];
-      } else {
-        [first, second, firstMove, secondMove] = [pokemon2, pokemon1, move2, move1];
-      }
+      attackers.push({ isP1: false, move: move2 });
+      attackers.push({ isP1: true, move: move1 });
     }
+  } else if (move1) {
+    attackers.push({ isP1: true, move: move1 });
+  } else if (move2) {
+    attackers.push({ isP1: false, move: move2 });
   }
 
   const events: TurnEvent[] = [];
@@ -502,25 +514,26 @@ export function resolveTurn(
   let battleOver = false;
   let lastAttackerIsP1: boolean | undefined;
   let secondFlinched = false;
-  let secondWasHitThisTurn = false; // tracks if first attacker damaged the second (for Revenge)
+  let firstDealtDamage = false; // for Revenge on second attacker
 
-  // ── First attacker ──────────────────────────────────────────────
-  {
-    const firstIsP1 = first.data.id === pokemon1.data.id;
-    let attacker = firstIsP1 ? p1 : p2;
-    let defender = firstIsP1 ? p2 : p1;
+  for (let i = 0; i < attackers.length; i++) {
+    if (battleOver) break;
+    const { isP1, move } = attackers[i];
+    const isFirst = i === 0;
+    let attacker = isP1 ? p1 : p2;
+    let defender = isP1 ? p2 : p1;
 
-    // Fake Out / firstTurnOnly fail on turn > 1
-    if (firstMove.effect?.firstTurnOnly && turnNumber > 1) {
-      events.push({ kind: 'move_failed', turn: turnNumber, pokemonName: attacker.data.name, moveName: firstMove.name });
+    if (!isFirst && secondFlinched) {
+      events.push({ kind: 'cant_move', turn: turnNumber, pokemonName: attacker.data.name, reason: 'flinch' });
+    } else if (move.effect?.firstTurnOnly && turnNumber > 1) {
+      events.push({ kind: 'move_failed', turn: turnNumber, pokemonName: attacker.data.name, moveName: move.name });
     } else {
       const { canAct: acts, updated: attackerChecked } = canAct(attacker, turnNumber, events);
       attacker = attackerChecked;
 
       if (acts) {
-        // First attacker: Revenge bonus never applies (no prior hit this turn);
-        // Hex bonus applies if the target already has a status (carried over).
-        const effMove = effectivePowerMove(firstMove, defender, false);
+        const foeHitUserThisTurn = !isFirst && firstDealtDamage;
+        const effMove = effectivePowerMove(move, defender, foeHitUserThisTurn);
         const result = calcDamage(attacker, defender, effMove);
         const newDefHp = Math.max(0, defender.currentHp - result.damage);
         defender = { ...defender, currentHp: newDefHp };
@@ -528,79 +541,33 @@ export function resolveTurn(
         events.push({
           kind: 'attack', turn: turnNumber,
           attackerName: attacker.data.name, defenderName: defender.data.name,
-          moveName: firstMove.name, moveType: firstMove.type,
+          moveName: move.name, moveType: move.type,
           damage: result.damage, isCrit: result.isCrit,
           missed: result.missed, effectiveness: result.effectiveness,
           attackerHpAfter: attacker.currentHp, defenderHpAfter: newDefHp,
         });
 
         if (!result.missed && result.effectiveness !== 0) {
-          if (result.damage > 0) secondWasHitThisTurn = true;
-          const eff = applySecondaryEffects(attacker, defender, firstMove, result.damage, turnNumber, events);
+          if (isFirst && result.damage > 0) firstDealtDamage = true;
+          const eff = applySecondaryEffects(attacker, defender, move, result.damage, turnNumber, events);
           attacker = eff.attacker;
           defender = eff.defender;
-          secondFlinched = eff.defenderFlinched;
+          // Flinch from second attacker has no effect this turn.
+          if (isFirst) secondFlinched = eff.defenderFlinched;
         }
       }
     }
 
-    if (firstIsP1) { p1 = attacker; p2 = defender; }
-    else            { p2 = attacker; p1 = defender; }
+    if (isP1) { p1 = attacker; p2 = defender; }
+    else      { p2 = attacker; p1 = defender; }
 
     if (p1.currentHp <= 0 || p2.currentHp <= 0) {
       battleOver = true;
-      lastAttackerIsP1 = firstIsP1;
+      lastAttackerIsP1 = isP1;
     }
   }
 
-  // ── Second attacker ─────────────────────────────────────────────
-  if (!battleOver) {
-    const secondIsP1 = second.data.id === pokemon1.data.id;
-    let attacker = secondIsP1 ? p1 : p2;
-    let defender = secondIsP1 ? p2 : p1;
-
-    if (secondFlinched) {
-      events.push({ kind: 'cant_move', turn: turnNumber, pokemonName: attacker.data.name, reason: 'flinch' });
-    } else if (secondMove.effect?.firstTurnOnly && turnNumber > 1) {
-      events.push({ kind: 'move_failed', turn: turnNumber, pokemonName: attacker.data.name, moveName: secondMove.name });
-    } else {
-      const { canAct: acts, updated: attackerChecked } = canAct(attacker, turnNumber, events);
-      attacker = attackerChecked;
-
-      if (acts) {
-        const effectiveMove = effectivePowerMove(secondMove, defender, secondWasHitThisTurn);
-        const result = calcDamage(attacker, defender, effectiveMove);
-        const newDefHp = Math.max(0, defender.currentHp - result.damage);
-        defender = { ...defender, currentHp: newDefHp };
-
-        events.push({
-          kind: 'attack', turn: turnNumber,
-          attackerName: attacker.data.name, defenderName: defender.data.name,
-          moveName: secondMove.name, moveType: secondMove.type,
-          damage: result.damage, isCrit: result.isCrit,
-          missed: result.missed, effectiveness: result.effectiveness,
-          attackerHpAfter: attacker.currentHp, defenderHpAfter: newDefHp,
-        });
-
-        if (!result.missed && result.effectiveness !== 0) {
-          const eff = applySecondaryEffects(attacker, defender, secondMove, result.damage, turnNumber, events);
-          attacker = eff.attacker;
-          defender = eff.defender;
-          // flinch on second attacker has no effect this turn
-        }
-      }
-    }
-
-    if (secondIsP1) { p1 = attacker; p2 = defender; }
-    else             { p2 = attacker; p1 = defender; }
-
-    if (p1.currentHp <= 0 || p2.currentHp <= 0) {
-      battleOver = true;
-      lastAttackerIsP1 = secondIsP1;
-    }
-  }
-
-  // ── End-of-turn: burn / poison ticks ────────────────────────────
+  // End-of-turn burn / poison ticks
   if (!battleOver) {
     p1 = applyEndOfTurnStatus(p1, turnNumber, events);
     p2 = applyEndOfTurnStatus(p2, turnNumber, events);

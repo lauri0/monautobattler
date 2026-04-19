@@ -5,6 +5,7 @@ import MainMenu from './components/MainMenu';
 import PokedexPage from './components/PokedexPage';
 import PokemonDetail from './components/PokemonDetail';
 import BattlePage from './components/BattlePage';
+import Battle3v3Page from './components/Battle3v3Page';
 import MassSimPage from './components/MassSimPage';
 import SettingsPage from './components/SettingsPage';
 import MoveBanPage from './components/MoveBanPage';
@@ -12,7 +13,7 @@ import GauntletPage from './components/GauntletPage';
 import TournamentPage from './components/TournamentPage';
 import StatisticsPage from './components/StatisticsPage';
 
-type Page = 'menu' | 'pokedex' | 'pokedex-detail' | 'battle' | 'masssim' | 'gauntlet' | 'tournament' | 'settings' | 'moveban' | 'statistics';
+type Page = 'menu' | 'pokedex' | 'pokedex-detail' | 'battle' | 'battle3v3' | 'masssim' | 'gauntlet' | 'tournament' | 'settings' | 'moveban' | 'statistics';
 
 export default function App() {
   const [page, setPage] = useState<Page>('menu');
@@ -98,6 +99,10 @@ export default function App() {
 
   if (page === 'battle') {
     return <BattlePage allPokemon={allPokemon} onBack={() => setPage('menu')} />;
+  }
+
+  if (page === 'battle3v3') {
+    return <Battle3v3Page allPokemon={allPokemon} onBack={() => setPage('menu')} />;
   }
 
   if (page === 'masssim') {

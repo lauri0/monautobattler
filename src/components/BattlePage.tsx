@@ -98,7 +98,7 @@ export default function BattlePage({ allPokemon, onBack }: Props) {
     return (
       <div className="page">
         <button className="back-btn" onClick={onBack}>← Back</button>
-        <h1 className="page-title">Single Battle</h1>
+        <h1 className="page-title">1v1 Battle</h1>
         <div className="battle-select card">
           <div className="battle-select-pickers">
             <div className="picker-col">

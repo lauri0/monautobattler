@@ -86,7 +86,7 @@ export default function TournamentPage({ allPokemon, onBack }: Props) {
     return (
       <div className="page">
         <button className="back-btn" onClick={onBack}>← Back</button>
-        <h1 className="page-title">Tournament</h1>
+        <h1 className="page-title">1v1 Tournament</h1>
         <div className="tournament-setup card">
           <p className="tournament-desc">
             32 Pokemon compete in a FIFA-style tournament: 8 groups of 4 (round-robin),
@@ -151,7 +151,7 @@ export default function TournamentPage({ allPokemon, onBack }: Props) {
     return (
       <div className="page">
         <button className="back-btn" onClick={onBack}>← Back</button>
-        <h1 className="page-title">Tournament Complete!</h1>
+        <h1 className="page-title">1v1 Tournament Complete!</h1>
         <div className="tournament-podium card">
           <div className="podium-place podium-first">
             <div className="podium-medal">1st</div>
@@ -204,7 +204,7 @@ export default function TournamentPage({ allPokemon, onBack }: Props) {
     return (
       <div className="page">
         <button className="back-btn" onClick={onBack}>← Back</button>
-        <h1 className="page-title">Tournament</h1>
+        <h1 className="page-title">1v1 Tournament</h1>
 
         <div className="tournament-progress card">
           <div className="progress-info">

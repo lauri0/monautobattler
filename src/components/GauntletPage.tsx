@@ -123,7 +123,7 @@ export default function GauntletPage({ allPokemon, onBack }: Props) {
   return (
     <div className="page">
       <button className="back-btn" onClick={onBack}>← Back</button>
-      <h1 className="page-title">Gauntlet</h1>
+      <h1 className="page-title">1v1 Gauntlet</h1>
       <p style={{ color: 'var(--text-muted)', marginTop: '-0.5rem', marginBottom: '1.5rem', fontSize: '0.9rem' }}>
         Pit one Pokemon against every other Pokemon to test its moveset.
       </p>

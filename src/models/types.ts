@@ -148,6 +148,47 @@ export interface AIStrategy {
   selectMove(attacker: BattlePokemon, defender: BattlePokemon, turnNumber?: number): Move;
 }
 
+// ── 3v3 Team Battle Types ──
+
+export type TeamSlotIndex = 0 | 1 | 2;
+export type SideIndex = 0 | 1;
+
+export interface Team {
+  pokemon: BattlePokemon[];      // length 3
+  activeIdx: TeamSlotIndex;
+}
+
+export type TeamAction =
+  | { kind: 'move'; move: Move }
+  | { kind: 'switch'; targetIdx: TeamSlotIndex };
+
+export type TeamBattlePhase = 'choose' | 'replace0' | 'replace1' | 'replaceBoth';
+
+export interface TeamBattleState {
+  teams: [Team, Team];
+  turn: number;
+  phase: TeamBattlePhase;
+}
+
+export type TeamTurnEvent =
+  | ({ side: SideIndex } & TurnEvent)
+  | { kind: 'switch'; turn: number; side: SideIndex; outName: string; inName: string };
+
+export interface TeamBattleResult {
+  winner: SideIndex;
+  finalState: TeamBattleState;
+  log: TeamTurnEvent[];
+}
+
+export interface TeamAIStrategy {
+  selectAction(state: TeamBattleState, side: SideIndex): TeamAction;
+}
+
+export interface TeamEvaluator {
+  // value ∈ [-1, +1] from `side`'s perspective.
+  evaluate(state: TeamBattleState, side: SideIndex): { value: number; priors?: Map<string, number> };
+}
+
 // ── Tournament Types ──
 
 export interface TournamentPokemon {
