@@ -5,6 +5,7 @@ import type {
   TeamTurnEvent,
   SideIndex,
   TeamSlotIndex,
+  TeamAction,
 } from '../models/types';
 import {
   buildTeamBattleState,
@@ -19,8 +20,10 @@ import {
   setTeam3v3Selection,
 } from '../persistence/userStorage';
 import BattlerPanel from './BattlerPanel';
+import TypeBadge from './TypeBadge';
 import LogEntry from './LogEntry';
 import { formatPokemonName } from '../utils/formatName';
+import { getTypeColor } from '../utils/typeColors';
 import './Battle3v3Page.css';
 
 interface Props {
@@ -64,6 +67,7 @@ export default function Battle3v3Page({ allPokemon, onBack }: Props) {
   });
 
   const [phase, setPhase] = useState<Phase>('select');
+  const [mode, setMode] = useState<'spectate' | 'play'>('spectate');
   const [state, setState] = useState<TeamBattleState | null>(null);
   const [log, setLog] = useState<TeamTurnEvent[]>([]);
   const [thinking, setThinking] = useState(false);
@@ -89,19 +93,36 @@ export default function Battle3v3Page({ allPokemon, onBack }: Props) {
   const team1Valid = teamIsValid(team1Ids, enabled);
   const canStart = team0Valid && team1Valid && enabled.length >= 3;
 
-  function startBattle() {
+  function startBattle(newMode: 'spectate' | 'play') {
     if (!canStart) return;
     const initial = buildTeamBattleState(team0Ids, team1Ids, allPokemon);
     setState(initial);
     setLog([]);
+    setMode(newMode);
     setPhase('battle');
+  }
+
+  function swapTeams() {
+    const t = team0Ids;
+    setTeam0Ids(team1Ids);
+    setTeam1Ids(t);
+  }
+
+  function randomizeTeam(side: SideIndex) {
+    if (enabled.length < 3) return;
+    const shuffled = [...enabled];
+    for (let i = shuffled.length - 1; i > 0; i--) {
+      const j = Math.floor(Math.random() * (i + 1));
+      [shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]];
+    }
+    const ids: TeamIds = [shuffled[0].id, shuffled[1].id, shuffled[2].id];
+    (side === 0 ? setTeam0Ids : setTeam1Ids)(ids);
   }
 
   function nextTurn() {
     if (!state || thinking) return;
     if (battleWinner(state) !== null) return;
     setThinking(true);
-    // Defer to next frame so the "thinking" indicator renders.
     setTimeout(() => {
       const a0 = legalActions(state, 0).length > 0 ? mctsTeamAI.selectAction(state, 0) : null;
       const a1 = legalActions(state, 1).length > 0 ? mctsTeamAI.selectAction(state, 1) : null;
@@ -113,8 +134,33 @@ export default function Battle3v3Page({ allPokemon, onBack }: Props) {
     }, 0);
   }
 
+  function submitPlayerAction(a0: TeamAction) {
+    if (!state || thinking) return;
+    if (battleWinner(state) !== null) return;
+    setThinking(true);
+    setTimeout(() => {
+      let cur = state;
+      const newEvents: TeamTurnEvent[] = [];
+      const a1 = legalActions(cur, 1).length > 0 ? mctsTeamAI.selectAction(cur, 1) : null;
+      const step = applyActions(cur, a0, a1);
+      newEvents.push(...step.events);
+      cur = step.next;
+      // Auto-advance any turns where only the AI needs to act.
+      while (battleWinner(cur) === null && legalActions(cur, 0).length === 0) {
+        const ai1 = legalActions(cur, 1).length > 0 ? mctsTeamAI.selectAction(cur, 1) : null;
+        const step2 = applyActions(cur, null, ai1);
+        newEvents.push(...step2.events);
+        cur = step2.next;
+      }
+      setLog(prev => [...prev, ...newEvents]);
+      setState(cur);
+      if (battleWinner(cur) !== null) setPhase('end');
+      setThinking(false);
+    }, 0);
+  }
+
   function rematch() {
-    startBattle();
+    startBattle(mode);
   }
 
   if (phase === 'select') {
@@ -130,6 +176,7 @@ export default function Battle3v3Page({ allPokemon, onBack }: Props) {
             allPokemon={allPokemon}
             valid={team0Valid}
             onChange={(slot, id) => setSlot(0, slot, id)}
+            onRandomize={() => randomizeTeam(0)}
           />
           <TeamBuilder
             label="Team 2"
@@ -138,16 +185,23 @@ export default function Battle3v3Page({ allPokemon, onBack }: Props) {
             allPokemon={allPokemon}
             valid={team1Valid}
             onChange={(slot, id) => setSlot(1, slot, id)}
+            onRandomize={() => randomizeTeam(1)}
           />
         </div>
-        <div style={{ textAlign: 'center', marginTop: '1.5rem' }}>
-          <button className="btn-primary" onClick={startBattle} disabled={!canStart}>
-            Start Battle
-          </button>
-          {!canStart && enabled.length < 3 && (
-            <p style={{ color: '#f44336', marginTop: '0.75rem' }}>Need at least 3 enabled Pokemon.</p>
-          )}
+        <div style={{ textAlign: 'center', marginTop: '1rem' }}>
+          <button className="btn-secondary" onClick={swapTeams}>⇄ Swap Teams</button>
         </div>
+        <div style={{ textAlign: 'center', marginTop: '1rem', display: 'flex', gap: '0.75rem', justifyContent: 'center' }}>
+          <button className="btn-primary" onClick={() => startBattle('play')} disabled={!canStart}>
+            Play Battle
+          </button>
+          <button className="btn-secondary" onClick={() => startBattle('spectate')} disabled={!canStart}>
+            Spectate Battle
+          </button>
+        </div>
+        {!canStart && enabled.length < 3 && (
+          <p style={{ color: '#f44336', marginTop: '0.75rem', textAlign: 'center' }}>Need at least 3 enabled Pokemon.</p>
+        )}
       </div>
     );
   }
@@ -162,7 +216,13 @@ export default function Battle3v3Page({ allPokemon, onBack }: Props) {
       <h1 className="page-title">3v3 Battle</h1>
 
       <div className="team-arena">
-        <TeamView state={state} side={0} />
+        <TeamView
+          state={state}
+          side={0}
+          onSwitch={mode === 'play' && phase === 'battle' && !thinking
+            ? (slot) => submitPlayerAction({ kind: 'switch', targetIdx: slot })
+            : undefined}
+        />
         <div className="arena-vs">VS</div>
         <TeamView state={state} side={1} />
       </div>
@@ -178,12 +238,20 @@ export default function Battle3v3Page({ allPokemon, onBack }: Props) {
         </div>
       )}
 
-      {phase === 'battle' && (
+      {phase === 'battle' && mode === 'spectate' && (
         <div style={{ textAlign: 'center', margin: '1rem 0' }}>
           <button className="btn-primary" onClick={nextTurn} disabled={thinking}>
             {thinking ? 'Thinking…' : 'Next Turn →'}
           </button>
         </div>
+      )}
+
+      {phase === 'battle' && mode === 'play' && (
+        <PlayerActionBar
+          state={state}
+          thinking={thinking}
+          onAction={submitPlayerAction}
+        />
       )}
 
       <div className="card battle-log" ref={logRef}>
@@ -204,12 +272,18 @@ interface TeamBuilderProps {
   allPokemon: PokemonData[];
   valid: boolean;
   onChange: (slot: TeamSlotIndex, id: number) => void;
+  onRandomize: () => void;
 }
 
-function TeamBuilder({ label, ids, enabled, allPokemon, valid, onChange }: TeamBuilderProps) {
+function TeamBuilder({ label, ids, enabled, allPokemon, valid, onChange, onRandomize }: TeamBuilderProps) {
   return (
     <div className="team-builder card">
-      <h3 className="section-title" style={{ marginBottom: '0.75rem' }}>{label}</h3>
+      <div className="team-builder-header">
+        <h3 className="section-title">{label}</h3>
+        <button className="btn-secondary btn-small" onClick={onRandomize} disabled={enabled.length < 3}>
+          🎲 Randomize
+        </button>
+      </div>
       {[0, 1, 2].map(slot => {
         const id = ids[slot];
         const data = allPokemon.find(p => p.id === id);
@@ -249,34 +323,161 @@ function TeamBuilder({ label, ids, enabled, allPokemon, valid, onChange }: TeamB
 
 // ── Team view (battle) ──────────────────────────────────────────────────────
 
-function TeamView({ state, side }: { state: TeamBattleState; side: SideIndex }) {
+function TeamView({
+  state,
+  side,
+  onSwitch,
+}: {
+  state: TeamBattleState;
+  side: SideIndex;
+  onSwitch?: (slot: TeamSlotIndex) => void;
+}) {
   const team = state.teams[side];
+  const switchableSlots = new Set<TeamSlotIndex>();
+  if (onSwitch) {
+    for (const a of legalActions(state, side)) {
+      if (a.kind === 'switch') switchableSlots.add(a.targetIdx);
+    }
+  }
+  const order = team.pokemon
+    .map((_, idx) => idx)
+    .sort((a, b) => (a === team.activeIdx ? -1 : b === team.activeIdx ? 1 : a - b));
   return (
     <div className="team-view">
-      {team.pokemon.map((p, i) => {
+      {order.map(i => {
+        const p = team.pokemon[i];
         const isActive = i === team.activeIdx;
         const fainted = p.currentHp <= 0;
+        const canSwitchHere = switchableSlots.has(i as TeamSlotIndex);
         return (
           <div
             key={i}
             className={
               'team-slot-view ' +
-              (isActive ? 'team-slot-active ' : '') +
+              (isActive ? `team-slot-active team-slot-active-${side} ` : '') +
               (fainted ? 'team-slot-fainted' : '')
             }
           >
             {isActive ? (
-              <BattlerPanel pokemon={p} />
+              <>
+                <BattlerPanel pokemon={p} />
+                <BaseStatsPanel data={p.data} />
+              </>
             ) : (
               <div className="team-bench-mini">
                 <img src={p.data.spriteUrl} alt={p.data.name} />
-                <div className="bench-name">{formatPokemonName(p.data.name)}</div>
+                <div className="bench-name-wrap">
+                  <div className="bench-name">{formatPokemonName(p.data.name)}</div>
+                  <div className="bench-types">
+                    {p.data.types.map(t => <TypeBadge key={t} type={t} />)}
+                  </div>
+                </div>
                 <div className="bench-hp">{Math.max(0, p.currentHp)}/{p.level50Stats.hp}</div>
+                {canSwitchHere && onSwitch && (
+                  <button
+                    className="btn-bench-switch"
+                    onClick={() => onSwitch(i as TeamSlotIndex)}
+                  >
+                    Switch in
+                  </button>
+                )}
               </div>
             )}
           </div>
         );
       })}
+    </div>
+  );
+}
+
+// ── Base stats panel ────────────────────────────────────────────────────────
+
+const STAT_ROWS: { key: keyof PokemonData['baseStats']; label: string }[] = [
+  { key: 'hp', label: 'HP' },
+  { key: 'attack', label: 'Atk' },
+  { key: 'defense', label: 'Def' },
+  { key: 'specialAttack', label: 'SpA' },
+  { key: 'specialDefense', label: 'SpD' },
+  { key: 'speed', label: 'Spe' },
+];
+
+function BaseStatsPanel({ data }: { data: PokemonData }) {
+  const bst = STAT_ROWS.reduce((s, r) => s + data.baseStats[r.key], 0);
+  return (
+    <div className="base-stats-panel">
+      <div className="base-stats-title">Base Stats</div>
+      {STAT_ROWS.map(r => {
+        const v = data.baseStats[r.key];
+        const pct = Math.min(100, (v / 255) * 100);
+        const color =
+          pct > 70 ? '#8b00ff'
+          : pct > 60 ? '#0055ff'
+          : pct > 50 ? '#00bcd4'
+          : pct > 40 ? '#27ae60'
+          : pct > 30 ? '#f1c40f'
+          : pct > 20 ? '#FD7D12'
+          : '#e74c3c';
+        return (
+          <div key={r.key} className="base-stat-row">
+            <span className="base-stat-label">{r.label}</span>
+            <span className="base-stat-value">{v}</span>
+            <span className="base-stat-bar"><span style={{ width: `${pct}%`, background: color }} /></span>
+          </div>
+        );
+      })}
+      <div className="base-stat-row base-stat-total">
+        <span className="base-stat-label">BST</span>
+        <span className="base-stat-value">{bst}</span>
+        <span />
+      </div>
+    </div>
+  );
+}
+
+// ── Player action bar ───────────────────────────────────────────────────────
+
+interface PlayerActionBarProps {
+  state: TeamBattleState;
+  thinking: boolean;
+  onAction: (a: TeamAction) => void;
+}
+
+function PlayerActionBar({ state, thinking, onAction }: PlayerActionBarProps) {
+  const actions = legalActions(state, 0);
+  const team = state.teams[0];
+  const active = team.pokemon[team.activeIdx];
+  const moves = actions.filter(a => a.kind === 'move');
+  const forcedReplace = state.phase === 'replace0' || state.phase === 'replaceBoth';
+
+  if (moves.length === 0 && !forcedReplace && !thinking) return null;
+
+  return (
+    <div className="player-action-bar card">
+      <div className="action-label">
+        {forcedReplace
+          ? `${formatPokemonName(active.data.name)} fainted — pick a replacement from the bench.`
+          : `Your move — ${formatPokemonName(active.data.name)}`}
+      </div>
+      {moves.length > 0 && (
+        <div className="action-row">
+          {moves.map((a, i) => {
+            if (a.kind !== 'move') return null;
+            const color = getTypeColor(a.move.type);
+            return (
+              <button
+                key={i}
+                className="btn-move"
+                disabled={thinking}
+                onClick={() => onAction(a)}
+                style={{ background: color, borderColor: color, color: '#fff' }}
+              >
+                {a.move.name}
+              </button>
+            );
+          })}
+        </div>
+      )}
+      {thinking && <div className="action-thinking">Opponent thinking…</div>}
     </div>
   );
 }

@@ -14,9 +14,9 @@ import { heuristicTeamEvaluator } from './heuristicTeamEvaluator';
 // once (via applyActions, which calls RNG inside) and cached. Leaves are scored
 // by a pluggable TeamEvaluator — swap in a neural net without touching MCTS.
 
-const C_UCB = 1.41;
+const C_UCB = 1.0;
 const MAX_ROLLOUT_DEPTH = 40;
-const DEFAULT_ITERATIONS = 200;
+const DEFAULT_ITERATIONS = 2000;
 
 interface ActionStat {
   visits: number;
@@ -121,34 +121,51 @@ export class MctsTeamAI implements TeamAIStrategy {
   private iterate(root: MctsNode): void {
     const path: { node: MctsNode; key0: string | null; key1: string | null }[] = [];
     let node = root;
+    let state: TeamBattleState = root.state;
     let depth = 0;
+    let value: number | null = null;
 
-    while (node.terminalValue === null && depth < MAX_ROLLOUT_DEPTH) {
+    while (depth < MAX_ROLLOUT_DEPTH) {
+      const winner = battleWinner(state);
+      if (winner !== null) {
+        value = winner === 0 ? 1 : -1;
+        break;
+      }
+      if (node.keys0.length === 0 && node.keys1.length === 0) break;
+
       const key0 = pickByUCB(node.stats0, node.keys0, node.visits, true);
       const key1 = pickByUCB(node.stats1, node.keys1, node.visits, false);
       if (key0 === null && key1 === null) break;
 
-      const childKey = `${key0 ?? '-'}|${key1 ?? '-'}`;
-      path.push({ node, key0, key1 });
+      const a0 = key0 !== null ? node.legal0[node.keys0.indexOf(key0)] : null;
+      const a1 = key1 !== null ? node.legal1[node.keys1.indexOf(key1)] : null;
+      // Re-sample the transition on every iteration. Major chance forks
+      // (fainting triggering a replace phase) are kept as separate children
+      // by including the resulting phase in the child key.
+      const { next } = applyActions(state, a0, a1);
 
+      path.push({ node, key0, key1 });
+      const childKey = `${key0 ?? '-'}|${key1 ?? '-'}|${next.phase}`;
       let child = node.children.get(childKey);
       if (!child) {
-        const a0 = key0 !== null ? node.legal0[node.keys0.indexOf(key0)] : null;
-        const a1 = key1 !== null ? node.legal1[node.keys1.indexOf(key1)] : null;
-        const { next } = applyActions(node.state, a0, a1);
         child = { node: makeNode(next) };
         node.children.set(childKey, child);
         node = child.node;
+        state = next;
         break; // expand-then-evaluate
       }
 
       node = child.node;
+      state = next;
       depth++;
     }
 
-    const value = node.terminalValue !== null
-      ? node.terminalValue
-      : this.evaluator.evaluate(node.state, 0).value;
+    if (value === null) {
+      const winner = battleWinner(state);
+      value = winner !== null
+        ? (winner === 0 ? 1 : -1)
+        : this.evaluator.evaluate(state, 0).value;
+    }
 
     node.visits++;
     for (let i = path.length - 1; i >= 0; i--) {

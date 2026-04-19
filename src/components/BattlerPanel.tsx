@@ -17,20 +17,18 @@ export default function BattlerPanel({ pokemon }: { pokemon: BattlePokemon }) {
   return (
     <div className="battler-panel card">
       <img src={pokemon.data.spriteUrl} alt={pokemon.data.name} className="battler-sprite" />
-      <div className="battler-name">{formatPokemonName(pokemon.data.name)}</div>
+      <div className="battler-name-row">
+        <span className="battler-name">{formatPokemonName(pokemon.data.name)}</span>
+        {status && (
+          <span className="ailment-badge" style={{ background: status.bg }}>{status.label}</span>
+        )}
+        {pokemon.confused && (
+          <span className="ailment-badge" style={{ background: '#d68910' }}>CNF</span>
+        )}
+      </div>
       <div style={{ display: 'flex', gap: 4, justifyContent: 'center', marginBottom: 8 }}>
         {pokemon.data.types.map(t => <TypeBadge key={t} type={t} />)}
       </div>
-      {(status || pokemon.confused) && (
-        <div className="battler-ailments">
-          {status && (
-            <span className="ailment-badge" style={{ background: status.bg }}>{status.label}</span>
-          )}
-          {pokemon.confused && (
-            <span className="ailment-badge" style={{ background: '#d68910' }}>CNF</span>
-          )}
-        </div>
-      )}
       <HpBar current={pokemon.currentHp} max={pokemon.level50Stats.hp} />
       <div className="battler-moves">
         {pokemon.moves.map(m => (

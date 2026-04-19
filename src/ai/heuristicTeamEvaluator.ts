@@ -52,9 +52,9 @@ export const heuristicTeamEvaluator: TeamEvaluator = {
     const raw =
       0.6 * (ourHpFrac - theirHpFrac) +
       0.4 * (aliveDiff / 3) +
-      0.02 * stageDiff +
+      0.05 * stageDiff +
       statusDiff;
 
-    return { value: Math.tanh(raw * 2) };
+    return { value: Math.tanh(raw * 3) };
   },
 };

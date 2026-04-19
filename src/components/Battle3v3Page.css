@@ -12,6 +12,19 @@
   gap: 0.5rem;
 }
 
+.team-builder-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.5rem;
+  margin-bottom: 0.25rem;
+}
+
+.btn-small {
+  padding: 0.35rem 0.7rem;
+  font-size: 0.8rem;
+}
+
 .team-slot {
   display: flex;
   align-items: center;
@@ -65,7 +78,77 @@
 }
 
 .team-slot-active {
-  /* full-size BattlerPanel rendered inside */
+  display: flex;
+  align-items: stretch;
+  gap: 0.75rem;
+}
+
+.team-slot-active > .battler-panel {
+  flex: 1;
+  min-width: 0;
+}
+
+.team-slot-active-0 { flex-direction: row; }
+.team-slot-active-1 { flex-direction: row-reverse; }
+
+.base-stats-panel {
+  flex: 0 0 150px;
+  display: flex;
+  flex-direction: column;
+  gap: 0.3rem;
+  padding: 0.6rem 0.7rem;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  align-self: center;
+}
+
+.base-stats-title {
+  font-size: 0.75rem;
+  font-weight: 700;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  color: var(--text-muted);
+  margin-bottom: 0.2rem;
+}
+
+.base-stat-row {
+  display: grid;
+  grid-template-columns: 28px 32px 1fr;
+  align-items: center;
+  gap: 0.4rem;
+  font-size: 0.78rem;
+  font-variant-numeric: tabular-nums;
+}
+
+.base-stat-label {
+  color: var(--text-muted);
+  font-weight: 600;
+}
+
+.base-stat-value {
+  text-align: right;
+  font-weight: 600;
+}
+
+.base-stat-bar {
+  height: 6px;
+  background: rgba(255, 255, 255, 0.08);
+  border-radius: 3px;
+  overflow: hidden;
+  display: block;
+}
+
+.base-stat-bar > span {
+  display: block;
+  height: 100%;
+}
+
+.base-stat-total {
+  margin-top: 0.2rem;
+  padding-top: 0.3rem;
+  border-top: 1px solid var(--border);
+  font-weight: 700;
 }
 
 .team-slot-fainted {
@@ -89,15 +172,95 @@
   object-fit: contain;
 }
 
-.bench-name {
+.bench-name-wrap {
   flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 0.2rem;
+  min-width: 0;
+}
+
+.bench-name {
   font-weight: 600;
   text-transform: capitalize;
   font-size: 0.85rem;
+}
+
+.bench-types {
+  display: flex;
+  gap: 0.25rem;
+  flex-wrap: wrap;
+}
+
+.bench-types .type-badge {
+  font-size: 0.6rem;
+  padding: 0.1rem 0.4rem;
 }
 
 .bench-hp {
   font-size: 0.75rem;
   color: var(--text-muted);
   font-variant-numeric: tabular-nums;
+}
+
+.player-action-bar {
+  margin: 1rem 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.action-label {
+  font-weight: 600;
+  font-size: 0.95rem;
+}
+
+.action-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+}
+
+.btn-move,
+.btn-switch {
+  padding: 0.5rem 0.9rem;
+  border-radius: 8px;
+  border: 1px solid var(--border);
+  background: var(--surface);
+  color: var(--text);
+  font-weight: 600;
+  cursor: pointer;
+  text-transform: capitalize;
+}
+
+.btn-move:hover:not(:disabled),
+.btn-switch:hover:not(:disabled) {
+  filter: brightness(1.15);
+}
+
+.btn-move:disabled,
+.btn-switch:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.btn-bench-switch {
+  padding: 0.3rem 0.6rem;
+  font-size: 0.75rem;
+  border-radius: 6px;
+  border: 1px solid #4fc3f7;
+  background: #2a3a4a;
+  color: #fff;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.btn-bench-switch:hover {
+  filter: brightness(1.2);
+}
+
+.action-thinking {
+  font-size: 0.85rem;
+  color: var(--text-muted);
+  font-style: italic;
 }

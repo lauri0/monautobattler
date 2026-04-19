@@ -68,6 +68,15 @@
   text-transform: capitalize;
 }
 
+.battler-name-row {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.4rem;
+  flex-wrap: wrap;
+  margin-bottom: 2px;
+}
+
 .battler-ailments {
   display: flex;
   gap: 4px;
