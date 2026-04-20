@@ -1,4 +1,4 @@
-export type DamageClass = 'physical' | 'special';
+export type DamageClass = 'physical' | 'special' | 'status';
 
 export type TypeName =
   | 'normal' | 'fire' | 'water' | 'electric' | 'grass' | 'ice'
@@ -32,6 +32,8 @@ export interface MoveEffect {
   useFoeAttack?: boolean;  // use the defender's Attack stat for damage instead of the attacker's (Foul Play)
   confusesUser?: boolean;  // confuses the user after hitting (Outrage, Petal Dance, Thrash)
   pivotSwitch?: boolean;   // user switches out after hitting (U-turn, Volt Switch, Flip Turn)
+  heal?: number;           // % of user's max HP to heal (Recover = 50)
+  protect?: boolean;       // marks Protect
 }
 
 export interface StatStages {
@@ -105,6 +107,12 @@ export interface BattlePokemon {
   // of additional forced turns AFTER the current turn. When it ticks to 0 the
   // lock clears and the user becomes confused.
   lockedMove?: { moveId: number; turnsLeft: number };
+  // Protect: set for the duration of the turn when Protect successfully resolves.
+  // Cleared at end of turn. Blocks any subsequent damaging move this turn.
+  protectedThisTurn?: boolean;
+  // True iff the pokemon's last move was a successful Protect. Triggers the
+  // 50% consecutive-use failure roll on the next attempt.
+  lastMoveProtected?: boolean;
   statStages: StatStages;
 }
 
@@ -133,7 +141,10 @@ export type TurnEvent =
   | { kind: 'confused'; turn: number; pokemonName: string }
   | { kind: 'confusion_hit'; turn: number; pokemonName: string; damage: number; hpAfter: number }
   | { kind: 'confusion_end'; turn: number; pokemonName: string }
-  | { kind: 'move_failed'; turn: number; pokemonName: string; moveName: string };
+  | { kind: 'move_failed'; turn: number; pokemonName: string; moveName: string }
+  | { kind: 'heal'; turn: number; pokemonName: string; healed: number; hpAfter: number }
+  | { kind: 'protected'; turn: number; pokemonName: string }
+  | { kind: 'protect_blocked'; turn: number; attackerName: string; defenderName: string; moveName: string };
 
 export interface BattleResult {
   winner: BattlePokemon;

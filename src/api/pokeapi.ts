@@ -49,11 +49,46 @@ const STATUS_MAP: Record<string, StatusCondition> = {
   freeze: 'freeze',
 };
 
+// Status moves we explicitly support. Any `damage_class === 'status'` move not
+// in this table is dropped — PokeAPI's meta is too inconsistent to trust for
+// status moves generically.
+const STATUS_MOVE_EFFECTS: Record<string, MoveEffect> = {
+  'swords-dance': { statChanges: [{ stat: 'attack', change: 2, target: 'user' }], statChance: 0 },
+  'agility':      { statChanges: [{ stat: 'speed', change: 2, target: 'user' }], statChance: 0 },
+  'amnesia':      { statChanges: [{ stat: 'special-defense', change: 2, target: 'user' }], statChance: 0 },
+  'barrier':      { statChanges: [{ stat: 'defense', change: 2, target: 'user' }], statChance: 0 },
+  'growl':        { statChanges: [{ stat: 'attack', change: -1, target: 'foe' }], statChance: 0 },
+  'leer':         { statChanges: [{ stat: 'defense', change: -1, target: 'foe' }], statChance: 0 },
+  'thunder-wave': { ailment: 'paralysis', ailmentChance: 0 },
+  'sleep-powder': { ailment: 'sleep', ailmentChance: 0 },
+  'poison-powder':{ ailment: 'poison', ailmentChance: 0 },
+  'recover':      { heal: 50 },
+  'protect':      { protect: true },
+};
+
 async function fetchMoveData(moveUrl: string): Promise<Move | null> {
   try {
     const data = await fetchJson<RawMove>(moveUrl);
     const rawClass = data.damage_class?.name;
-    if (!rawClass || rawClass === 'status') return null;
+    if (!rawClass) return null;
+
+    // Status moves: require an explicit whitelist entry.
+    if (rawClass === 'status') {
+      const statusEffect = STATUS_MOVE_EFFECTS[data.name];
+      if (!statusEffect) return null;
+      return {
+        id: data.id,
+        name: data.name,
+        type: data.type.name as TypeName,
+        power: 0,
+        accuracy: data.accuracy,
+        pp: data.pp,
+        damageClass: 'status',
+        priority: data.priority ?? 0,
+        effect: statusEffect,
+      };
+    }
+
     const damageClass = rawClass as DamageClass;
     if (!data.power) return null;
 

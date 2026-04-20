@@ -15,7 +15,10 @@
       "Bash(wc -l /c/Users/lauri/PokemonBattler/src/**/*.ts /c/Users/lauri/PokemonBattler/src/**/*.tsx)",
       "Bash(curl -s http://localhost:5174/)",
       "Bash(npx vite *)",
-      "Bash(npx eslint *)"
+      "Bash(npx eslint *)",
+      "Bash(npm test *)",
+      "Bash(git stash *)",
+      "Bash(npx vitest *)"
     ]
   }
 }

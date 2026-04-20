@@ -167,6 +167,37 @@ export default function LogEntry({ ev }: { ev: TurnEvent }) {
     );
   }
 
+  if (ev.kind === 'heal') {
+    return (
+      <div className="log-entry log-entry--effect">
+        <span className="log-turn">T{ev.turn}</span>
+        <span className="log-attacker">{ev.pokemonName}</span>
+        <span className="log-eff"> recovered HP! (+{ev.healed} HP, {ev.hpAfter} HP)</span>
+      </div>
+    );
+  }
+
+  if (ev.kind === 'protected') {
+    return (
+      <div className="log-entry log-entry--effect">
+        <span className="log-turn">T{ev.turn}</span>
+        <span className="log-attacker">{ev.pokemonName}</span>
+        <span className="log-eff"> protected itself!</span>
+      </div>
+    );
+  }
+
+  if (ev.kind === 'protect_blocked') {
+    return (
+      <div className="log-entry log-entry--status">
+        <span className="log-turn">T{ev.turn}</span>
+        <span className="log-attacker">{ev.attackerName}</span>
+        <span className="log-move"> used {ev.moveName}</span>
+        <span className="log-miss"> — but {ev.defenderName} protected itself!</span>
+      </div>
+    );
+  }
+
   if (ev.kind === 'move_failed') {
     return (
       <div className="log-entry log-entry--status">

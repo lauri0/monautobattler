@@ -15,7 +15,7 @@ import type {
   StatStages,
 } from '../models/types';
 import { buildBattlePokemon } from './buildBattlePokemon';
-import { applyEndOfTurnStatus, resolveSingleAttack, usableMoves } from './battleEngine';
+import { applyEndOfTurnStatus, effectivePriority, resolveSingleAttack, usableMoves } from './battleEngine';
 import { effectiveSpeed } from './damageCalc';
 
 const MAX_TURNS = 500;
@@ -105,6 +105,8 @@ function onSwitchOut(p: BattlePokemon): BattlePokemon {
     confused: false,
     confusionTurnsLeft: undefined,
     lockedMove: undefined,
+    protectedThisTurn: false,
+    lastMoveProtected: false,
     sleepTurnsUsed: p.statusCondition === 'sleep' ? 0 : undefined,
     frozenTurnsUsed: p.statusCondition === 'freeze' ? 0 : undefined,
   };
@@ -194,8 +196,10 @@ function completeTurn(
   const inner: TurnEvent[] = [];
   const a0 = teams[0].pokemon[teams[0].activeIdx];
   const a1 = teams[1].pokemon[teams[1].activeIdx];
-  const a0Ticked = applyEndOfTurnStatus(a0, turn, inner);
-  const a1Ticked = applyEndOfTurnStatus(a1, turn, inner);
+  let a0Ticked = applyEndOfTurnStatus(a0, turn, inner);
+  let a1Ticked = applyEndOfTurnStatus(a1, turn, inner);
+  if (a0Ticked.protectedThisTurn) a0Ticked = { ...a0Ticked, protectedThisTurn: false };
+  if (a1Ticked.protectedThisTurn) a1Ticked = { ...a1Ticked, protectedThisTurn: false };
   teams[0] = writeActive(teams[0], a0Ticked);
   teams[1] = writeActive(teams[1], a1Ticked);
   tagTickEvents(inner, a0.data.name, events);
@@ -231,7 +235,9 @@ function runOneAttack(
 
 // Figure out which side acts first. Only meaningful when both have a move.
 function speedOrder(teams: [Team, Team], m0: Move, m1: Move): SideIndex {
-  if (m0.priority !== m1.priority) return m0.priority > m1.priority ? 0 : 1;
+  const p0 = effectivePriority(m0);
+  const p1 = effectivePriority(m1);
+  if (p0 !== p1) return p0 > p1 ? 0 : 1;
   const s0 = effectiveSpeed(teams[0].pokemon[teams[0].activeIdx]);
   const s1 = effectiveSpeed(teams[1].pokemon[teams[1].activeIdx]);
   if (s0 !== s1) return s0 > s1 ? 0 : 1;

@@ -48,6 +48,23 @@ function effectivePowerMove(
   return { ...move, power: move.power * multiplier };
 }
 
+// Protect gets a priority boost that supersedes other priority moves. The real
+// games use +4; we use that too so Protect reliably resolves before the foe's
+// attack regardless of speed.
+export function effectivePriority(move: Move): number {
+  return move.effect?.protect ? 4 : move.priority;
+}
+
+function targetsFoe(move: Move): boolean {
+  const eff = move.effect;
+  if (!eff) return false;
+  if (eff.ailment) return true;
+  if (eff.confuses) return true;
+  if (eff.flinchChance) return true;
+  if (eff.statChanges?.some(s => s.target === 'foe')) return true;
+  return false;
+}
+
 function clampStage(v: number): number {
   return Math.max(-6, Math.min(6, v));
 }
@@ -317,8 +334,8 @@ export function simulateTurnDeterministic(
   let firstHit: boolean, secondHit: boolean;
   let firstEffects: ChanceOutcome['effectsM1'], secondEffects: ChanceOutcome['effectsM2'];
   const isP1First = (() => {
-    const pri1 = m1?.priority ?? 0;
-    const pri2 = m2?.priority ?? 0;
+    const pri1 = m1 ? effectivePriority(m1) : 0;
+    const pri2 = m2 ? effectivePriority(m2) : 0;
     if (pri1 !== pri2) return pri1 > pri2;
     return effectiveSpeed(p1) >= effectiveSpeed(p2); // ties go to p1 (deterministic)
   })();
@@ -371,14 +388,15 @@ export function simulateTurnDeterministic(
       dealtDamage = dmg > 0;
 
       // Drain / recoil (deterministic)
-      let defHp = Math.max(0, defender.currentHp - dmg);
+      const actualDmg = Math.min(dmg, defender.currentHp);
+      let defHp = defender.currentHp - actualDmg;
       defender = { ...defender, currentHp: defHp };
       if (move.effect?.drain) {
         if (move.effect.drain > 0) {
-          const healed = Math.max(1, Math.floor(dmg * move.effect.drain / 100));
+          const healed = Math.max(1, Math.floor(actualDmg * move.effect.drain / 100));
           attacker = { ...attacker, currentHp: Math.min(attacker.level50Stats.hp, attacker.currentHp + healed) };
         } else {
-          const recoil = Math.max(1, Math.floor(dmg * Math.abs(move.effect.drain) / 100));
+          const recoil = Math.max(1, Math.floor(actualDmg * Math.abs(move.effect.drain) / 100));
           attacker = { ...attacker, currentHp: Math.max(0, attacker.currentHp - recoil) };
         }
       }
@@ -478,6 +496,96 @@ export interface SingleAttackResult {
 }
 
 /**
+ * Resolve a non-damaging (status-class) move. Accuracy is rolled here since
+ * there's no damage calc to delegate it to. Returns the same shape as the
+ * damaging path but without a pivot trigger or flinch.
+ */
+function resolveStatusMove(
+  attacker: BattlePokemon,
+  defender: BattlePokemon,
+  move: Move,
+  turn: number,
+  events: TurnEvent[],
+): { attacker: BattlePokemon; defender: BattlePokemon; dealtDamage: boolean; defenderFlinched: boolean } {
+  const eff = move.effect;
+
+  // Protect: consecutive-use failure roll, otherwise set the flags.
+  if (eff?.protect) {
+    if (attacker.lastMoveProtected && Math.random() >= 0.5) {
+      events.push({ kind: 'move_failed', turn, pokemonName: attacker.data.name, moveName: move.name });
+      attacker = { ...attacker, lastMoveProtected: false };
+      return { attacker, defender, dealtDamage: false, defenderFlinched: false };
+    }
+    events.push({ kind: 'protected', turn, pokemonName: attacker.data.name });
+    attacker = { ...attacker, protectedThisTurn: true, lastMoveProtected: true };
+    return { attacker, defender, dealtDamage: false, defenderFlinched: false };
+  }
+
+  const foeTargeting = targetsFoe(move);
+
+  // Status moves that target the foe are blocked by Protect.
+  if (foeTargeting && defender.protectedThisTurn) {
+    events.push({
+      kind: 'protect_blocked', turn,
+      attackerName: attacker.data.name, defenderName: defender.data.name,
+      moveName: move.name,
+    });
+    return { attacker, defender, dealtDamage: false, defenderFlinched: false };
+  }
+
+  // Accuracy roll (Sleep Powder 75, Thunder Wave 90, Poison Powder 75, etc.)
+  if (move.accuracy !== null && Math.random() > move.accuracy / 100) {
+    events.push({
+      kind: 'attack', turn,
+      attackerName: attacker.data.name, defenderName: defender.data.name,
+      moveName: move.name, moveType: move.type,
+      damage: 0, isCrit: false, missed: true, effectiveness: 1,
+      attackerHpAfter: attacker.currentHp, defenderHpAfter: defender.currentHp,
+    });
+    return { attacker, defender, dealtDamage: false, defenderFlinched: false };
+  }
+
+  // Heal (Recover)
+  if (eff?.heal) {
+    const maxHp = attacker.level50Stats.hp;
+    if (attacker.currentHp >= maxHp) {
+      events.push({ kind: 'move_failed', turn, pokemonName: attacker.data.name, moveName: move.name });
+      return { attacker, defender, dealtDamage: false, defenderFlinched: false };
+    }
+    const healed = Math.min(maxHp - attacker.currentHp, Math.max(1, Math.floor(maxHp * eff.heal / 100)));
+    const hpAfter = attacker.currentHp + healed;
+    attacker = { ...attacker, currentHp: hpAfter };
+    events.push({ kind: 'heal', turn, pokemonName: attacker.data.name, healed, hpAfter });
+    return { attacker, defender, dealtDamage: false, defenderFlinched: false };
+  }
+
+  // Stat changes (always apply for status moves — statChance: 0)
+  if (eff?.statChanges) {
+    for (const sc of eff.statChanges) {
+      if (sc.target === 'user') {
+        attacker = applyStatChange(attacker, sc.stat, sc.change, turn, events);
+      } else {
+        defender = applyStatChange(defender, sc.stat, sc.change, turn, events);
+      }
+    }
+  }
+
+  // Primary ailment (Thunder Wave, Sleep Powder, Poison Powder)
+  if (eff?.ailment) {
+    if (defender.statusCondition) {
+      events.push({ kind: 'move_failed', turn, pokemonName: attacker.data.name, moveName: move.name });
+    } else if (isImmuneToAilment(defender, eff.ailment)) {
+      events.push({ kind: 'move_failed', turn, pokemonName: attacker.data.name, moveName: move.name });
+    } else {
+      defender = { ...defender, statusCondition: eff.ailment };
+      events.push({ kind: 'status_applied', turn, pokemonName: defender.data.name, condition: eff.ailment });
+    }
+  }
+
+  return { attacker, defender, dealtDamage: false, defenderFlinched: false };
+}
+
+/**
  * Resolve one attacker's action for a turn, mutating the passed event array.
  * Shared between the 1v1 engine (which calls it twice per turn) and the team
  * engine (which drives attacks one-by-one so it can interleave pivot switches).
@@ -505,10 +613,31 @@ export function resolveSingleAttack(
     return { attacker, defender, dealtDamage: false, defenderFlinched: false, pivotTriggered: false };
   }
 
+  // Any non-Protect action ends the Protect consecutive-use streak.
+  if (!move.effect?.protect && attacker.lastMoveProtected) {
+    attacker = { ...attacker, lastMoveProtected: false };
+  }
+
+  if (move.damageClass === 'status') {
+    const result = resolveStatusMove(attacker, defender, move, turnNumber, events);
+    return { ...result, pivotTriggered: false };
+  }
+
+  // Protect blocks damaging moves from the foe.
+  if (defender.protectedThisTurn) {
+    events.push({
+      kind: 'protect_blocked', turn: turnNumber,
+      attackerName: attacker.data.name, defenderName: defender.data.name,
+      moveName: move.name,
+    });
+    return { attacker, defender, dealtDamage: false, defenderFlinched: false, pivotTriggered: false };
+  }
+
   const wasLockedBefore = !!attacker.lockedMove && attacker.lockedMove.moveId === move.id;
   const effMove = effectivePowerMove(move, defender, ctx.foeHitUserThisTurn);
   const result = calcDamage(attacker, defender, effMove);
-  const newDefHp = Math.max(0, defender.currentHp - result.damage);
+  const actualDamage = Math.min(result.damage, defender.currentHp);
+  const newDefHp = defender.currentHp - actualDamage;
   defender = { ...defender, currentHp: newDefHp };
 
   events.push({
@@ -525,7 +654,7 @@ export function resolveSingleAttack(
   const connected = !result.missed && result.effectiveness !== 0;
   if (connected) {
     if (result.damage > 0) dealtDamage = true;
-    const eff = applySecondaryEffects(attacker, defender, move, result.damage, turnNumber, events);
+    const eff = applySecondaryEffects(attacker, defender, move, actualDamage, turnNumber, events);
     attacker = eff.attacker;
     defender = eff.defender;
     defenderFlinched = eff.defenderFlinched;
@@ -587,8 +716,10 @@ export function resolveTurnWithMoves(
   const attackers: Attacker[] = [];
   if (move1 && move2) {
     let p1First: boolean;
-    if (move1.priority !== move2.priority) {
-      p1First = move1.priority > move2.priority;
+    const pri1 = effectivePriority(move1);
+    const pri2 = effectivePriority(move2);
+    if (pri1 !== pri2) {
+      p1First = pri1 > pri2;
     } else {
       const spd1 = effectiveSpeed(pokemon1);
       const spd2 = effectiveSpeed(pokemon2);
@@ -649,6 +780,12 @@ export function resolveTurnWithMoves(
     p2 = applyEndOfTurnStatus(p2, turnNumber, events);
     if (p1.currentHp <= 0 || p2.currentHp <= 0) battleOver = true;
   }
+
+  // Clear per-turn Protect flag. lastMoveProtected persists between turns so
+  // that consecutive Protect uses can fail — it's cleared when the user takes
+  // any non-Protect action (handled in resolveSingleAttack).
+  if (p1.protectedThisTurn) p1 = { ...p1, protectedThisTurn: false };
+  if (p2.protectedThisTurn) p2 = { ...p2, protectedThisTurn: false };
 
   return { events, p1After: p1, p2After: p2, battleOver, lastAttackerIsP1 };
 }
