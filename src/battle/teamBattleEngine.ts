@@ -16,7 +16,7 @@ import type {
   StatStages,
 } from '../models/types';
 import { buildBattlePokemon } from './buildBattlePokemon';
-import { applyEndOfTurnStatus, applyStealthRockOnEntry, effectivePriority, makeInitialField, resolveSingleAttack, usableMoves } from './battleEngine';
+import { applyEndOfTurnStatus, applyStealthRockOnEntry, effectivePriority, makeInitialField, resolveSingleAttack, tickTaunt, usableMoves } from './battleEngine';
 import { effectiveSpeed } from './damageCalc';
 
 const MAX_TURNS = 500;
@@ -116,6 +116,7 @@ function onSwitchOut(p: BattlePokemon): BattlePokemon {
 function setActive(team: Team, newIdx: TeamSlotIndex, updatedOut: BattlePokemon): Team {
   const pokemon = team.pokemon.slice();
   pokemon[team.activeIdx] = updatedOut;
+  pokemon[newIdx] = { ...pokemon[newIdx], justSwitchedIn: true };
   return { pokemon, activeIdx: newIdx };
 }
 
@@ -200,8 +201,12 @@ function completeTurn(
   const a1 = teams[1].pokemon[teams[1].activeIdx];
   let a0Ticked = applyEndOfTurnStatus(a0, turn, inner);
   let a1Ticked = applyEndOfTurnStatus(a1, turn, inner);
+  a0Ticked = tickTaunt(a0Ticked, turn, inner);
+  a1Ticked = tickTaunt(a1Ticked, turn, inner);
   if (a0Ticked.protectedThisTurn) a0Ticked = { ...a0Ticked, protectedThisTurn: false };
   if (a1Ticked.protectedThisTurn) a1Ticked = { ...a1Ticked, protectedThisTurn: false };
+  if (a0Ticked.justSwitchedIn) a0Ticked = { ...a0Ticked, justSwitchedIn: false };
+  if (a1Ticked.justSwitchedIn) a1Ticked = { ...a1Ticked, justSwitchedIn: false };
   teams[0] = writeActive(teams[0], a0Ticked);
   teams[1] = writeActive(teams[1], a1Ticked);
   tagTickEvents(inner, a0.data.name, events);

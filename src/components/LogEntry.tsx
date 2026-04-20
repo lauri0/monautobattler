@@ -245,5 +245,25 @@ export default function LogEntry({ ev }: { ev: TurnEvent }) {
     );
   }
 
+  if (ev.kind === 'taunted') {
+    return (
+      <div className="log-entry log-entry--status">
+        <span className="log-turn">T{ev.turn}</span>
+        <span className="log-attacker">{ev.pokemonName}</span>
+        <span className="log-miss"> fell for the taunt!</span>
+      </div>
+    );
+  }
+
+  if (ev.kind === 'taunt_end') {
+    return (
+      <div className="log-entry log-entry--effect">
+        <span className="log-turn">T{ev.turn}</span>
+        <span className="log-attacker">{ev.pokemonName}</span>
+        <span className="log-eff"> shook off the taunt.</span>
+      </div>
+    );
+  }
+
   return null;
 }

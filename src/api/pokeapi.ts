@@ -69,6 +69,24 @@ const STATUS_MOVE_EFFECTS: Record<string, MoveEffect> = {
   'light-screen': { fieldEffect: 'lightScreen' },
   'reflect':      { fieldEffect: 'reflect' },
   'stealth-rock': { fieldEffect: 'stealthRock' },
+  'taunt':        { taunt: true },
+  'will-o-wisp':  { ailment: 'burn', ailmentChance: 0 },
+  'nasty-plot':   { statChanges: [{ stat: 'special-attack', change: 2, target: 'user' }], statChance: 0 },
+  'dragon-dance': { statChanges: [{ stat: 'attack', change: 1, target: 'user' }, { stat: 'speed', change: 1, target: 'user' }], statChance: 0 },
+  'calm-mind':    { statChanges: [{ stat: 'special-attack', change: 1, target: 'user' }, { stat: 'special-defense', change: 1, target: 'user' }], statChance: 0 },
+  'bulk-up':      { statChanges: [{ stat: 'attack', change: 1, target: 'user' }, { stat: 'defense', change: 1, target: 'user' }], statChance: 0 },
+  'iron-defense': { statChanges: [{ stat: 'defense', change: 2, target: 'user' }], statChance: 0 },
+  'shell-smash':  { statChanges: [
+    { stat: 'attack', change: 2, target: 'user' },
+    { stat: 'special-attack', change: 2, target: 'user' },
+    { stat: 'speed', change: 2, target: 'user' },
+    { stat: 'defense', change: -1, target: 'user' },
+    { stat: 'special-defense', change: -1, target: 'user' },
+  ], statChance: 0 },
+  'parting-shot': { statChanges: [
+    { stat: 'attack', change: -1, target: 'foe' },
+    { stat: 'special-attack', change: -1, target: 'foe' },
+  ], statChance: 0, pivotSwitch: true },
 };
 
 async function fetchMoveData(moveUrl: string): Promise<Move | null> {

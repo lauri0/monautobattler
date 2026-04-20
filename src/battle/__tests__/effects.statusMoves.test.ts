@@ -399,3 +399,112 @@ describe('Stealth Rock', () => {
     expect(events.find(e => e.kind === 'move_failed')).toBeTruthy();
   });
 });
+
+// ── Taunt & misc new status moves ───────────────────────────────────────────
+describe('Taunt', () => {
+  const taunt = () => makeMove({ name: 'taunt', damageClass: 'status', power: 0, accuracy: 100, effect: { taunt: true } });
+
+  it('applies taunt to the foe for 3 turns', () => {
+    stubRng([0]); // accuracy pass
+    const r = runStatus(makePokemon(), makePokemon(), taunt());
+    expect(r.defender.tauntTurns).toBe(3);
+    expect(r.events.some(e => e.kind === 'taunted')).toBe(true);
+  });
+
+  it('fails if the foe is already taunted', () => {
+    stubRng([0]);
+    const foe = { ...makePokemon(), tauntTurns: 2 };
+    const r = runStatus(makePokemon(), foe, taunt());
+    expect(r.events.some(e => e.kind === 'move_failed')).toBe(true);
+  });
+
+  it('blocks the taunted pokemon from using a status move', () => {
+    const swordsDance = makeMove({ name: 'swords-dance', damageClass: 'status', power: 0, accuracy: null,
+      effect: { statChanges: [{ stat: 'attack', change: 2, target: 'user' }], statChance: 0 } });
+    const attacker = { ...makePokemon(), tauntTurns: 3 };
+    const r = runStatus(attacker, makePokemon(), swordsDance);
+    expect(r.events.some(e => e.kind === 'move_failed')).toBe(true);
+    expect(r.attacker.statStages.attack).toBe(0);
+  });
+
+  it('decrements and expires after 3 turns via resolveTurnWithMoves', () => {
+    stubRngConst(0);
+    const tackle = makeMove({ name: 'tackle', power: 1, damageClass: 'physical' });
+    let p1 = { ...makePokemon({ name: 'a' }), tauntTurns: 3 };
+    let p2 = makePokemon({ name: 'b' });
+    let field = makeInitialField();
+    for (let t = 1; t <= 3; t++) {
+      const r = resolveTurnWithMoves(p1, p2, tackle, tackle, t, field);
+      p1 = r.p1After; p2 = r.p2After; field = r.field;
+    }
+    expect(p1.tauntTurns).toBeUndefined();
+  });
+});
+
+describe('Will-O-Wisp', () => {
+  const wow = () => makeMove({ name: 'will-o-wisp', damageClass: 'status', power: 0, accuracy: 85,
+    type: 'fire', effect: { ailment: 'burn', ailmentChance: 0 } });
+
+  it('burns the foe on hit', () => {
+    stubRng([0]); // accuracy pass
+    const r = runStatus(makePokemon(), makePokemon(), wow());
+    expect(r.defender.statusCondition).toBe('burn');
+  });
+
+  it('fails against a fire-type', () => {
+    stubRng([0]);
+    const fireFoe = makePokemon({ types: ['fire'] });
+    const r = runStatus(makePokemon(), fireFoe, wow());
+    expect(r.defender.statusCondition).toBeUndefined();
+    expect(r.events.some(e => e.kind === 'move_failed')).toBe(true);
+  });
+});
+
+describe('Stat-boosting status moves', () => {
+  it('Nasty Plot raises user SpA by 2', () => {
+    const move = makeMove({ name: 'nasty-plot', damageClass: 'status', power: 0, accuracy: null,
+      effect: { statChanges: [{ stat: 'special-attack', change: 2, target: 'user' }], statChance: 0 } });
+    const r = runStatus(makePokemon(), makePokemon(), move);
+    expect(r.attacker.statStages['special-attack']).toBe(2);
+  });
+
+  it('Dragon Dance raises user Atk and Speed by 1', () => {
+    const move = makeMove({ name: 'dragon-dance', damageClass: 'status', power: 0, accuracy: null,
+      effect: { statChanges: [
+        { stat: 'attack', change: 1, target: 'user' },
+        { stat: 'speed', change: 1, target: 'user' },
+      ], statChance: 0 } });
+    const r = runStatus(makePokemon(), makePokemon(), move);
+    expect(r.attacker.statStages.attack).toBe(1);
+    expect(r.attacker.statStages.speed).toBe(1);
+  });
+
+  it('Calm Mind raises SpA and SpD by 1', () => {
+    const move = makeMove({ name: 'calm-mind', damageClass: 'status', power: 0, accuracy: null,
+      effect: { statChanges: [
+        { stat: 'special-attack', change: 1, target: 'user' },
+        { stat: 'special-defense', change: 1, target: 'user' },
+      ], statChance: 0 } });
+    const r = runStatus(makePokemon(), makePokemon(), move);
+    expect(r.attacker.statStages['special-attack']).toBe(1);
+    expect(r.attacker.statStages['special-defense']).toBe(1);
+  });
+
+  it('Bulk Up raises Atk and Def by 1', () => {
+    const move = makeMove({ name: 'bulk-up', damageClass: 'status', power: 0, accuracy: null,
+      effect: { statChanges: [
+        { stat: 'attack', change: 1, target: 'user' },
+        { stat: 'defense', change: 1, target: 'user' },
+      ], statChance: 0 } });
+    const r = runStatus(makePokemon(), makePokemon(), move);
+    expect(r.attacker.statStages.attack).toBe(1);
+    expect(r.attacker.statStages.defense).toBe(1);
+  });
+
+  it('Iron Defense raises Def by 2', () => {
+    const move = makeMove({ name: 'iron-defense', damageClass: 'status', power: 0, accuracy: null,
+      effect: { statChanges: [{ stat: 'defense', change: 2, target: 'user' }], statChance: 0 } });
+    const r = runStatus(makePokemon(), makePokemon(), move);
+    expect(r.attacker.statStages.defense).toBe(2);
+  });
+});

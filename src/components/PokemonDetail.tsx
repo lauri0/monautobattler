@@ -33,24 +33,24 @@ export default function PokemonDetail({ pokemon, allPokemon, onBack, onNavigate 
   const allowedIds = getAllowedMoveIds();
 
   const [moveset, setMoveset] = useState<number[]>(() => {
-    const stored = persisted.moveset.length === 3
+    const stored = persisted.moveset.length === 4
       ? persisted.moveset
-      : pokemon.availableMoves.slice(0, 3).map(m => m.id);
+      : pokemon.availableMoves.slice(0, 4).map(m => m.id);
     // Keep only allowed moves; fill remaining slots from allowed list
     const valid = stored.filter(id => allowedIds.includes(id));
-    if (valid.length < 3) {
+    if (valid.length < 4) {
       const used = new Set(valid);
       for (const m of pokemon.availableMoves) {
-        if (valid.length >= 3) break;
+        if (valid.length >= 4) break;
         if (allowedIds.includes(m.id) && !used.has(m.id)) {
           valid.push(m.id);
           used.add(m.id);
         }
       }
     }
-    // If still under 3 (fewer unique allowed moves than slots), fill with first allowed move
+    // If still under 4 (fewer unique allowed moves than slots), fill with first allowed move
     const firstAllowed = pokemon.availableMoves.find(m => allowedIds.includes(m.id));
-    while (valid.length < 3 && firstAllowed) {
+    while (valid.length < 4 && firstAllowed) {
       valid.push(firstAllowed.id);
     }
     return valid;
@@ -229,7 +229,7 @@ export default function PokemonDetail({ pokemon, allPokemon, onBack, onNavigate 
           <div className="card" style={{ marginBottom: '1rem' }}>
             <h3 className="section-title">Moveset</h3>
             <div className="moveset-slots">
-              {[0, 1, 2].map(slot => {
+              {[0, 1, 2, 3].map(slot => {
                 const selectedMove = moveMap.get(moveset[slot]);
                 return (
                   <div key={slot} className="move-slot">

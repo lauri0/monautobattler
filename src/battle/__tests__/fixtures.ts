@@ -66,7 +66,7 @@ export function makePokemon(overrides: PokemonOverrides = {}): BattlePokemon {
     elo: 1000,
     wins: 0,
     losses: 0,
-    moveset: moves.map(m => m.id).slice(0, 3),
+    moveset: moves.map(m => m.id).slice(0, 4),
     disabled: false,
   };
   return {

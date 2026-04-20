@@ -6,6 +6,7 @@ import { getTypeEffectiveness } from '../utils/typeChart';
 export const TRICK_ROOM_TURNS = 5;
 export const TAILWIND_TURNS = 4;
 export const SCREEN_TURNS = 5;
+export const TAUNT_TURNS = 3;
 
 function makeSide(): SideFieldState {
   return { tailwindTurns: 0, lightScreenTurns: 0, reflectTurns: 0, stealthRock: false };
@@ -94,17 +95,16 @@ export const STRUGGLE: Move = {
 };
 
 /**
- * Returns the moves the pokemon can actually use on `turnNumber`. Currently
- * just filters out firstTurnOnly moves (e.g. Fake Out) on turn > 1, but kept
- * as a helper so future turn-gated mechanics have one place to extend.
+ * Returns the moves the pokemon can actually use this turn. Filters out
+ * firstTurnOnly moves (e.g. Fake Out) unless the pokemon just switched in.
  * Falls back to Struggle when no moves are available.
  */
-export function usableMoves(p: BattlePokemon, turnNumber: number): Move[] {
+export function usableMoves(p: BattlePokemon, _turnNumber?: number): Move[] {
   if (p.lockedMove) {
     const locked = p.moves.find(m => m.id === p.lockedMove!.moveId);
     return locked ? [locked] : [STRUGGLE];
   }
-  const moves = turnNumber <= 1 ? p.moves : p.moves.filter(m => !m.effect?.firstTurnOnly);
+  const moves = p.justSwitchedIn ? p.moves : p.moves.filter(m => !m.effect?.firstTurnOnly);
   return moves.length > 0 ? moves : [STRUGGLE];
 }
 
@@ -349,6 +349,18 @@ export function applyEndOfTurnStatus(
   return { ...p, currentHp: newHp };
 }
 
+// Decrements a pokemon's taunt counter. Emits taunt_end if it expires this turn.
+export function tickTaunt(p: BattlePokemon, turn: number, events: TurnEvent[]): BattlePokemon {
+  if (!p.tauntTurns) return p;
+  const next = p.tauntTurns - 1;
+  if (next <= 0) {
+    events.push({ kind: 'taunt_end', turn, pokemonName: p.data.name });
+    const { tauntTurns: _drop, ...rest } = p;
+    return { ...rest };
+  }
+  return { ...p, tauntTurns: next };
+}
+
 // ── Deterministic simulation for expectiminimax tree search ─────────────────
 
 export interface ChanceOutcome {
@@ -403,9 +415,9 @@ export function simulateTurnDeterministic(
   turnNumber: number,
   outcome: ChanceOutcome,
 ): { p1After: BattlePokemon; p2After: BattlePokemon; battleOver: boolean; lastAttackerIsP1?: boolean } {
-  // Filter firstTurnOnly moves on turn > 1
-  const m1 = turnNumber > 1 && move1.effect?.firstTurnOnly ? null : move1;
-  const m2 = turnNumber > 1 && move2.effect?.firstTurnOnly ? null : move2;
+  // Filter firstTurnOnly moves for pokemon that are not fresh on the field.
+  const m1 = !p1.justSwitchedIn && move1.effect?.firstTurnOnly ? null : move1;
+  const m2 = !p2.justSwitchedIn && move2.effect?.firstTurnOnly ? null : move2;
 
   // Determine attack order by priority then speed
   let first: BattlePokemon, second: BattlePokemon;
@@ -595,7 +607,7 @@ function resolveStatusMove(
   attackerSide: SideIndex,
   field: FieldState,
   events: TurnEvent[],
-): { attacker: BattlePokemon; defender: BattlePokemon; dealtDamage: boolean; defenderFlinched: boolean; field: FieldState } {
+): { attacker: BattlePokemon; defender: BattlePokemon; dealtDamage: boolean; defenderFlinched: boolean; pivotTriggered: boolean; field: FieldState } {
   const eff = move.effect;
 
   // Protect: consecutive-use failure roll, otherwise set the flags.
@@ -603,11 +615,11 @@ function resolveStatusMove(
     if (attacker.lastMoveProtected && Math.random() >= 0.5) {
       events.push({ kind: 'move_failed', turn, pokemonName: attacker.data.name, moveName: move.name });
       attacker = { ...attacker, lastMoveProtected: false };
-      return { attacker, defender, dealtDamage: false, defenderFlinched: false, field };
+      return { attacker, defender, dealtDamage: false, defenderFlinched: false, pivotTriggered: false, field };
     }
     events.push({ kind: 'protected', turn, pokemonName: attacker.data.name });
     attacker = { ...attacker, protectedThisTurn: true, lastMoveProtected: true };
-    return { attacker, defender, dealtDamage: false, defenderFlinched: false, field };
+    return { attacker, defender, dealtDamage: false, defenderFlinched: false, pivotTriggered: false, field };
   }
 
   const foeTargeting = targetsFoe(move);
@@ -619,7 +631,7 @@ function resolveStatusMove(
       attackerName: attacker.data.name, defenderName: defender.data.name,
       moveName: move.name,
     });
-    return { attacker, defender, dealtDamage: false, defenderFlinched: false, field };
+    return { attacker, defender, dealtDamage: false, defenderFlinched: false, pivotTriggered: false, field };
   }
 
   // Accuracy roll (Sleep Powder 75, Thunder Wave 90, Poison Powder 75, etc.)
@@ -631,7 +643,7 @@ function resolveStatusMove(
       damage: 0, isCrit: false, missed: true, effectiveness: 1,
       attackerHpAfter: attacker.currentHp, defenderHpAfter: defender.currentHp,
     });
-    return { attacker, defender, dealtDamage: false, defenderFlinched: false, field };
+    return { attacker, defender, dealtDamage: false, defenderFlinched: false, pivotTriggered: false, field };
   }
 
   // Field / side conditions (Trick Room, Tailwind, screens, Stealth Rock).
@@ -639,15 +651,15 @@ function resolveStatusMove(
   // side so switch-ins there take damage.
   if (eff?.fieldEffect) {
     const fx: FieldEffectKind = eff.fieldEffect;
-    const failed = (): { attacker: BattlePokemon; defender: BattlePokemon; dealtDamage: boolean; defenderFlinched: boolean; field: FieldState } => {
+    const failed = (): { attacker: BattlePokemon; defender: BattlePokemon; dealtDamage: boolean; defenderFlinched: boolean; pivotTriggered: boolean; field: FieldState } => {
       events.push({ kind: 'move_failed', turn, pokemonName: attacker.data.name, moveName: move.name });
-      return { attacker, defender, dealtDamage: false, defenderFlinched: false, field };
+      return { attacker, defender, dealtDamage: false, defenderFlinched: false, pivotTriggered: false, field };
     };
     if (fx === 'trickRoom') {
       if (field.trickRoomTurns > 0) return failed();
       const nextField: FieldState = { ...field, trickRoomTurns: TRICK_ROOM_TURNS };
       events.push({ kind: 'field_set', turn, effect: fx, turns: TRICK_ROOM_TURNS, pokemonName: attacker.data.name });
-      return { attacker, defender, dealtDamage: false, defenderFlinched: false, field: nextField };
+      return { attacker, defender, dealtDamage: false, defenderFlinched: false, pivotTriggered: false, field: nextField };
     }
     if (fx === 'tailwind' || fx === 'lightScreen' || fx === 'reflect') {
       const userSide = field.sides[attackerSide];
@@ -665,7 +677,7 @@ function resolveStatusMove(
       sides[attackerSide] = updatedSide;
       const nextField: FieldState = { ...field, sides };
       events.push({ kind: 'field_set', turn, effect: fx, side: attackerSide, turns: duration, pokemonName: attacker.data.name });
-      return { attacker, defender, dealtDamage: false, defenderFlinched: false, field: nextField };
+      return { attacker, defender, dealtDamage: false, defenderFlinched: false, pivotTriggered: false, field: nextField };
     }
     if (fx === 'stealthRock') {
       const foeSide = opposite(attackerSide);
@@ -674,8 +686,19 @@ function resolveStatusMove(
       sides[foeSide] = { ...sides[foeSide], stealthRock: true };
       const nextField: FieldState = { ...field, sides };
       events.push({ kind: 'field_set', turn, effect: fx, side: foeSide, turns: 0, pokemonName: attacker.data.name });
-      return { attacker, defender, dealtDamage: false, defenderFlinched: false, field: nextField };
+      return { attacker, defender, dealtDamage: false, defenderFlinched: false, pivotTriggered: false, field: nextField };
     }
+  }
+
+  // Taunt (applies to foe)
+  if (eff?.taunt) {
+    if ((defender.tauntTurns ?? 0) > 0) {
+      events.push({ kind: 'move_failed', turn, pokemonName: attacker.data.name, moveName: move.name });
+      return { attacker, defender, dealtDamage: false, defenderFlinched: false, pivotTriggered: false, field };
+    }
+    defender = { ...defender, tauntTurns: TAUNT_TURNS };
+    events.push({ kind: 'taunted', turn, pokemonName: defender.data.name, turns: TAUNT_TURNS });
+    return { attacker, defender, dealtDamage: false, defenderFlinched: false, pivotTriggered: false, field };
   }
 
   // Heal (Recover)
@@ -683,13 +706,13 @@ function resolveStatusMove(
     const maxHp = attacker.level50Stats.hp;
     if (attacker.currentHp >= maxHp) {
       events.push({ kind: 'move_failed', turn, pokemonName: attacker.data.name, moveName: move.name });
-      return { attacker, defender, dealtDamage: false, defenderFlinched: false, field };
+      return { attacker, defender, dealtDamage: false, defenderFlinched: false, pivotTriggered: false, field };
     }
     const healed = Math.min(maxHp - attacker.currentHp, Math.max(1, Math.floor(maxHp * eff.heal / 100)));
     const hpAfter = attacker.currentHp + healed;
     attacker = { ...attacker, currentHp: hpAfter };
     events.push({ kind: 'heal', turn, pokemonName: attacker.data.name, healed, hpAfter });
-    return { attacker, defender, dealtDamage: false, defenderFlinched: false, field };
+    return { attacker, defender, dealtDamage: false, defenderFlinched: false, pivotTriggered: false, field };
   }
 
   // Stat changes (always apply for status moves — statChance: 0)
@@ -715,7 +738,8 @@ function resolveStatusMove(
     }
   }
 
-  return { attacker, defender, dealtDamage: false, defenderFlinched: false, field };
+  const pivotTriggered = !!(eff?.pivotSwitch && attacker.currentHp > 0);
+  return { attacker, defender, dealtDamage: false, defenderFlinched: false, pivotTriggered, field };
 }
 
 /**
@@ -739,7 +763,7 @@ export function resolveSingleAttack(
     events.push({ kind: 'cant_move', turn: turnNumber, pokemonName: attacker.data.name, reason: 'flinch' });
     return { attacker, defender, dealtDamage: false, defenderFlinched: false, pivotTriggered: false, field };
   }
-  if (move.effect?.firstTurnOnly && turnNumber > 1) {
+  if (move.effect?.firstTurnOnly && !attacker.justSwitchedIn) {
     events.push({ kind: 'move_failed', turn: turnNumber, pokemonName: attacker.data.name, moveName: move.name });
     return { attacker, defender, dealtDamage: false, defenderFlinched: false, pivotTriggered: false, field };
   }
@@ -755,9 +779,14 @@ export function resolveSingleAttack(
     attacker = { ...attacker, lastMoveProtected: false };
   }
 
+  // Taunt blocks all status moves.
+  if (move.damageClass === 'status' && (attacker.tauntTurns ?? 0) > 0) {
+    events.push({ kind: 'move_failed', turn: turnNumber, pokemonName: attacker.data.name, moveName: move.name });
+    return { attacker, defender, dealtDamage: false, defenderFlinched: false, pivotTriggered: false, field };
+  }
+
   if (move.damageClass === 'status') {
-    const result = resolveStatusMove(attacker, defender, move, turnNumber, attackerSide, field, events);
-    return { ...result, pivotTriggered: false };
+    return resolveStatusMove(attacker, defender, move, turnNumber, attackerSide, field, events);
   }
 
   // Protect blocks damaging moves from the foe.
@@ -930,6 +959,10 @@ export function resolveTurnWithMoves(
     if (p1.currentHp <= 0 || p2.currentHp <= 0) battleOver = true;
   }
 
+  // Taunt countdown (runs regardless of KO).
+  p1 = tickTaunt(p1, turnNumber, events);
+  p2 = tickTaunt(p2, turnNumber, events);
+
   // Decrement any active field / side counters. Runs regardless of KO so that
   // Trick Room etc. still expires when one side faints.
   field = tickField(field, turnNumber, events);
@@ -939,6 +972,8 @@ export function resolveTurnWithMoves(
   // any non-Protect action (handled in resolveSingleAttack).
   if (p1.protectedThisTurn) p1 = { ...p1, protectedThisTurn: false };
   if (p2.protectedThisTurn) p2 = { ...p2, protectedThisTurn: false };
+  if (p1.justSwitchedIn) p1 = { ...p1, justSwitchedIn: false };
+  if (p2.justSwitchedIn) p2 = { ...p2, justSwitchedIn: false };
 
   return { events, p1After: p1, p2After: p2, battleOver, lastAttackerIsP1, field };
 }

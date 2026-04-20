@@ -35,6 +35,7 @@ export interface MoveEffect {
   heal?: number;           // % of user's max HP to heal (Recover = 50)
   protect?: boolean;       // marks Protect
   fieldEffect?: FieldEffectKind; // marks a field/side-condition-setting status move
+  taunt?: boolean;         // applies Taunt to the target (blocks status moves for N turns)
 }
 
 export type FieldEffectKind =
@@ -108,7 +109,7 @@ export interface PokemonPersisted {
   elo: number;
   wins: number;
   losses: number;
-  moveset: number[]; // 3 move IDs
+  moveset: number[]; // 4 move IDs
   disabled: boolean;
 }
 
@@ -133,6 +134,12 @@ export interface BattlePokemon {
   // True iff the pokemon's last move was a successful Protect. Triggers the
   // 50% consecutive-use failure roll on the next attempt.
   lastMoveProtected?: boolean;
+  // Taunt: remaining turns during which the pokemon cannot select status moves.
+  // 0/undefined = not taunted. Decremented at end of turn.
+  tauntTurns?: number;
+  // True on a pokemon's first turn on the field (start of battle, or fresh after
+  // switching in). Cleared at end of turn. Fake Out uses this gate.
+  justSwitchedIn?: boolean;
   statStages: StatStages;
 }
 
@@ -167,7 +174,9 @@ export type TurnEvent =
   | { kind: 'protect_blocked'; turn: number; attackerName: string; defenderName: string; moveName: string }
   | { kind: 'field_set'; turn: number; effect: FieldEffectKind; side?: SideIndex; turns: number; pokemonName: string }
   | { kind: 'field_expired'; turn: number; effect: FieldEffectKind; side?: SideIndex }
-  | { kind: 'stealth_rock_damage'; turn: number; pokemonName: string; damage: number; hpAfter: number };
+  | { kind: 'stealth_rock_damage'; turn: number; pokemonName: string; damage: number; hpAfter: number }
+  | { kind: 'taunted'; turn: number; pokemonName: string; turns: number }
+  | { kind: 'taunt_end'; turn: number; pokemonName: string };
 
 export interface BattleResult {
   winner: BattlePokemon;

@@ -87,13 +87,17 @@ export function effectSummary(move: Move): string {
     parts.push('protect');
   }
 
+  if (eff.taunt) {
+    parts.push('taunt 3t');
+  }
+
   if (eff.fieldEffect) {
     const labels: Record<string, string> = {
-      trickRoom: 'Trick Room 5t',
-      tailwind: 'Tailwind 4t',
-      lightScreen: 'Light Screen 5t',
-      reflect: 'Reflect 5t',
-      stealthRock: 'Stealth Rock',
+      trickRoom: 'trick room 5t',
+      tailwind: 'tailwind 4t',
+      lightScreen: 'light screen 5t',
+      reflect: 'reflect 5t',
+      stealthRock: 'stealth Rock',
     };
     parts.push(labels[eff.fieldEffect] ?? eff.fieldEffect);
   }
