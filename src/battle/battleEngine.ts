@@ -1,6 +1,85 @@
-import type { BattlePokemon, Move, TurnEvent, BattleResult, StatStageName, StatStages, AIStrategy } from '../models/types';
-import { calcDamage, calcExpectedDamage, effectiveSpeed } from './damageCalc';
+import type { BattlePokemon, Move, TurnEvent, BattleResult, StatStageName, StatStages, AIStrategy, FieldState, FieldEffectKind, SideIndex, SideFieldState } from '../models/types';
+import { calcDamage, calcExpectedDamage, effectiveSpeed, type DefenderScreens } from './damageCalc';
 import { defaultAI } from '../ai/aiModule';
+import { getTypeEffectiveness } from '../utils/typeChart';
+
+export const TRICK_ROOM_TURNS = 5;
+export const TAILWIND_TURNS = 4;
+export const SCREEN_TURNS = 5;
+
+function makeSide(): SideFieldState {
+  return { tailwindTurns: 0, lightScreenTurns: 0, reflectTurns: 0, stealthRock: false };
+}
+
+export function makeInitialField(): FieldState {
+  return { trickRoomTurns: 0, sides: [makeSide(), makeSide()] };
+}
+
+function opposite(side: SideIndex): SideIndex {
+  return side === 0 ? 1 : 0;
+}
+
+function defenderScreensFor(field: FieldState, defenderSide: SideIndex): DefenderScreens {
+  const s = field.sides[defenderSide];
+  return { lightScreen: s.lightScreenTurns > 0, reflect: s.reflectTurns > 0 };
+}
+
+function sideEffectiveSpeed(p: BattlePokemon, field: FieldState, side: SideIndex): number {
+  return effectiveSpeed(p, field.sides[side].tailwindTurns > 0);
+}
+
+/**
+ * Apply Stealth Rock damage to a pokemon switching into `side`. Returns the
+ * updated pokemon. Emits a `stealth_rock_damage` event when damage is dealt.
+ * Damage scales with rock-type effectiveness vs. the incoming pokemon's types
+ * (base 1/8 max HP, so 1/32 quarter-resisted up to 1/2 for Flying/Fire etc.).
+ */
+export function applyStealthRockOnEntry(
+  p: BattlePokemon,
+  field: FieldState,
+  side: SideIndex,
+  turn: number,
+  events: TurnEvent[],
+): BattlePokemon {
+  if (!field.sides[side].stealthRock) return p;
+  if (p.currentHp <= 0) return p;
+  const eff = getTypeEffectiveness('rock', p.data.types);
+  if (eff === 0) return p;
+  const damage = Math.max(1, Math.floor(p.level50Stats.hp * 0.125 * eff));
+  const hpAfter = Math.max(0, p.currentHp - damage);
+  events.push({ kind: 'stealth_rock_damage', turn, pokemonName: p.data.name, damage, hpAfter });
+  return { ...p, currentHp: hpAfter };
+}
+
+// Decrement per-turn field counters and emit expiry events.
+function tickField(field: FieldState, turn: number, events: TurnEvent[]): FieldState {
+  const next: FieldState = {
+    trickRoomTurns: field.trickRoomTurns,
+    sides: [{ ...field.sides[0] }, { ...field.sides[1] }],
+  };
+  if (next.trickRoomTurns > 0) {
+    next.trickRoomTurns--;
+    if (next.trickRoomTurns === 0) {
+      events.push({ kind: 'field_expired', turn, effect: 'trickRoom' });
+    }
+  }
+  for (const s of [0, 1] as SideIndex[]) {
+    const side = next.sides[s];
+    if (side.tailwindTurns > 0) {
+      side.tailwindTurns--;
+      if (side.tailwindTurns === 0) events.push({ kind: 'field_expired', turn, effect: 'tailwind', side: s });
+    }
+    if (side.lightScreenTurns > 0) {
+      side.lightScreenTurns--;
+      if (side.lightScreenTurns === 0) events.push({ kind: 'field_expired', turn, effect: 'lightScreen', side: s });
+    }
+    if (side.reflectTurns > 0) {
+      side.reflectTurns--;
+      if (side.reflectTurns === 0) events.push({ kind: 'field_expired', turn, effect: 'reflect', side: s });
+    }
+  }
+  return next;
+}
 
 export const STRUGGLE: Move = {
   id: -1,
@@ -493,6 +572,14 @@ export interface SingleAttackResult {
   // and is still alive. The caller (team engine) should prompt the attacker
   // to choose a replacement.
   pivotTriggered: boolean;
+  field: FieldState;
+}
+
+export interface AttackCtx {
+  preFlinched: boolean;
+  foeHitUserThisTurn: boolean;
+  field?: FieldState;
+  attackerSide?: SideIndex;
 }
 
 /**
@@ -505,8 +592,10 @@ function resolveStatusMove(
   defender: BattlePokemon,
   move: Move,
   turn: number,
+  attackerSide: SideIndex,
+  field: FieldState,
   events: TurnEvent[],
-): { attacker: BattlePokemon; defender: BattlePokemon; dealtDamage: boolean; defenderFlinched: boolean } {
+): { attacker: BattlePokemon; defender: BattlePokemon; dealtDamage: boolean; defenderFlinched: boolean; field: FieldState } {
   const eff = move.effect;
 
   // Protect: consecutive-use failure roll, otherwise set the flags.
@@ -514,11 +603,11 @@ function resolveStatusMove(
     if (attacker.lastMoveProtected && Math.random() >= 0.5) {
       events.push({ kind: 'move_failed', turn, pokemonName: attacker.data.name, moveName: move.name });
       attacker = { ...attacker, lastMoveProtected: false };
-      return { attacker, defender, dealtDamage: false, defenderFlinched: false };
+      return { attacker, defender, dealtDamage: false, defenderFlinched: false, field };
     }
     events.push({ kind: 'protected', turn, pokemonName: attacker.data.name });
     attacker = { ...attacker, protectedThisTurn: true, lastMoveProtected: true };
-    return { attacker, defender, dealtDamage: false, defenderFlinched: false };
+    return { attacker, defender, dealtDamage: false, defenderFlinched: false, field };
   }
 
   const foeTargeting = targetsFoe(move);
@@ -530,7 +619,7 @@ function resolveStatusMove(
       attackerName: attacker.data.name, defenderName: defender.data.name,
       moveName: move.name,
     });
-    return { attacker, defender, dealtDamage: false, defenderFlinched: false };
+    return { attacker, defender, dealtDamage: false, defenderFlinched: false, field };
   }
 
   // Accuracy roll (Sleep Powder 75, Thunder Wave 90, Poison Powder 75, etc.)
@@ -542,7 +631,51 @@ function resolveStatusMove(
       damage: 0, isCrit: false, missed: true, effectiveness: 1,
       attackerHpAfter: attacker.currentHp, defenderHpAfter: defender.currentHp,
     });
-    return { attacker, defender, dealtDamage: false, defenderFlinched: false };
+    return { attacker, defender, dealtDamage: false, defenderFlinched: false, field };
+  }
+
+  // Field / side conditions (Trick Room, Tailwind, screens, Stealth Rock).
+  // Setting an already-active effect fails; Stealth Rock lays on the opposing
+  // side so switch-ins there take damage.
+  if (eff?.fieldEffect) {
+    const fx: FieldEffectKind = eff.fieldEffect;
+    const failed = (): { attacker: BattlePokemon; defender: BattlePokemon; dealtDamage: boolean; defenderFlinched: boolean; field: FieldState } => {
+      events.push({ kind: 'move_failed', turn, pokemonName: attacker.data.name, moveName: move.name });
+      return { attacker, defender, dealtDamage: false, defenderFlinched: false, field };
+    };
+    if (fx === 'trickRoom') {
+      if (field.trickRoomTurns > 0) return failed();
+      const nextField: FieldState = { ...field, trickRoomTurns: TRICK_ROOM_TURNS };
+      events.push({ kind: 'field_set', turn, effect: fx, turns: TRICK_ROOM_TURNS, pokemonName: attacker.data.name });
+      return { attacker, defender, dealtDamage: false, defenderFlinched: false, field: nextField };
+    }
+    if (fx === 'tailwind' || fx === 'lightScreen' || fx === 'reflect') {
+      const userSide = field.sides[attackerSide];
+      const currentTurns =
+        fx === 'tailwind' ? userSide.tailwindTurns :
+        fx === 'lightScreen' ? userSide.lightScreenTurns :
+        userSide.reflectTurns;
+      if (currentTurns > 0) return failed();
+      const duration = fx === 'tailwind' ? TAILWIND_TURNS : SCREEN_TURNS;
+      const updatedSide: SideFieldState = { ...userSide };
+      if (fx === 'tailwind') updatedSide.tailwindTurns = duration;
+      else if (fx === 'lightScreen') updatedSide.lightScreenTurns = duration;
+      else updatedSide.reflectTurns = duration;
+      const sides: [SideFieldState, SideFieldState] = [field.sides[0], field.sides[1]];
+      sides[attackerSide] = updatedSide;
+      const nextField: FieldState = { ...field, sides };
+      events.push({ kind: 'field_set', turn, effect: fx, side: attackerSide, turns: duration, pokemonName: attacker.data.name });
+      return { attacker, defender, dealtDamage: false, defenderFlinched: false, field: nextField };
+    }
+    if (fx === 'stealthRock') {
+      const foeSide = opposite(attackerSide);
+      if (field.sides[foeSide].stealthRock) return failed();
+      const sides: [SideFieldState, SideFieldState] = [field.sides[0], field.sides[1]];
+      sides[foeSide] = { ...sides[foeSide], stealthRock: true };
+      const nextField: FieldState = { ...field, sides };
+      events.push({ kind: 'field_set', turn, effect: fx, side: foeSide, turns: 0, pokemonName: attacker.data.name });
+      return { attacker, defender, dealtDamage: false, defenderFlinched: false, field: nextField };
+    }
   }
 
   // Heal (Recover)
@@ -550,13 +683,13 @@ function resolveStatusMove(
     const maxHp = attacker.level50Stats.hp;
     if (attacker.currentHp >= maxHp) {
       events.push({ kind: 'move_failed', turn, pokemonName: attacker.data.name, moveName: move.name });
-      return { attacker, defender, dealtDamage: false, defenderFlinched: false };
+      return { attacker, defender, dealtDamage: false, defenderFlinched: false, field };
     }
     const healed = Math.min(maxHp - attacker.currentHp, Math.max(1, Math.floor(maxHp * eff.heal / 100)));
     const hpAfter = attacker.currentHp + healed;
     attacker = { ...attacker, currentHp: hpAfter };
     events.push({ kind: 'heal', turn, pokemonName: attacker.data.name, healed, hpAfter });
-    return { attacker, defender, dealtDamage: false, defenderFlinched: false };
+    return { attacker, defender, dealtDamage: false, defenderFlinched: false, field };
   }
 
   // Stat changes (always apply for status moves — statChance: 0)
@@ -582,7 +715,7 @@ function resolveStatusMove(
     }
   }
 
-  return { attacker, defender, dealtDamage: false, defenderFlinched: false };
+  return { attacker, defender, dealtDamage: false, defenderFlinched: false, field };
 }
 
 /**
@@ -595,22 +728,26 @@ export function resolveSingleAttack(
   defender: BattlePokemon,
   move: Move,
   turnNumber: number,
-  ctx: { preFlinched: boolean; foeHitUserThisTurn: boolean },
+  ctx: AttackCtx,
   events: TurnEvent[],
 ): SingleAttackResult {
+  const field: FieldState = ctx.field ?? makeInitialField();
+  const attackerSide: SideIndex = ctx.attackerSide ?? 0;
+  const defenderSide: SideIndex = opposite(attackerSide);
+
   if (ctx.preFlinched) {
     events.push({ kind: 'cant_move', turn: turnNumber, pokemonName: attacker.data.name, reason: 'flinch' });
-    return { attacker, defender, dealtDamage: false, defenderFlinched: false, pivotTriggered: false };
+    return { attacker, defender, dealtDamage: false, defenderFlinched: false, pivotTriggered: false, field };
   }
   if (move.effect?.firstTurnOnly && turnNumber > 1) {
     events.push({ kind: 'move_failed', turn: turnNumber, pokemonName: attacker.data.name, moveName: move.name });
-    return { attacker, defender, dealtDamage: false, defenderFlinched: false, pivotTriggered: false };
+    return { attacker, defender, dealtDamage: false, defenderFlinched: false, pivotTriggered: false, field };
   }
 
   const { canAct: acts, updated: attackerChecked } = canAct(attacker, turnNumber, events);
   attacker = attackerChecked;
   if (!acts) {
-    return { attacker, defender, dealtDamage: false, defenderFlinched: false, pivotTriggered: false };
+    return { attacker, defender, dealtDamage: false, defenderFlinched: false, pivotTriggered: false, field };
   }
 
   // Any non-Protect action ends the Protect consecutive-use streak.
@@ -619,7 +756,7 @@ export function resolveSingleAttack(
   }
 
   if (move.damageClass === 'status') {
-    const result = resolveStatusMove(attacker, defender, move, turnNumber, events);
+    const result = resolveStatusMove(attacker, defender, move, turnNumber, attackerSide, field, events);
     return { ...result, pivotTriggered: false };
   }
 
@@ -630,12 +767,12 @@ export function resolveSingleAttack(
       attackerName: attacker.data.name, defenderName: defender.data.name,
       moveName: move.name,
     });
-    return { attacker, defender, dealtDamage: false, defenderFlinched: false, pivotTriggered: false };
+    return { attacker, defender, dealtDamage: false, defenderFlinched: false, pivotTriggered: false, field };
   }
 
   const wasLockedBefore = !!attacker.lockedMove && attacker.lockedMove.moveId === move.id;
   const effMove = effectivePowerMove(move, defender, ctx.foeHitUserThisTurn);
-  const result = calcDamage(attacker, defender, effMove);
+  const result = calcDamage(attacker, defender, effMove, undefined, defenderScreensFor(field, defenderSide));
   const actualDamage = Math.min(result.damage, defender.currentHp);
   const newDefHp = defender.currentHp - actualDamage;
   defender = { ...defender, currentHp: newDefHp };
@@ -676,7 +813,7 @@ export function resolveSingleAttack(
     move.effect?.pivotSwitch && connected && attacker.currentHp > 0
   );
 
-  return { attacker, defender, dealtDamage, defenderFlinched, pivotTriggered };
+  return { attacker, defender, dealtDamage, defenderFlinched, pivotTriggered, field };
 }
 
 export function resolveTurn(
@@ -685,18 +822,21 @@ export function resolveTurn(
   turnNumber: number,
   ai1: AIStrategy = defaultAI,
   ai2: AIStrategy = defaultAI,
-): { events: TurnEvent[]; p1After: BattlePokemon; p2After: BattlePokemon; battleOver: boolean; lastAttackerIsP1?: boolean } {
+  field: FieldState = makeInitialField(),
+): { events: TurnEvent[]; p1After: BattlePokemon; p2After: BattlePokemon; battleOver: boolean; lastAttackerIsP1?: boolean; field: FieldState } {
   const move1 = ai1.selectMove(
     { ...pokemon1, moves: usableMoves(pokemon1, turnNumber) },
     pokemon2,
     turnNumber,
+    { defenderScreens: defenderScreensFor(field, 1) },
   );
   const move2 = ai2.selectMove(
     { ...pokemon2, moves: usableMoves(pokemon2, turnNumber) },
     pokemon1,
     turnNumber,
+    { defenderScreens: defenderScreensFor(field, 0) },
   );
-  return resolveTurnWithMoves(pokemon1, pokemon2, move1, move2, turnNumber);
+  return resolveTurnWithMoves(pokemon1, pokemon2, move1, move2, turnNumber, field);
 }
 
 /**
@@ -710,7 +850,9 @@ export function resolveTurnWithMoves(
   move1: Move | null,
   move2: Move | null,
   turnNumber: number,
-): { events: TurnEvent[]; p1After: BattlePokemon; p2After: BattlePokemon; battleOver: boolean; lastAttackerIsP1?: boolean } {
+  initialField: FieldState = makeInitialField(),
+): { events: TurnEvent[]; p1After: BattlePokemon; p2After: BattlePokemon; battleOver: boolean; lastAttackerIsP1?: boolean; field: FieldState } {
+  let field: FieldState = initialField;
   // Build the ordered list of attackers. Zero, one, or two entries.
   type Attacker = { isP1: boolean; move: Move };
   const attackers: Attacker[] = [];
@@ -721,10 +863,14 @@ export function resolveTurnWithMoves(
     if (pri1 !== pri2) {
       p1First = pri1 > pri2;
     } else {
-      const spd1 = effectiveSpeed(pokemon1);
-      const spd2 = effectiveSpeed(pokemon2);
-      if (spd1 !== spd2) p1First = spd1 > spd2;
-      else p1First = Math.random() < 0.5;
+      const spd1 = sideEffectiveSpeed(pokemon1, field, 0);
+      const spd2 = sideEffectiveSpeed(pokemon2, field, 1);
+      if (spd1 !== spd2) {
+        // Trick Room reverses the speed comparison within the same priority bracket.
+        p1First = field.trickRoomTurns > 0 ? spd1 < spd2 : spd1 > spd2;
+      } else {
+        p1First = Math.random() < 0.5;
+      }
     }
     if (p1First) {
       attackers.push({ isP1: true, move: move1 });
@@ -757,9 +903,12 @@ export function resolveTurnWithMoves(
     const r = resolveSingleAttack(attacker, defender, move, turnNumber, {
       preFlinched: !isFirst && secondFlinched,
       foeHitUserThisTurn: !isFirst && firstDealtDamage,
+      field,
+      attackerSide: isP1 ? 0 : 1,
     }, events);
     attacker = r.attacker;
     defender = r.defender;
+    field = r.field;
     if (isFirst) {
       firstDealtDamage = r.dealtDamage;
       secondFlinched = r.defenderFlinched;
@@ -781,13 +930,17 @@ export function resolveTurnWithMoves(
     if (p1.currentHp <= 0 || p2.currentHp <= 0) battleOver = true;
   }
 
+  // Decrement any active field / side counters. Runs regardless of KO so that
+  // Trick Room etc. still expires when one side faints.
+  field = tickField(field, turnNumber, events);
+
   // Clear per-turn Protect flag. lastMoveProtected persists between turns so
   // that consecutive Protect uses can fail — it's cleared when the user takes
   // any non-Protect action (handled in resolveSingleAttack).
   if (p1.protectedThisTurn) p1 = { ...p1, protectedThisTurn: false };
   if (p2.protectedThisTurn) p2 = { ...p2, protectedThisTurn: false };
 
-  return { events, p1After: p1, p2After: p2, battleOver, lastAttackerIsP1 };
+  return { events, p1After: p1, p2After: p2, battleOver, lastAttackerIsP1, field };
 }
 
 export function runFullBattle(
@@ -801,13 +954,15 @@ export function runFullBattle(
   const allEvents: TurnEvent[] = [];
   let turn = 1;
   const MAX_TURNS = 500;
+  let field = makeInitialField();
 
   let lastAttackerIsP1: boolean | undefined;
   while (p1.currentHp > 0 && p2.currentHp > 0 && turn <= MAX_TURNS) {
-    const result = resolveTurn(p1, p2, turn, ai1, ai2);
+    const result = resolveTurn(p1, p2, turn, ai1, ai2, field);
     allEvents.push(...result.events);
     p1 = result.p1After;
     p2 = result.p2After;
+    field = result.field;
     lastAttackerIsP1 = result.lastAttackerIsP1;
     if (result.battleOver) break;
     turn++;

@@ -79,5 +79,24 @@ export function effectSummary(move: Move): string {
     parts.push('switch out');
   }
 
+  if (eff.heal) {
+    parts.push(`heal ${eff.heal}%`);
+  }
+
+  if (eff.protect) {
+    parts.push('protect');
+  }
+
+  if (eff.fieldEffect) {
+    const labels: Record<string, string> = {
+      trickRoom: 'Trick Room 5t',
+      tailwind: 'Tailwind 4t',
+      lightScreen: 'Light Screen 5t',
+      reflect: 'Reflect 5t',
+      stealthRock: 'Stealth Rock',
+    };
+    parts.push(labels[eff.fieldEffect] ?? eff.fieldEffect);
+  }
+
   return parts.join(' · ');
 }

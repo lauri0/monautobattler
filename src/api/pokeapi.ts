@@ -64,6 +64,11 @@ const STATUS_MOVE_EFFECTS: Record<string, MoveEffect> = {
   'poison-powder':{ ailment: 'poison', ailmentChance: 0 },
   'recover':      { heal: 50 },
   'protect':      { protect: true },
+  'trick-room':   { fieldEffect: 'trickRoom' },
+  'tailwind':     { fieldEffect: 'tailwind' },
+  'light-screen': { fieldEffect: 'lightScreen' },
+  'reflect':      { fieldEffect: 'reflect' },
+  'stealth-rock': { fieldEffect: 'stealthRock' },
 };
 
 async function fetchMoveData(moveUrl: string): Promise<Move | null> {

@@ -8,22 +8,39 @@ export interface DamageResult {
   effectiveness: number;
 }
 
+// Screens on the defender's side that affect incoming damage. Passed into the
+// damage calculators so the AI evaluators also see the reduction.
+export interface DefenderScreens {
+  lightScreen?: boolean;
+  reflect?: boolean;
+}
+
 // Standard Gen stat stage multiplier: (2 + max(stage,0)) / (2 - min(stage,0))
 function statStageMult(stage: number): number {
   return (2 + Math.max(stage, 0)) / (2 - Math.min(stage, 0));
 }
 
-export function effectiveSpeed(p: BattlePokemon): number {
+export function effectiveSpeed(p: BattlePokemon, tailwind = false): number {
   let spd = p.level50Stats.speed * statStageMult(p.statStages.speed);
   if (p.statusCondition === 'paralysis') spd *= 0.5;
+  if (tailwind) spd *= 2;
   return spd;
+}
+
+// True when a screen matching the move's class applies and the hit is not a crit.
+function screenApplies(move: Move, screens: DefenderScreens | undefined, isCrit: boolean): boolean {
+  if (!screens || isCrit) return false;
+  if (move.damageClass === 'physical') return !!screens.reflect;
+  if (move.damageClass === 'special') return !!screens.lightScreen;
+  return false;
 }
 
 export function calcDamage(
   attacker: BattlePokemon,
   defender: BattlePokemon,
   move: Move,
-  randomRoll?: number // 0.85–1.00; if not provided, random
+  randomRoll?: number, // 0.85–1.00; if not provided, random
+  defenderScreens?: DefenderScreens,
 ): DamageResult {
   // Check accuracy
   if (move.accuracy !== null) {
@@ -59,9 +76,10 @@ export function calcDamage(
 
   const stab = attacker.data.types.includes(move.type) ? 1.5 : 1.0;
   const critMult = isCrit ? 1.5 : 1.0;
+  const screenMult = screenApplies(move, defenderScreens, isCrit) ? 0.5 : 1.0;
 
   const base = Math.floor(Math.floor((Math.floor(2 * 50 / 5) + 2) * move.power * A / D) / 50 + 2);
-  const damage = Math.floor(base * critMult * roll * stab * effectiveness);
+  const damage = Math.floor(base * critMult * roll * stab * effectiveness * screenMult);
 
   return {
     damage: Math.max(1, damage),
@@ -74,7 +92,8 @@ export function calcDamage(
 export function calcMinDamage(
   attacker: BattlePokemon,
   defender: BattlePokemon,
-  move: Move
+  move: Move,
+  defenderScreens?: DefenderScreens,
 ): number {
   const effectiveness = getTypeEffectiveness(move.type, defender.data.types, move.effect?.superEffectiveAgainst);
   if (effectiveness === 0) return 0;
@@ -93,15 +112,17 @@ export function calcMinDamage(
   }
 
   const stab = attacker.data.types.includes(move.type) ? 1.5 : 1.0;
+  const screenMult = screenApplies(move, defenderScreens, false) ? 0.5 : 1.0;
   const base = Math.floor(Math.floor((Math.floor(2 * 50 / 5) + 2) * move.power * A / D) / 50 + 2);
-  const damage = Math.floor(base * 1.0 * 0.85 * stab * effectiveness);
+  const damage = Math.floor(base * 1.0 * 0.85 * stab * effectiveness * screenMult);
   return Math.max(1, damage);
 }
 
 export function calcExpectedDamage(
   attacker: BattlePokemon,
   defender: BattlePokemon,
-  move: Move
+  move: Move,
+  defenderScreens?: DefenderScreens,
 ): number {
   const effectiveness = getTypeEffectiveness(move.type, defender.data.types, move.effect?.superEffectiveAgainst);
   if (effectiveness === 0) return 0;
@@ -121,7 +142,8 @@ export function calcExpectedDamage(
 
   const stab = attacker.data.types.includes(move.type) ? 1.5 : 1.0;
   const roll = 0.925; // average of 0.85–1.00
+  const screenMult = screenApplies(move, defenderScreens, false) ? 0.5 : 1.0;
   const base = Math.floor(Math.floor((Math.floor(2 * 50 / 5) + 2) * move.power * A / D) / 50 + 2);
-  const damage = Math.floor(base * 1.0 * roll * stab * effectiveness);
+  const damage = Math.floor(base * 1.0 * roll * stab * effectiveness * screenMult);
   return Math.max(1, damage);
 }

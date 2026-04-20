@@ -208,5 +208,42 @@ export default function LogEntry({ ev }: { ev: TurnEvent }) {
     );
   }
 
+  if (ev.kind === 'field_set') {
+    const names: Record<string, string> = {
+      trickRoom: 'Trick Room', tailwind: 'Tailwind',
+      lightScreen: 'Light Screen', reflect: 'Reflect', stealthRock: 'Stealth Rock',
+    };
+    return (
+      <div className="log-entry log-entry--status">
+        <span className="log-turn">T{ev.turn}</span>
+        <span className="log-attacker">{ev.pokemonName}</span>
+        <span> set up {names[ev.effect] ?? ev.effect}!</span>
+      </div>
+    );
+  }
+
+  if (ev.kind === 'field_expired') {
+    const names: Record<string, string> = {
+      trickRoom: 'Trick Room', tailwind: 'Tailwind',
+      lightScreen: 'Light Screen', reflect: 'Reflect', stealthRock: 'Stealth Rock',
+    };
+    return (
+      <div className="log-entry log-entry--status">
+        <span className="log-turn">T{ev.turn}</span>
+        <span>{names[ev.effect] ?? ev.effect} faded.</span>
+      </div>
+    );
+  }
+
+  if (ev.kind === 'stealth_rock_damage') {
+    return (
+      <div className="log-entry log-entry--status">
+        <span className="log-turn">T{ev.turn}</span>
+        <span className="log-attacker">{ev.pokemonName}</span>
+        <span> was hurt by Stealth Rock! (-{ev.damage} HP)</span>
+      </div>
+    );
+  }
+
   return null;
 }

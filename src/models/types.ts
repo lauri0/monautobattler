@@ -34,6 +34,26 @@ export interface MoveEffect {
   pivotSwitch?: boolean;   // user switches out after hitting (U-turn, Volt Switch, Flip Turn)
   heal?: number;           // % of user's max HP to heal (Recover = 50)
   protect?: boolean;       // marks Protect
+  fieldEffect?: FieldEffectKind; // marks a field/side-condition-setting status move
+}
+
+export type FieldEffectKind =
+  | 'trickRoom'
+  | 'tailwind'
+  | 'lightScreen'
+  | 'reflect'
+  | 'stealthRock';
+
+export interface SideFieldState {
+  tailwindTurns: number;
+  lightScreenTurns: number;
+  reflectTurns: number;
+  stealthRock: boolean;
+}
+
+export interface FieldState {
+  trickRoomTurns: number;
+  sides: [SideFieldState, SideFieldState];
 }
 
 export interface StatStages {
@@ -144,7 +164,10 @@ export type TurnEvent =
   | { kind: 'move_failed'; turn: number; pokemonName: string; moveName: string }
   | { kind: 'heal'; turn: number; pokemonName: string; healed: number; hpAfter: number }
   | { kind: 'protected'; turn: number; pokemonName: string }
-  | { kind: 'protect_blocked'; turn: number; attackerName: string; defenderName: string; moveName: string };
+  | { kind: 'protect_blocked'; turn: number; attackerName: string; defenderName: string; moveName: string }
+  | { kind: 'field_set'; turn: number; effect: FieldEffectKind; side?: SideIndex; turns: number; pokemonName: string }
+  | { kind: 'field_expired'; turn: number; effect: FieldEffectKind; side?: SideIndex }
+  | { kind: 'stealth_rock_damage'; turn: number; pokemonName: string; damage: number; hpAfter: number };
 
 export interface BattleResult {
   winner: BattlePokemon;
@@ -161,7 +184,14 @@ export interface EloChange {
 export interface AIStrategy {
   // turnNumber is the current battle turn (1-based). Optional for back-compat;
   // AIs that model first-turn-only moves should use it to prune correctly.
-  selectMove(attacker: BattlePokemon, defender: BattlePokemon, turnNumber?: number): Move;
+  // opts.defenderScreens, when present, lets strategies down-weight moves that
+  // are halved by an active Reflect / Light Screen on the defender's side.
+  selectMove(
+    attacker: BattlePokemon,
+    defender: BattlePokemon,
+    turnNumber?: number,
+    opts?: { defenderScreens?: { reflect?: boolean; lightScreen?: boolean } },
+  ): Move;
 }
 
 // ── 3v3 Team Battle Types ──
@@ -184,6 +214,7 @@ export interface TeamBattleState {
   teams: [Team, Team];
   turn: number;
   phase: TeamBattlePhase;
+  field: FieldState;
   // During pivot0/pivot1, holds the opponent's still-to-resolve attack (if any).
   // The opponent attack is resolved against the new active after the pivoting
   // side picks a replacement. Cleared once the turn finishes.

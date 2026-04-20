@@ -4,6 +4,7 @@ import { getAllPokemonData, getAllMoves } from '../persistence/db';
 import { getAllowedMoveIds, setAllowedMoveIds } from '../persistence/userStorage';
 import { getTypeColor } from '../utils/typeColors';
 import { effectSummary } from '../utils/moveEffectSummary';
+import { damageClassIcon } from '../utils/moveIcon';
 import './MoveBanPage.css';
 
 interface Props {
@@ -28,7 +29,7 @@ function MoveRow({ m, isAllowed, onAllow, onBan }: MoveRowProps) {
         {m.type}
       </span>
       <span className="ban-move-name">
-        {m.damageClass === 'physical' ? '⚔' : '✦'} {m.name}
+        {damageClassIcon(m.damageClass)} {m.name}
       </span>
       <span className="ban-move-meta">
         {m.power}pw · {m.accuracy ?? '—'}%{m.priority ? ` · pri ${m.priority > 0 ? '+' : ''}${m.priority}` : ''}{fx ? ` · ${fx}` : ''}

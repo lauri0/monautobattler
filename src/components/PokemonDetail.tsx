@@ -4,6 +4,7 @@ import { getPokemonPersisted, setPokemonPersisted, getAllowedMoveIds } from '../
 import { calcLevel50Stats } from '../utils/statCalc';
 import { getDetailedDefensiveMatchups } from '../utils/typeChart';
 import { getTypeColor } from '../utils/typeColors';
+import { damageClassIcon } from '../utils/moveIcon';
 import TypeBadge from './TypeBadge';
 import './PokemonDetail.css';
 
@@ -244,7 +245,7 @@ export default function PokemonDetail({ pokemon, allPokemon, onBack, onNavigate 
                           const fx = effectSummary(m);
                           return (
                             <option key={m.id} value={m.id} style={{ background: getTypeColor(m.type), color: '#fff' }}>
-                              {`${m.damageClass === 'physical' ? '⚔' : '✦'} ${m.name}  ${m.power}pw  ${m.accuracy ?? '—'}%${m.priority ? `  · pri ${m.priority > 0 ? '+' : ''}${m.priority}` : ''}${fx ? `  · ${fx}` : ''}`}
+                              {`${damageClassIcon(m.damageClass)} ${m.name}  ${m.power}pw  ${m.accuracy ?? '—'}%${m.priority ? `  · pri ${m.priority > 0 ? '+' : ''}${m.priority}` : ''}${fx ? `  · ${fx}` : ''}`}
                             </option>
                           );
                         })}

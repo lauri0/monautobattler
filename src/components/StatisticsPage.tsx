@@ -2,6 +2,7 @@ import { useMemo, useState } from 'react';
 import type { PokemonData, TypeName, DamageClass } from '../models/types';
 import { getPokemonPersisted } from '../persistence/userStorage';
 import { effectSummary } from '../utils/moveEffectSummary';
+import { damageClassIcon } from '../utils/moveIcon';
 import { getTypeEffectiveness, ALL_TYPES } from '../utils/typeChart';
 import { getTypeColor } from '../utils/typeColors';
 import TypeBadge from './TypeBadge';
@@ -120,7 +121,7 @@ export default function StatisticsPage({ allPokemon, onBack }: Props) {
                   <tr key={m.name}>
                     <td className="rank-cell">#{i + 1}</td>
                     <td className="stats-move-class" title={m.damageClass}>
-                      {m.damageClass === 'physical' ? '⚔' : '✦'}
+                      {damageClassIcon(m.damageClass)}
                     </td>
                     <td className="stats-move-name">{formatMoveName(m.name)}</td>
                     <td><TypeBadge type={m.type} /></td>

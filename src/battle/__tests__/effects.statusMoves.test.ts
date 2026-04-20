@@ -1,6 +1,6 @@
 import { describe, it, expect } from 'vitest';
-import { resolveSingleAttack, resolveTurnWithMoves } from '../battleEngine';
-import type { TurnEvent } from '../../models/types';
+import { makeInitialField, resolveSingleAttack, resolveTurnWithMoves } from '../battleEngine';
+import type { FieldState, TurnEvent } from '../../models/types';
 import { makePokemon, makeMove } from './fixtures';
 import { stubRng, stubRngConst } from './rng';
 
@@ -222,5 +222,180 @@ describe('Protect', () => {
     const attacker = makePokemon({ lastMoveProtected: true });
     const r = runStatus(attacker, makePokemon(), tackle);
     expect(r.attacker.lastMoveProtected).toBe(false);
+  });
+});
+
+// ── Field / side conditions ─────────────────────────────────────────────────
+
+const trickRoom = () => makeMove({ name: 'trick-room', damageClass: 'status', power: 0,
+  accuracy: null, priority: -7, effect: { fieldEffect: 'trickRoom' } });
+const tailwind = () => makeMove({ name: 'tailwind', damageClass: 'status', power: 0,
+  accuracy: null, priority: 0, effect: { fieldEffect: 'tailwind' } });
+const lightScreen = () => makeMove({ name: 'light-screen', damageClass: 'status', power: 0,
+  accuracy: null, priority: 0, effect: { fieldEffect: 'lightScreen' } });
+const reflect = () => makeMove({ name: 'reflect', damageClass: 'status', power: 0,
+  accuracy: null, priority: 0, effect: { fieldEffect: 'reflect' } });
+const stealthRock = () => makeMove({ name: 'stealth-rock', damageClass: 'status', power: 0,
+  accuracy: null, priority: 0, effect: { fieldEffect: 'stealthRock' } });
+
+describe('Trick Room', () => {
+  it('sets the field counter and emits field_set', () => {
+    const r = runStatus(makePokemon(), makePokemon(), trickRoom());
+    expect(r.field.trickRoomTurns).toBe(5);
+    expect(r.events.find(e => e.kind === 'field_set')).toBeTruthy();
+  });
+
+  it('reverses move order within the same priority bracket', () => {
+    stubRngConst(0.5); // priority/effect rolls use 0.5 consistently
+    const fast = makePokemon({ name: 'fast', stats: { speed: 200 } });
+    const slow = makePokemon({ name: 'slow', stats: { speed: 10 } });
+    const tackleFast = makeMove({ id: 701, name: 'tackle', power: 40, damageClass: 'physical', accuracy: 100 });
+    const tackleSlow = makeMove({ id: 702, name: 'tackle', power: 40, damageClass: 'physical', accuracy: 100 });
+    const field: FieldState = { ...makeInitialField(), trickRoomTurns: 5 };
+    const { events } = resolveTurnWithMoves(fast, slow, tackleFast, tackleSlow, 1, field);
+    const attacks = events.filter(e => e.kind === 'attack') as Extract<TurnEvent, { kind: 'attack' }>[];
+    expect(attacks[0].attackerName).toBe('slow');
+    expect(attacks[1].attackerName).toBe('fast');
+  });
+
+  it('fails when already active', () => {
+    const field: FieldState = { ...makeInitialField(), trickRoomTurns: 3 };
+    const events: TurnEvent[] = [];
+    const r = resolveSingleAttack(makePokemon(), makePokemon(), trickRoom(), 1,
+      { ...CTX, field, attackerSide: 0 }, events);
+    expect(events.find(e => e.kind === 'move_failed')).toBeTruthy();
+    expect(r.field.trickRoomTurns).toBe(3); // unchanged
+  });
+
+  it('decrements each turn and expires', () => {
+    stubRngConst(0.5);
+    const p1 = makePokemon({ name: 'a' });
+    const p2 = makePokemon({ name: 'b' });
+    let field: FieldState = { ...makeInitialField(), trickRoomTurns: 1 };
+    const { field: after, events } = resolveTurnWithMoves(p1, p2, null, null, 1, field);
+    expect(after.trickRoomTurns).toBe(0);
+    expect(events.find(e => e.kind === 'field_expired' && e.effect === 'trickRoom')).toBeTruthy();
+  });
+});
+
+describe('Tailwind', () => {
+  it('doubles acting side speed for the priority tie-break', () => {
+    stubRngConst(0.5);
+    // Side 0 is slower (80) but has tailwind → effective 160 > side 1's 100.
+    const slow = makePokemon({ name: 'slowTail', stats: { speed: 80 } });
+    const mid = makePokemon({ name: 'midBase', stats: { speed: 100 } });
+    const m1 = makeMove({ id: 711, name: 'tackleA', power: 40, damageClass: 'physical', accuracy: 100 });
+    const m2 = makeMove({ id: 712, name: 'tackleB', power: 40, damageClass: 'physical', accuracy: 100 });
+    const field: FieldState = makeInitialField();
+    field.sides[0].tailwindTurns = 4;
+    const { events } = resolveTurnWithMoves(slow, mid, m1, m2, 1, field);
+    const first = events.find(e => e.kind === 'attack') as Extract<TurnEvent, { kind: 'attack' }>;
+    expect(first.attackerName).toBe('slowTail');
+  });
+
+  it('sets 4 turns and decrements', () => {
+    const r = runStatus(makePokemon(), makePokemon(), tailwind());
+    expect(r.field.sides[0].tailwindTurns).toBe(4);
+    // Drive a turn forward with no moves to tick the counter.
+    const { field: after } = resolveTurnWithMoves(makePokemon(), makePokemon(), null, null, 2, r.field);
+    expect(after.sides[0].tailwindTurns).toBe(3);
+  });
+});
+
+describe('Light Screen', () => {
+  it('halves special damage on the defender side', () => {
+    // Two fixed RNG sequences: first without screen, then with screen.
+    // Each damaging move uses: accuracy (1), crit (1), roll (1) = 3 calls.
+    const ember = makeMove({ name: 'ember', type: 'fire', power: 40,
+      damageClass: 'special', accuracy: 100 });
+    const attacker = makePokemon({ stats: { specialAttack: 100 } });
+    const defender = makePokemon({ stats: { specialDefense: 100, hp: 400 }, currentHp: 400 });
+
+    stubRng([0, 0.99, 1.0]);
+    const r1 = resolveSingleAttack(attacker, defender, ember, 1,
+      { preFlinched: false, foeHitUserThisTurn: false }, []);
+    const damageNoScreen = defender.currentHp - r1.defender.currentHp;
+
+    stubRng([0, 0.99, 1.0]);
+    const field: FieldState = makeInitialField();
+    field.sides[1].lightScreenTurns = 5;
+    const r2 = resolveSingleAttack(attacker, defender, ember, 1,
+      { preFlinched: false, foeHitUserThisTurn: false, field, attackerSide: 0 }, []);
+    const damageWithScreen = defender.currentHp - r2.defender.currentHp;
+
+    expect(damageWithScreen).toBeLessThan(damageNoScreen);
+    expect(damageWithScreen).toBeGreaterThanOrEqual(Math.floor(damageNoScreen / 2) - 1);
+  });
+
+  it('fails to set when already active', () => {
+    const field: FieldState = makeInitialField();
+    field.sides[0].lightScreenTurns = 2;
+    const events: TurnEvent[] = [];
+    resolveSingleAttack(makePokemon(), makePokemon(), lightScreen(), 1,
+      { ...CTX, field, attackerSide: 0 }, events);
+    expect(events.find(e => e.kind === 'move_failed')).toBeTruthy();
+  });
+});
+
+describe('Reflect', () => {
+  it('halves physical damage on the defender side', () => {
+    const tackle = makeMove({ name: 'tackle', power: 60,
+      damageClass: 'physical', accuracy: 100 });
+    const attacker = makePokemon({ stats: { attack: 100 } });
+    const defender = makePokemon({ stats: { defense: 100, hp: 400 }, currentHp: 400 });
+
+    stubRng([0, 0.99, 1.0]);
+    const noScreen = resolveSingleAttack(attacker, defender, tackle, 1,
+      { preFlinched: false, foeHitUserThisTurn: false }, []);
+
+    stubRng([0, 0.99, 1.0]);
+    const field: FieldState = makeInitialField();
+    field.sides[1].reflectTurns = 5;
+    const withScreen = resolveSingleAttack(attacker, defender, tackle, 1,
+      { preFlinched: false, foeHitUserThisTurn: false, field, attackerSide: 0 }, []);
+
+    const dmgNo = defender.currentHp - noScreen.defender.currentHp;
+    const dmgYes = defender.currentHp - withScreen.defender.currentHp;
+    expect(dmgYes).toBeLessThan(dmgNo);
+  });
+
+  it('does not apply on a crit', () => {
+    const tackle = makeMove({ name: 'tackle', power: 60,
+      damageClass: 'physical', accuracy: 100 });
+    const attacker = makePokemon({ stats: { attack: 100 } });
+    const defender = makePokemon({ stats: { defense: 100, hp: 400 }, currentHp: 400 });
+
+    // Force crit: accuracy 0 (pass), crit roll 0 (< 1/24 always crits), roll 1.0.
+    stubRng([0, 0, 1.0]);
+    const noScreen = resolveSingleAttack(attacker, defender, tackle, 1,
+      { preFlinched: false, foeHitUserThisTurn: false }, []);
+
+    stubRng([0, 0, 1.0]);
+    const field: FieldState = makeInitialField();
+    field.sides[1].reflectTurns = 5;
+    const withScreen = resolveSingleAttack(attacker, defender, tackle, 1,
+      { preFlinched: false, foeHitUserThisTurn: false, field, attackerSide: 0 }, []);
+
+    expect(noScreen.defender.currentHp).toBe(withScreen.defender.currentHp);
+  });
+});
+
+describe('Stealth Rock', () => {
+  it('marks the opposing side and emits field_set', () => {
+    const r = runStatus(makePokemon(), makePokemon(), stealthRock());
+    // Caster is side 0; rocks should lay on side 1.
+    expect(r.field.sides[1].stealthRock).toBe(true);
+    expect(r.field.sides[0].stealthRock).toBe(false);
+    const ev = r.events.find(e => e.kind === 'field_set');
+    expect(ev).toBeTruthy();
+  });
+
+  it('fails when already set on that side', () => {
+    const field: FieldState = makeInitialField();
+    field.sides[1].stealthRock = true;
+    const events: TurnEvent[] = [];
+    resolveSingleAttack(makePokemon(), makePokemon(), stealthRock(), 1,
+      { ...CTX, field, attackerSide: 0 }, events);
+    expect(events.find(e => e.kind === 'move_failed')).toBeTruthy();
   });
 });
