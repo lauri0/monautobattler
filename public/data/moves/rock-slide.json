@@ -1,0 +1,13 @@
+{
+  "id": 157,
+  "name": "rock-slide",
+  "type": "rock",
+  "power": 75,
+  "accuracy": 90,
+  "pp": 10,
+  "damageClass": "physical",
+  "priority": 0,
+  "effect": {
+    "flinchChance": 30
+  }
+}

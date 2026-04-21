@@ -1,0 +1,14 @@
+{
+  "id": 84,
+  "name": "thunder-shock",
+  "type": "electric",
+  "power": 40,
+  "accuracy": 100,
+  "pp": 30,
+  "damageClass": "special",
+  "priority": 0,
+  "effect": {
+    "ailment": "paralysis",
+    "ailmentChance": 10
+  }
+}

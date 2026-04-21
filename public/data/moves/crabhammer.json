@@ -1,0 +1,13 @@
+{
+  "id": 152,
+  "name": "crabhammer",
+  "type": "water",
+  "power": 100,
+  "accuracy": 90,
+  "pp": 10,
+  "damageClass": "physical",
+  "priority": 0,
+  "effect": {
+    "critRate": 1
+  }
+}

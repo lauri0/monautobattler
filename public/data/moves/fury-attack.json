@@ -1,0 +1,10 @@
+{
+  "id": 31,
+  "name": "fury-attack",
+  "type": "normal",
+  "power": 15,
+  "accuracy": 85,
+  "pp": 20,
+  "damageClass": "physical",
+  "priority": 0
+}

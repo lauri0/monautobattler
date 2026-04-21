@@ -1,0 +1,55 @@
+{
+  "id": 110,
+  "name": "weezing",
+  "types": [
+    "poison"
+  ],
+  "baseStats": {
+    "hp": 65,
+    "attack": 90,
+    "defense": 120,
+    "specialAttack": 85,
+    "specialDefense": 70,
+    "speed": 60
+  },
+  "spriteUrl": "/sprites/110.png",
+  "moves": [
+    "explosion",
+    "self-destruct",
+    "hyper-beam",
+    "giga-impact",
+    "gunk-shot",
+    "belch",
+    "thunder",
+    "fire-blast",
+    "heat-wave",
+    "sludge-wave",
+    "take-down",
+    "flamethrower",
+    "thunderbolt",
+    "sludge-bomb",
+    "body-slam",
+    "shadow-ball",
+    "dark-pulse",
+    "tera-blast",
+    "facade",
+    "psybeam",
+    "sludge",
+    "venoshock",
+    "thief",
+    "assurance",
+    "clear-smog",
+    "tackle",
+    "acid-spray",
+    "double-hit",
+    "smog",
+    "protect",
+    "will-o-wisp",
+    "taunt"
+  ],
+  "abilities": [
+    "levitate",
+    "neutralizing-gas",
+    "stench"
+  ]
+}

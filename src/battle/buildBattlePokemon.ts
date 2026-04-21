@@ -26,6 +26,11 @@ export function buildBattlePokemon(pokemonData: PokemonData): BattlePokemon {
 
   // If no allowed moves remain, the battle engine falls back to Struggle via usableMoves()
 
+  const abilities = pokemonData.abilities ?? [];
+  const selected = persisted.selectedAbility && abilities.includes(persisted.selectedAbility)
+    ? persisted.selectedAbility
+    : abilities[0];
+
   return {
     data: pokemonData,
     persisted,
@@ -34,5 +39,6 @@ export function buildBattlePokemon(pokemonData: PokemonData): BattlePokemon {
     currentHp: level50Stats.hp,
     statStages: { attack: 0, defense: 0, 'special-attack': 0, 'special-defense': 0, speed: 0 },
     justSwitchedIn: true,
+    ability: selected,
   };
 }

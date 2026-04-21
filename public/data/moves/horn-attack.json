@@ -1,0 +1,10 @@
+{
+  "id": 30,
+  "name": "horn-attack",
+  "type": "normal",
+  "power": 65,
+  "accuracy": 100,
+  "pp": 25,
+  "damageClass": "physical",
+  "priority": 0
+}

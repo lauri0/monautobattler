@@ -1,0 +1,14 @@
+{
+  "id": 209,
+  "name": "spark",
+  "type": "electric",
+  "power": 65,
+  "accuracy": 100,
+  "pp": 20,
+  "damageClass": "physical",
+  "priority": 0,
+  "effect": {
+    "ailment": "paralysis",
+    "ailmentChance": 30
+  }
+}

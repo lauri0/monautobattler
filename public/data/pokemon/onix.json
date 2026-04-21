@@ -1,0 +1,49 @@
+{
+  "id": 95,
+  "name": "onix",
+  "types": [
+    "rock",
+    "ground"
+  ],
+  "baseStats": {
+    "hp": 35,
+    "attack": 45,
+    "defense": 160,
+    "specialAttack": 30,
+    "specialDefense": 45,
+    "speed": 70
+  },
+  "spriteUrl": "/sprites/95.png",
+  "moves": [
+    "explosion",
+    "head-smash",
+    "double-edge",
+    "earthquake",
+    "iron-tail",
+    "stone-edge",
+    "rock-climb",
+    "dragon-pulse",
+    "slam",
+    "strength",
+    "dig",
+    "flash-cannon",
+    "rock-slide",
+    "facade",
+    "dragon-breath",
+    "rock-tomb",
+    "bulldoze",
+    "dragon-tail",
+    "rock-throw",
+    "payback",
+    "smack-down",
+    "tackle",
+    "rock-smash",
+    "sand-tomb",
+    "rollout",
+    "rock-blast",
+    "bind",
+    "protect",
+    "taunt",
+    "stealth-rock"
+  ]
+}

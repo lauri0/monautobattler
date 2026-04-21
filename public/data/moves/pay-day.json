@@ -1,0 +1,10 @@
+{
+  "id": 6,
+  "name": "pay-day",
+  "type": "normal",
+  "power": 40,
+  "accuracy": 100,
+  "pp": 20,
+  "damageClass": "physical",
+  "priority": 0
+}

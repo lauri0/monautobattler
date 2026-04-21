@@ -1,0 +1,54 @@
+{
+  "id": 2,
+  "name": "ivysaur",
+  "types": [
+    "grass",
+    "poison"
+  ],
+  "baseStats": {
+    "hp": 60,
+    "attack": 62,
+    "defense": 63,
+    "specialAttack": 80,
+    "specialDefense": 80,
+    "speed": 60
+  },
+  "spriteUrl": "/sprites/2.png",
+  "moves": [
+    "leaf-storm",
+    "double-edge",
+    "solar-beam",
+    "petal-dance",
+    "power-whip",
+    "take-down",
+    "sludge-bomb",
+    "energy-ball",
+    "body-slam",
+    "seed-bomb",
+    "grass-pledge",
+    "tera-blast",
+    "giga-drain",
+    "facade",
+    "knock-off",
+    "venoshock",
+    "magical-leaf",
+    "razor-leaf",
+    "grassy-glide",
+    "weather-ball",
+    "trailblaze",
+    "vine-whip",
+    "tackle",
+    "false-swipe",
+    "acid-spray",
+    "bullet-seed",
+    "swords-dance",
+    "growl",
+    "poison-powder",
+    "sleep-powder",
+    "protect"
+  ],
+  "abilities": [
+    "overgrow",
+    "chlorophyll"
+  ]
+}

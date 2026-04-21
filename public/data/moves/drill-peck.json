@@ -1,0 +1,10 @@
+{
+  "id": 65,
+  "name": "drill-peck",
+  "type": "flying",
+  "power": 80,
+  "accuracy": 100,
+  "pp": 20,
+  "damageClass": "physical",
+  "priority": 0
+}

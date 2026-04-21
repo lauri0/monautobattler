@@ -1,0 +1,10 @@
+{
+  "id": 667,
+  "name": "high-horsepower",
+  "type": "ground",
+  "power": 95,
+  "accuracy": 95,
+  "pp": 10,
+  "damageClass": "physical",
+  "priority": 0
+}

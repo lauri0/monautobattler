@@ -1,0 +1,59 @@
+{
+  "id": 8,
+  "name": "wartortle",
+  "types": [
+    "water"
+  ],
+  "baseStats": {
+    "hp": 59,
+    "attack": 63,
+    "defense": 80,
+    "specialAttack": 65,
+    "specialDefense": 80,
+    "speed": 58
+  },
+  "spriteUrl": "/sprites/8.png",
+  "moves": [
+    "focus-punch",
+    "water-spout",
+    "double-edge",
+    "wave-crash",
+    "hydro-pump",
+    "blizzard",
+    "take-down",
+    "surf",
+    "ice-beam",
+    "muddy-water",
+    "aqua-tail",
+    "body-slam",
+    "liquidation",
+    "dig",
+    "zen-headbutt",
+    "water-pledge",
+    "tera-blast",
+    "ice-spinner",
+    "ice-punch",
+    "brick-break",
+    "facade",
+    "bite",
+    "water-pulse",
+    "flip-turn",
+    "icy-wind",
+    "mud-shot",
+    "rapid-spin",
+    "weather-ball",
+    "chilling-water",
+    "tackle",
+    "water-gun",
+    "fake-out",
+    "aqua-jet",
+    "whirlpool",
+    "protect",
+    "iron-defense",
+    "shell-smash"
+  ],
+  "abilities": [
+    "torrent",
+    "rain-dish"
+  ]
+}

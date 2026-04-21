@@ -1,0 +1,10 @@
+{
+  "id": 128,
+  "name": "clamp",
+  "type": "water",
+  "power": 35,
+  "accuracy": 85,
+  "pp": 15,
+  "damageClass": "physical",
+  "priority": 0
+}

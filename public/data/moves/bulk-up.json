@@ -1,0 +1,25 @@
+{
+  "id": 339,
+  "name": "bulk-up",
+  "type": "fighting",
+  "power": 0,
+  "accuracy": null,
+  "pp": 20,
+  "damageClass": "status",
+  "priority": 0,
+  "effect": {
+    "statChanges": [
+      {
+        "stat": "attack",
+        "change": 1,
+        "target": "user"
+      },
+      {
+        "stat": "defense",
+        "change": 1,
+        "target": "user"
+      }
+    ],
+    "statChance": 0
+  }
+}

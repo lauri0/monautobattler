@@ -1,0 +1,20 @@
+{
+  "id": 45,
+  "name": "growl",
+  "type": "normal",
+  "power": 0,
+  "accuracy": 100,
+  "pp": 40,
+  "damageClass": "status",
+  "priority": 0,
+  "effect": {
+    "statChanges": [
+      {
+        "stat": "attack",
+        "change": -1,
+        "target": "foe"
+      }
+    ],
+    "statChance": 0
+  }
+}

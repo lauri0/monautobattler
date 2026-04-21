@@ -1,5 +1,6 @@
 import type { BattlePokemon, Move } from '../models/types';
 import { getTypeEffectiveness } from '../utils/typeChart';
+import { getAbilityDamageMultiplier } from './abilities';
 
 export interface DamageResult {
   damage: number;
@@ -77,9 +78,10 @@ export function calcDamage(
   const stab = attacker.data.types.includes(move.type) ? 1.5 : 1.0;
   const critMult = isCrit ? 1.5 : 1.0;
   const screenMult = screenApplies(move, defenderScreens, isCrit) ? 0.5 : 1.0;
+  const abilityMult = getAbilityDamageMultiplier(attacker, move);
 
   const base = Math.floor(Math.floor((Math.floor(2 * 50 / 5) + 2) * move.power * A / D) / 50 + 2);
-  const damage = Math.floor(base * critMult * roll * stab * effectiveness * screenMult);
+  const damage = Math.floor(base * critMult * roll * stab * effectiveness * screenMult * abilityMult);
 
   return {
     damage: Math.max(1, damage),
@@ -113,8 +115,9 @@ export function calcMinDamage(
 
   const stab = attacker.data.types.includes(move.type) ? 1.5 : 1.0;
   const screenMult = screenApplies(move, defenderScreens, false) ? 0.5 : 1.0;
+  const abilityMult = getAbilityDamageMultiplier(attacker, move);
   const base = Math.floor(Math.floor((Math.floor(2 * 50 / 5) + 2) * move.power * A / D) / 50 + 2);
-  const damage = Math.floor(base * 1.0 * 0.85 * stab * effectiveness * screenMult);
+  const damage = Math.floor(base * 1.0 * 0.85 * stab * effectiveness * screenMult * abilityMult);
   return Math.max(1, damage);
 }
 
@@ -143,7 +146,8 @@ export function calcExpectedDamage(
   const stab = attacker.data.types.includes(move.type) ? 1.5 : 1.0;
   const roll = 0.925; // average of 0.85–1.00
   const screenMult = screenApplies(move, defenderScreens, false) ? 0.5 : 1.0;
+  const abilityMult = getAbilityDamageMultiplier(attacker, move);
   const base = Math.floor(Math.floor((Math.floor(2 * 50 / 5) + 2) * move.power * A / D) / 50 + 2);
-  const damage = Math.floor(base * 1.0 * roll * stab * effectiveness * screenMult);
+  const damage = Math.floor(base * 1.0 * roll * stab * effectiveness * screenMult * abilityMult);
   return Math.max(1, damage);
 }

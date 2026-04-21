@@ -1,0 +1,14 @@
+{
+  "id": 436,
+  "name": "lava-plume",
+  "type": "fire",
+  "power": 80,
+  "accuracy": 100,
+  "pp": 15,
+  "damageClass": "special",
+  "priority": 0,
+  "effect": {
+    "ailment": "burn",
+    "ailmentChance": 30
+  }
+}

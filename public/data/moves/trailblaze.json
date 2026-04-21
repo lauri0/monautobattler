@@ -1,0 +1,10 @@
+{
+  "id": 885,
+  "name": "trailblaze",
+  "type": "grass",
+  "power": 50,
+  "accuracy": 100,
+  "pp": 20,
+  "damageClass": "physical",
+  "priority": 0
+}

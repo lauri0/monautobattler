@@ -23,6 +23,7 @@ import { pickRoster } from '../tournament/rosterPicker';
 import {
   buildTeamBattleState,
   runFullTeamBattle,
+  applyInitialSwitchInsTeam,
 } from '../battle/teamBattleEngine';
 import { mctsTeamAI } from '../ai/mctsTeamAI';
 import { getPokemonPersisted } from '../persistence/userStorage';
@@ -443,8 +444,9 @@ function MatchView(props: {
   onBack: () => void;
 }) {
   const { tournamentState, pending, onEnd, onBack } = props;
+  const startup = useMemo(() => applyInitialSwitchInsTeam(pending.initial), [pending.initial]);
   const { state, log, thinking, winner, done, nextTurn, submitPlayerAction } =
-    useTeamBattleController(pending.initial);
+    useTeamBattleController(startup.state, startup.events);
   const logRef = useRef<HTMLDivElement>(null);
 
   const teamA = tournamentState.teams[pending.pairing.a];

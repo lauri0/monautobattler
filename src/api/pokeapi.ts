@@ -1,5 +1,4 @@
 import type { PokemonData, Move, TypeName, DamageClass, StatusCondition, MoveEffect, StatChange } from '../models/types';
-import { savePokemonData, saveMove } from '../persistence/db';
 import {
   addToLoadedRange,
   getMoveLearnSettings,
@@ -15,6 +14,7 @@ import {
   type VariantSettings,
 } from '../persistence/userStorage';
 import { buildFetchIds } from './variants';
+import { mergeAbilityNames } from '../data/abilitiesStore';
 
 const BASE = 'https://pokeapi.co/api/v2';
 
@@ -39,6 +39,14 @@ async function fetchJson<T>(url: string): Promise<T> {
   const res = await fetch(url);
   if (!res.ok) throw new Error(`Fetch failed: ${url} (${res.status})`);
   return res.json() as Promise<T>;
+}
+
+async function saveJsonFile(kind: 'pokemon' | 'move', name: string, body: unknown): Promise<void> {
+  await fetch(`/__save-data/${kind}/${name}`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(body, null, 2),
+  });
 }
 
 const STATUS_MAP: Record<string, StatusCondition> = {
@@ -264,7 +272,7 @@ export async function fetchAndStorePokemon(
   for (const result of moveResults) {
     if (result.status === 'fulfilled' && result.value !== null) {
       moves.push(result.value);
-      await saveMove(result.value);
+      await saveJsonFile('move', result.value.name, result.value);
     }
   }
 
@@ -277,13 +285,20 @@ export async function fetchAndStorePokemon(
       const gigaDrain = await fetchMoveData(`${BASE}/move/giga-drain`);
       if (gigaDrain) {
         moves[idx] = gigaDrain;
-        await saveMove(gigaDrain);
+        await saveJsonFile('move', gigaDrain.name, gigaDrain);
       }
     }
   }
 
   const baseStats = parseStats(raw.stats);
   const localSpriteUrl = `/sprites/${id}.png`;
+
+  // Abilities: LGPE has none; other games pull the slot-ordered list from the
+  // pokemon response. The full set of encountered names is maintained in a
+  // single `public/data/abilities/all.json`.
+  const abilities: string[] = gameInfo.id === 'lgpe'
+    ? []
+    : [...raw.abilities].sort((a, b) => a.slot - b.slot).map(a => a.ability.name);
 
   const pokemon: PokemonData = {
     id: raw.id,
@@ -292,9 +307,22 @@ export async function fetchAndStorePokemon(
     baseStats,
     spriteUrl: localSpriteUrl,
     availableMoves: moves,
+    abilities,
   };
 
-  await savePokemonData(pokemon);
+  await saveJsonFile('pokemon', pokemon.name, {
+    id: pokemon.id,
+    name: pokemon.name,
+    types: pokemon.types,
+    baseStats: pokemon.baseStats,
+    spriteUrl: pokemon.spriteUrl,
+    moves: moves.map(m => m.name),
+    abilities,
+  });
+
+  if (abilities.length > 0) {
+    await mergeAbilityNames(abilities);
+  }
 
   const bst = Object.values(baseStats).reduce((sum, v) => sum + v, 0);
   const bstThreshold = getAutoDisableBstThreshold();
@@ -400,6 +428,12 @@ interface RawPokemon {
   types: RawTypeEntry[];
   stats: RawStat[];
   moves: RawMoveEntry[];
+  abilities: RawAbilityEntry[];
+}
+interface RawAbilityEntry {
+  ability: { name: string; url: string };
+  is_hidden: boolean;
+  slot: number;
 }
 interface RawTypeEntry { type: { name: string } }
 interface RawStat { stat: { name: string }; base_stat: number }

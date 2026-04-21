@@ -1,0 +1,10 @@
+{
+  "id": 332,
+  "name": "aerial-ace",
+  "type": "flying",
+  "power": 60,
+  "accuracy": null,
+  "pp": 20,
+  "damageClass": "physical",
+  "priority": 0
+}

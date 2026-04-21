@@ -1,0 +1,61 @@
+{
+  "id": 49,
+  "name": "venomoth",
+  "types": [
+    "bug",
+    "poison"
+  ],
+  "baseStats": {
+    "hp": 70,
+    "attack": 65,
+    "defense": 60,
+    "specialAttack": 90,
+    "specialDefense": 75,
+    "speed": 90
+  },
+  "spriteUrl": "/sprites/49.png",
+  "moves": [
+    "hyper-beam",
+    "giga-impact",
+    "double-edge",
+    "solar-beam",
+    "sludge-wave",
+    "take-down",
+    "psychic",
+    "sludge-bomb",
+    "bug-buzz",
+    "energy-ball",
+    "leech-life",
+    "zen-headbutt",
+    "lunge",
+    "tera-blast",
+    "giga-drain",
+    "air-slash",
+    "psychic-noise",
+    "facade",
+    "u-turn",
+    "skitter-smack",
+    "psybeam",
+    "venoshock",
+    "swift",
+    "thief",
+    "air-cutter",
+    "bug-bite",
+    "acrobatics",
+    "confusion",
+    "poison-fang",
+    "struggle-bug",
+    "pounce",
+    "tackle",
+    "acid-spray",
+    "poison-powder",
+    "sleep-powder",
+    "agility",
+    "protect"
+  ],
+  "abilities": [
+    "shield-dust",
+    "tinted-lens",
+    "wonder-skin"
+  ]
+}

@@ -1,0 +1,15 @@
+{
+  "id": 342,
+  "name": "poison-tail",
+  "type": "poison",
+  "power": 50,
+  "accuracy": 100,
+  "pp": 25,
+  "damageClass": "physical",
+  "priority": 0,
+  "effect": {
+    "ailment": "poison",
+    "ailmentChance": 10,
+    "critRate": 1
+  }
+}

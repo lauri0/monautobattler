@@ -1,0 +1,20 @@
+{
+  "id": 61,
+  "name": "bubble-beam",
+  "type": "water",
+  "power": 65,
+  "accuracy": 100,
+  "pp": 20,
+  "damageClass": "special",
+  "priority": 0,
+  "effect": {
+    "statChanges": [
+      {
+        "stat": "speed",
+        "change": -1,
+        "target": "foe"
+      }
+    ],
+    "statChance": 10
+  }
+}

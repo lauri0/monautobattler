@@ -1,0 +1,13 @@
+{
+  "id": 72,
+  "name": "mega-drain",
+  "type": "grass",
+  "power": 40,
+  "accuracy": 100,
+  "pp": 15,
+  "damageClass": "special",
+  "priority": 0,
+  "effect": {
+    "drain": 50
+  }
+}

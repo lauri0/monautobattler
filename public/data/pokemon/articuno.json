@@ -1,0 +1,57 @@
+{
+  "id": 144,
+  "name": "articuno",
+  "types": [
+    "ice",
+    "flying"
+  ],
+  "baseStats": {
+    "hp": 90,
+    "attack": 85,
+    "defense": 100,
+    "specialAttack": 95,
+    "specialDefense": 125,
+    "speed": 85
+  },
+  "spriteUrl": "/sprites/144.png",
+  "moves": [
+    "hyper-beam",
+    "giga-impact",
+    "double-edge",
+    "brave-bird",
+    "blizzard",
+    "hurricane",
+    "fly",
+    "take-down",
+    "ice-beam",
+    "tera-blast",
+    "ice-spinner",
+    "air-slash",
+    "facade",
+    "u-turn",
+    "freeze-dry",
+    "swift",
+    "ancient-power",
+    "air-cutter",
+    "aerial-ace",
+    "water-pulse",
+    "avalanche",
+    "icy-wind",
+    "weather-ball",
+    "gust",
+    "powder-snow",
+    "ice-shard",
+    "dual-wingbeat",
+    "icicle-spear",
+    "triple-axel",
+    "agility",
+    "light-screen",
+    "reflect",
+    "protect",
+    "tailwind"
+  ],
+  "abilities": [
+    "pressure",
+    "snow-cloak"
+  ]
+}

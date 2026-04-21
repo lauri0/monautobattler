@@ -1,0 +1,49 @@
+{
+  "id": 82,
+  "name": "magneton",
+  "types": [
+    "electric",
+    "steel"
+  ],
+  "baseStats": {
+    "hp": 50,
+    "attack": 60,
+    "defense": 95,
+    "specialAttack": 120,
+    "specialDefense": 70,
+    "speed": 70
+  },
+  "spriteUrl": "/sprites/82.png",
+  "moves": [
+    "hyper-beam",
+    "steel-beam",
+    "zap-cannon",
+    "thunder",
+    "take-down",
+    "thunderbolt",
+    "wild-charge",
+    "tri-attack",
+    "flash-cannon",
+    "discharge",
+    "iron-head",
+    "tera-blast",
+    "facade",
+    "volt-switch",
+    "spark",
+    "swift",
+    "electroweb",
+    "charge-beam",
+    "tackle",
+    "thunder-shock",
+    "thunder-wave",
+    "light-screen",
+    "reflect",
+    "protect",
+    "iron-defense"
+  ],
+  "abilities": [
+    "magnet-pull",
+    "sturdy",
+    "analytic"
+  ]
+}

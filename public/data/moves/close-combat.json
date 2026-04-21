@@ -1,0 +1,25 @@
+{
+  "id": 370,
+  "name": "close-combat",
+  "type": "fighting",
+  "power": 120,
+  "accuracy": 100,
+  "pp": 5,
+  "damageClass": "physical",
+  "priority": 0,
+  "effect": {
+    "statChanges": [
+      {
+        "stat": "defense",
+        "change": -1,
+        "target": "user"
+      },
+      {
+        "stat": "special-defense",
+        "change": -1,
+        "target": "user"
+      }
+    ],
+    "statChance": 100
+  }
+}

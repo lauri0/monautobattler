@@ -1,0 +1,10 @@
+{
+  "id": 530,
+  "name": "dual-chop",
+  "type": "dragon",
+  "power": 40,
+  "accuracy": 90,
+  "pp": 15,
+  "damageClass": "physical",
+  "priority": 0
+}

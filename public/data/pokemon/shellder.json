@@ -1,0 +1,52 @@
+{
+  "id": 90,
+  "name": "shellder",
+  "types": [
+    "water"
+  ],
+  "baseStats": {
+    "hp": 30,
+    "attack": 65,
+    "defense": 100,
+    "specialAttack": 45,
+    "specialDefense": 25,
+    "speed": 40
+  },
+  "spriteUrl": "/sprites/90.png",
+  "moves": [
+    "hydro-pump",
+    "blizzard",
+    "take-down",
+    "surf",
+    "ice-beam",
+    "liquidation",
+    "waterfall",
+    "tera-blast",
+    "ice-spinner",
+    "razor-shell",
+    "facade",
+    "bubble-beam",
+    "aurora-beam",
+    "swift",
+    "water-pulse",
+    "avalanche",
+    "icy-wind",
+    "mud-shot",
+    "chilling-water",
+    "tackle",
+    "water-gun",
+    "ice-shard",
+    "whirlpool",
+    "icicle-spear",
+    "rock-blast",
+    "leer",
+    "protect",
+    "iron-defense",
+    "shell-smash"
+  ],
+  "abilities": [
+    "shell-armor",
+    "skill-link",
+    "overcoat"
+  ]
+}

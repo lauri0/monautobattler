@@ -1,0 +1,14 @@
+{
+  "id": 77,
+  "name": "poison-powder",
+  "type": "poison",
+  "power": 0,
+  "accuracy": 75,
+  "pp": 35,
+  "damageClass": "status",
+  "priority": 0,
+  "effect": {
+    "ailment": "poison",
+    "ailmentChance": 0
+  }
+}

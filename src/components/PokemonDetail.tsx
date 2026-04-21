@@ -22,7 +22,8 @@ const STAT_LABELS: Record<string, string> = {
 const STAT_MAX = 255;
 
 import { effectSummary } from '../utils/moveEffectSummary';
-import { formatPokemonName } from '../utils/formatName';
+import { formatPokemonName, formatAbilityName } from '../utils/formatName';
+import { isAbilityImplemented } from '../battle/abilities';
 
 export default function PokemonDetail({ pokemon, allPokemon, onBack, onNavigate }: Props) {
   const sorted = [...allPokemon].sort((a, b) => a.id - b.id);
@@ -56,6 +57,13 @@ export default function PokemonDetail({ pokemon, allPokemon, onBack, onNavigate 
     return valid;
   });
   const [disabled, setDisabled] = useState(persisted.disabled);
+  const [selectedAbility, setSelectedAbility] = useState<string | undefined>(() => {
+    const abilities = pokemon.abilities ?? [];
+    if (persisted.selectedAbility && abilities.includes(persisted.selectedAbility)) {
+      return persisted.selectedAbility;
+    }
+    return abilities[0];
+  });
   const [saved, setSaved] = useState(false);
 
   const stats = calcLevel50Stats(pokemon.baseStats);
@@ -71,7 +79,7 @@ export default function PokemonDetail({ pokemon, allPokemon, onBack, onNavigate 
   }
 
   function handleSave() {
-    setPokemonPersisted({ ...persisted, moveset, disabled });
+    setPokemonPersisted({ ...persisted, moveset, disabled, selectedAbility });
     setSaved(true);
     setTimeout(() => setSaved(false), 2000);
   }
@@ -224,6 +232,25 @@ export default function PokemonDetail({ pokemon, allPokemon, onBack, onNavigate 
               <span className="bst-value">{bst}</span>
             </div>
           </div>
+
+          {/* Ability */}
+          {pokemon.abilities.length > 0 && (
+            <div className="card" style={{ marginBottom: '1rem' }}>
+              <h3 className="section-title">Ability</h3>
+              <select
+                value={selectedAbility ?? ''}
+                onChange={e => { setSelectedAbility(e.target.value); setSaved(false); }}
+                style={{ width: '100%' }}
+              >
+                {pokemon.abilities.map(name => (
+                  <option key={name} value={name}>
+                    {formatAbilityName(name)}
+                    {!isAbilityImplemented(name) ? ' (Unimplemented)' : ''}
+                  </option>
+                ))}
+              </select>
+            </div>
+          )}
 
           {/* Moveset */}
           <div className="card" style={{ marginBottom: '1rem' }}>

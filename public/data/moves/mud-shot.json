@@ -1,0 +1,20 @@
+{
+  "id": 341,
+  "name": "mud-shot",
+  "type": "ground",
+  "power": 55,
+  "accuracy": 95,
+  "pp": 15,
+  "damageClass": "special",
+  "priority": 0,
+  "effect": {
+    "statChanges": [
+      {
+        "stat": "speed",
+        "change": -1,
+        "target": "foe"
+      }
+    ],
+    "statChance": 100
+  }
+}

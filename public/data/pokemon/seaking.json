@@ -1,0 +1,34 @@
+{
+  "id": 119,
+  "name": "seaking",
+  "types": [
+    "water"
+  ],
+  "baseStats": {
+    "hp": 80,
+    "attack": 92,
+    "defense": 65,
+    "specialAttack": 65,
+    "specialDefense": 80,
+    "speed": 68
+  },
+  "spriteUrl": "/sprites/119.png",
+  "moves": [
+    "hyper-beam",
+    "giga-impact",
+    "megahorn",
+    "blizzard",
+    "surf",
+    "ice-beam",
+    "waterfall",
+    "poison-jab",
+    "scald",
+    "facade",
+    "horn-attack",
+    "water-pulse",
+    "peck",
+    "swords-dance",
+    "agility",
+    "protect"
+  ]
+}

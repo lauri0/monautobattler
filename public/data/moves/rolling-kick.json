@@ -1,0 +1,13 @@
+{
+  "id": 27,
+  "name": "rolling-kick",
+  "type": "fighting",
+  "power": 60,
+  "accuracy": 85,
+  "pp": 15,
+  "damageClass": "physical",
+  "priority": 0,
+  "effect": {
+    "flinchChance": 30
+  }
+}

@@ -1,0 +1,10 @@
+{
+  "id": 574,
+  "name": "disarming-voice",
+  "type": "fairy",
+  "power": 40,
+  "accuracy": null,
+  "pp": 15,
+  "damageClass": "special",
+  "priority": 0
+}

@@ -1,0 +1,13 @@
+{
+  "id": 556,
+  "name": "icicle-crash",
+  "type": "ice",
+  "power": 85,
+  "accuracy": 90,
+  "pp": 10,
+  "damageClass": "physical",
+  "priority": 0,
+  "effect": {
+    "flinchChance": 30
+  }
+}

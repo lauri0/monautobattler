@@ -1,0 +1,17 @@
+{
+  "id": 573,
+  "name": "freeze-dry",
+  "type": "ice",
+  "power": 70,
+  "accuracy": 100,
+  "pp": 20,
+  "damageClass": "special",
+  "priority": 0,
+  "effect": {
+    "ailment": "freeze",
+    "ailmentChance": 10,
+    "superEffectiveAgainst": [
+      "water"
+    ]
+  }
+}

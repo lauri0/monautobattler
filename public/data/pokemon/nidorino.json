@@ -1,0 +1,42 @@
+{
+  "id": 33,
+  "name": "nidorino",
+  "types": [
+    "poison"
+  ],
+  "baseStats": {
+    "hp": 61,
+    "attack": 72,
+    "defense": 57,
+    "specialAttack": 55,
+    "specialDefense": 55,
+    "speed": 65
+  },
+  "spriteUrl": "/sprites/33.png",
+  "moves": [
+    "blizzard",
+    "thunder",
+    "iron-tail",
+    "ice-beam",
+    "thunderbolt",
+    "sludge-bomb",
+    "earth-power",
+    "strength",
+    "dig",
+    "poison-jab",
+    "facade",
+    "shadow-claw",
+    "horn-attack",
+    "thief",
+    "shock-wave",
+    "water-pulse",
+    "cut",
+    "rock-smash",
+    "peck",
+    "double-kick",
+    "fury-attack",
+    "poison-sting",
+    "leer",
+    "protect"
+  ]
+}

@@ -1,0 +1,20 @@
+{
+  "id": 612,
+  "name": "power-up-punch",
+  "type": "fighting",
+  "power": 40,
+  "accuracy": 100,
+  "pp": 20,
+  "damageClass": "physical",
+  "priority": 0,
+  "effect": {
+    "statChanges": [
+      {
+        "stat": "attack",
+        "change": 1,
+        "target": "user"
+      }
+    ],
+    "statChance": 100
+  }
+}

@@ -14,9 +14,9 @@ import { mctsTeamAI } from '../ai/mctsTeamAI';
  * and play mode (side 0 is the human; AI auto-advances any turns where
  * only the opponent needs to act — e.g. replace phases for side 1 only).
  */
-export function useTeamBattleController(initial: TeamBattleState) {
+export function useTeamBattleController(initial: TeamBattleState, initialLog: TeamTurnEvent[] = []) {
   const [state, setState] = useState<TeamBattleState>(initial);
-  const [log, setLog] = useState<TeamTurnEvent[]>([]);
+  const [log, setLog] = useState<TeamTurnEvent[]>(initialLog);
   const [thinking, setThinking] = useState(false);
 
   const winner: SideIndex | null = battleWinner(state);
@@ -57,9 +57,9 @@ export function useTeamBattleController(initial: TeamBattleState) {
     }, 0);
   }, [state, thinking, done]);
 
-  const reset = useCallback((newInitial: TeamBattleState) => {
+  const reset = useCallback((newInitial: TeamBattleState, newLog: TeamTurnEvent[] = []) => {
     setState(newInitial);
-    setLog([]);
+    setLog(newLog);
     setThinking(false);
   }, []);
 

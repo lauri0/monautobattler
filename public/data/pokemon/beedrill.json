@@ -1,0 +1,46 @@
+{
+  "id": 15,
+  "name": "beedrill",
+  "types": [
+    "bug",
+    "poison"
+  ],
+  "baseStats": {
+    "hp": 65,
+    "attack": 90,
+    "defense": 40,
+    "specialAttack": 45,
+    "specialDefense": 80,
+    "speed": 75
+  },
+  "spriteUrl": "/sprites/15.png",
+  "moves": [
+    "hyper-beam",
+    "giga-impact",
+    "solar-beam",
+    "sludge-bomb",
+    "poison-jab",
+    "x-scissor",
+    "giga-drain",
+    "brick-break",
+    "facade",
+    "u-turn",
+    "venoshock",
+    "thief",
+    "aerial-ace",
+    "assurance",
+    "bug-bite",
+    "cut",
+    "payback",
+    "fell-stinger",
+    "false-swipe",
+    "fury-cutter",
+    "rock-smash",
+    "pin-missile",
+    "fury-attack",
+    "poison-sting",
+    "swords-dance",
+    "agility",
+    "protect"
+  ]
+}

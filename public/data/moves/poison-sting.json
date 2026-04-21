@@ -1,0 +1,14 @@
+{
+  "id": 40,
+  "name": "poison-sting",
+  "type": "poison",
+  "power": 15,
+  "accuracy": 100,
+  "pp": 35,
+  "damageClass": "physical",
+  "priority": 0,
+  "effect": {
+    "ailment": "poison",
+    "ailmentChance": 30
+  }
+}

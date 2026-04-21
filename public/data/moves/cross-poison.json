@@ -1,0 +1,15 @@
+{
+  "id": 440,
+  "name": "cross-poison",
+  "type": "poison",
+  "power": 70,
+  "accuracy": 100,
+  "pp": 20,
+  "damageClass": "physical",
+  "priority": 0,
+  "effect": {
+    "ailment": "poison",
+    "ailmentChance": 10,
+    "critRate": 1
+  }
+}

@@ -1,0 +1,44 @@
+{
+  "id": 47,
+  "name": "parasect",
+  "types": [
+    "bug",
+    "grass"
+  ],
+  "baseStats": {
+    "hp": 60,
+    "attack": 95,
+    "defense": 80,
+    "specialAttack": 60,
+    "specialDefense": 80,
+    "speed": 30
+  },
+  "spriteUrl": "/sprites/47.png",
+  "moves": [
+    "hyper-beam",
+    "giga-impact",
+    "solar-beam",
+    "sludge-bomb",
+    "energy-ball",
+    "dig",
+    "x-scissor",
+    "giga-drain",
+    "brick-break",
+    "slash",
+    "facade",
+    "cross-poison",
+    "thief",
+    "aerial-ace",
+    "cut",
+    "scratch",
+    "false-swipe",
+    "fury-cutter",
+    "rock-smash",
+    "bullet-seed",
+    "absorb",
+    "swords-dance",
+    "poison-powder",
+    "light-screen",
+    "protect"
+  ]
+}

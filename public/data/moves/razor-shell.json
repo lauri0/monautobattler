@@ -1,0 +1,20 @@
+{
+  "id": 534,
+  "name": "razor-shell",
+  "type": "water",
+  "power": 75,
+  "accuracy": 95,
+  "pp": 10,
+  "damageClass": "physical",
+  "priority": 0,
+  "effect": {
+    "statChanges": [
+      {
+        "stat": "defense",
+        "change": -1,
+        "target": "foe"
+      }
+    ],
+    "statChance": 50
+  }
+}

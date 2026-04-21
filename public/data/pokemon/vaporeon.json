@@ -1,0 +1,61 @@
+{
+  "id": 134,
+  "name": "vaporeon",
+  "types": [
+    "water"
+  ],
+  "baseStats": {
+    "hp": 130,
+    "attack": 65,
+    "defense": 60,
+    "specialAttack": 110,
+    "specialDefense": 95,
+    "speed": 65
+  },
+  "spriteUrl": "/sprites/134.png",
+  "moves": [
+    "hyper-beam",
+    "giga-impact",
+    "last-resort",
+    "double-edge",
+    "hydro-pump",
+    "blizzard",
+    "take-down",
+    "surf",
+    "ice-beam",
+    "hyper-voice",
+    "muddy-water",
+    "body-slam",
+    "liquidation",
+    "dig",
+    "waterfall",
+    "shadow-ball",
+    "scald",
+    "tera-blast",
+    "alluring-voice",
+    "facade",
+    "aurora-beam",
+    "bite",
+    "swift",
+    "covet",
+    "water-pulse",
+    "flip-turn",
+    "icy-wind",
+    "weather-ball",
+    "trailblaze",
+    "chilling-water",
+    "tackle",
+    "water-gun",
+    "quick-attack",
+    "whirlpool",
+    "mud-slap",
+    "stored-power",
+    "growl",
+    "protect",
+    "calm-mind"
+  ],
+  "abilities": [
+    "water-absorb",
+    "hydration"
+  ]
+}

@@ -1,0 +1,14 @@
+{
+  "id": 172,
+  "name": "flame-wheel",
+  "type": "fire",
+  "power": 60,
+  "accuracy": 100,
+  "pp": 25,
+  "damageClass": "physical",
+  "priority": 0,
+  "effect": {
+    "ailment": "burn",
+    "ailmentChance": 10
+  }
+}

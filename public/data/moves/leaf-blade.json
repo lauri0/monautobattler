@@ -1,0 +1,13 @@
+{
+  "id": 348,
+  "name": "leaf-blade",
+  "type": "grass",
+  "power": 90,
+  "accuracy": 100,
+  "pp": 15,
+  "damageClass": "physical",
+  "priority": 0,
+  "effect": {
+    "critRate": 1
+  }
+}

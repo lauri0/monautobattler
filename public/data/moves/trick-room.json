@@ -1,0 +1,13 @@
+{
+  "id": 433,
+  "name": "trick-room",
+  "type": "psychic",
+  "power": 0,
+  "accuracy": null,
+  "pp": 5,
+  "damageClass": "status",
+  "priority": -7,
+  "effect": {
+    "fieldEffect": "trickRoom"
+  }
+}

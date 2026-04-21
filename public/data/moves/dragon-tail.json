@@ -1,0 +1,10 @@
+{
+  "id": 525,
+  "name": "dragon-tail",
+  "type": "dragon",
+  "power": 60,
+  "accuracy": 90,
+  "pp": 10,
+  "damageClass": "physical",
+  "priority": -6
+}

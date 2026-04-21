@@ -1,0 +1,13 @@
+{
+  "id": 23,
+  "name": "stomp",
+  "type": "normal",
+  "power": 65,
+  "accuracy": 100,
+  "pp": 20,
+  "damageClass": "physical",
+  "priority": 0,
+  "effect": {
+    "flinchChance": 30
+  }
+}

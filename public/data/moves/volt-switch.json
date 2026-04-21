@@ -1,0 +1,13 @@
+{
+  "id": 521,
+  "name": "volt-switch",
+  "type": "electric",
+  "power": 70,
+  "accuracy": 100,
+  "pp": 20,
+  "damageClass": "special",
+  "priority": 0,
+  "effect": {
+    "pivotSwitch": true
+  }
+}

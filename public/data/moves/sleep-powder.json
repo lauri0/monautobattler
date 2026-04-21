@@ -1,0 +1,14 @@
+{
+  "id": 79,
+  "name": "sleep-powder",
+  "type": "grass",
+  "power": 0,
+  "accuracy": 75,
+  "pp": 15,
+  "damageClass": "status",
+  "priority": 0,
+  "effect": {
+    "ailment": "sleep",
+    "ailmentChance": 0
+  }
+}

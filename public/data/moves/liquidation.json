@@ -1,0 +1,20 @@
+{
+  "id": 710,
+  "name": "liquidation",
+  "type": "water",
+  "power": 85,
+  "accuracy": 100,
+  "pp": 10,
+  "damageClass": "physical",
+  "priority": 0,
+  "effect": {
+    "statChanges": [
+      {
+        "stat": "defense",
+        "change": -1,
+        "target": "foe"
+      }
+    ],
+    "statChance": 20
+  }
+}

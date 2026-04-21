@@ -2,6 +2,7 @@ import type { BattlePokemon, Move, TurnEvent, BattleResult, StatStageName, StatS
 import { calcDamage, calcExpectedDamage, effectiveSpeed, type DefenderScreens } from './damageCalc';
 import { defaultAI } from '../ai/aiModule';
 import { getTypeEffectiveness } from '../utils/typeChart';
+import { applySwitchInAbility } from './abilities';
 
 export const TRICK_ROOM_TURNS = 5;
 export const TAILWIND_TURNS = 4;
@@ -997,15 +998,30 @@ export function resolveTurnWithMoves(
   return { events, p1After: p1, p2After: p2, battleOver, lastAttackerIsP1, field };
 }
 
+// Apply switch-in abilities for both sides at battle start. Returns updated
+// pokemon and any events produced. Call this once before the first turn.
+export function applyInitialSwitchIns(
+  pokemon1: BattlePokemon,
+  pokemon2: BattlePokemon,
+): { p1: BattlePokemon; p2: BattlePokemon; events: TurnEvent[] } {
+  const events: TurnEvent[] = [];
+  let p1 = pokemon1;
+  let p2 = pokemon2;
+  p2 = applySwitchInAbility(p1, p2, 1, events);
+  p1 = applySwitchInAbility(p2, p1, 1, events);
+  return { p1, p2, events };
+}
+
 export function runFullBattle(
   pokemon1: BattlePokemon,
   pokemon2: BattlePokemon,
   ai1: AIStrategy = defaultAI,
   ai2: AIStrategy = defaultAI,
 ): BattleResult {
-  let p1 = { ...pokemon1 };
-  let p2 = { ...pokemon2 };
-  const allEvents: TurnEvent[] = [];
+  const init = applyInitialSwitchIns(pokemon1, pokemon2);
+  let p1 = init.p1;
+  let p2 = init.p2;
+  const allEvents: TurnEvent[] = [...init.events];
   let turn = 1;
   const MAX_TURNS = 500;
   let field = makeInitialField();

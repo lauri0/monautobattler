@@ -1,0 +1,13 @@
+{
+  "id": 529,
+  "name": "drill-run",
+  "type": "ground",
+  "power": 80,
+  "accuracy": 95,
+  "pp": 10,
+  "damageClass": "physical",
+  "priority": 0,
+  "effect": {
+    "critRate": 1
+  }
+}

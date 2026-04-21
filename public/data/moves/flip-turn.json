@@ -1,0 +1,13 @@
+{
+  "id": 812,
+  "name": "flip-turn",
+  "type": "water",
+  "power": 60,
+  "accuracy": 100,
+  "pp": 20,
+  "damageClass": "physical",
+  "priority": 0,
+  "effect": {
+    "pivotSwitch": true
+  }
+}

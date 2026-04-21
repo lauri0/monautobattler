@@ -1,0 +1,13 @@
+{
+  "id": 138,
+  "name": "dream-eater",
+  "type": "psychic",
+  "power": 100,
+  "accuracy": 100,
+  "pp": 15,
+  "damageClass": "special",
+  "priority": 0,
+  "effect": {
+    "drain": 50
+  }
+}

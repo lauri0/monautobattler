@@ -1,0 +1,20 @@
+{
+  "id": 784,
+  "name": "breaking-swipe",
+  "type": "dragon",
+  "power": 60,
+  "accuracy": 100,
+  "pp": 15,
+  "damageClass": "physical",
+  "priority": 0,
+  "effect": {
+    "statChanges": [
+      {
+        "stat": "attack",
+        "change": -1,
+        "target": "foe"
+      }
+    ],
+    "statChance": 100
+  }
+}

@@ -1,0 +1,13 @@
+{
+  "id": 409,
+  "name": "drain-punch",
+  "type": "fighting",
+  "power": 75,
+  "accuracy": 100,
+  "pp": 10,
+  "damageClass": "physical",
+  "priority": 0,
+  "effect": {
+    "drain": 50
+  }
+}

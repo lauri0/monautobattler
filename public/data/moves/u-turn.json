@@ -1,0 +1,13 @@
+{
+  "id": 369,
+  "name": "u-turn",
+  "type": "bug",
+  "power": 70,
+  "accuracy": 100,
+  "pp": 20,
+  "damageClass": "physical",
+  "priority": 0,
+  "effect": {
+    "pivotSwitch": true
+  }
+}

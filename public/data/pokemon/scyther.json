@@ -1,0 +1,62 @@
+{
+  "id": 123,
+  "name": "scyther",
+  "types": [
+    "bug",
+    "flying"
+  ],
+  "baseStats": {
+    "hp": 70,
+    "attack": 110,
+    "defense": 80,
+    "specialAttack": 55,
+    "specialDefense": 80,
+    "speed": 105
+  },
+  "spriteUrl": "/sprites/123.png",
+  "moves": [
+    "hyper-beam",
+    "giga-impact",
+    "close-combat",
+    "take-down",
+    "bug-buzz",
+    "x-scissor",
+    "lunge",
+    "tera-blast",
+    "brick-break",
+    "air-slash",
+    "slash",
+    "facade",
+    "u-turn",
+    "night-slash",
+    "skitter-smack",
+    "wing-attack",
+    "swift",
+    "thief",
+    "air-cutter",
+    "aerial-ace",
+    "bug-bite",
+    "acrobatics",
+    "struggle-bug",
+    "pounce",
+    "trailblaze",
+    "quick-attack",
+    "false-swipe",
+    "fury-cutter",
+    "vacuum-wave",
+    "dual-wingbeat",
+    "double-hit",
+    "feint",
+    "swords-dance",
+    "leer",
+    "agility",
+    "light-screen",
+    "protect",
+    "tailwind"
+  ],
+  "abilities": [
+    "swarm",
+    "technician",
+    "steadfast"
+  ]
+}

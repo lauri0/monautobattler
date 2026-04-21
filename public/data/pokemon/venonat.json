@@ -1,0 +1,53 @@
+{
+  "id": 48,
+  "name": "venonat",
+  "types": [
+    "bug",
+    "poison"
+  ],
+  "baseStats": {
+    "hp": 60,
+    "attack": 55,
+    "defense": 50,
+    "specialAttack": 40,
+    "specialDefense": 55,
+    "speed": 45
+  },
+  "spriteUrl": "/sprites/48.png",
+  "moves": [
+    "solar-beam",
+    "take-down",
+    "psychic",
+    "sludge-bomb",
+    "bug-buzz",
+    "energy-ball",
+    "leech-life",
+    "zen-headbutt",
+    "lunge",
+    "tera-blast",
+    "giga-drain",
+    "psychic-noise",
+    "facade",
+    "skitter-smack",
+    "psybeam",
+    "venoshock",
+    "swift",
+    "thief",
+    "bug-bite",
+    "confusion",
+    "poison-fang",
+    "struggle-bug",
+    "pounce",
+    "tackle",
+    "acid-spray",
+    "poison-powder",
+    "sleep-powder",
+    "agility",
+    "protect"
+  ],
+  "abilities": [
+    "compound-eyes",
+    "tinted-lens",
+    "run-away"
+  ]
+}

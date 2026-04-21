@@ -1,0 +1,21 @@
+{
+  "id": 132,
+  "name": "ditto",
+  "types": [
+    "normal"
+  ],
+  "baseStats": {
+    "hp": 48,
+    "attack": 48,
+    "defense": 48,
+    "specialAttack": 48,
+    "specialDefense": 48,
+    "speed": 48
+  },
+  "spriteUrl": "/sprites/132.png",
+  "moves": [],
+  "abilities": [
+    "limber",
+    "imposter"
+  ]
+}

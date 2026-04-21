@@ -1,0 +1,20 @@
+{
+  "id": 242,
+  "name": "crunch",
+  "type": "dark",
+  "power": 80,
+  "accuracy": 100,
+  "pp": 15,
+  "damageClass": "physical",
+  "priority": 0,
+  "effect": {
+    "statChanges": [
+      {
+        "stat": "defense",
+        "change": -1,
+        "target": "foe"
+      }
+    ],
+    "statChance": 20
+  }
+}

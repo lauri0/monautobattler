@@ -1,0 +1,45 @@
+{
+  "id": 78,
+  "name": "rapidash",
+  "types": [
+    "fire"
+  ],
+  "baseStats": {
+    "hp": 65,
+    "attack": 100,
+    "defense": 70,
+    "specialAttack": 80,
+    "specialDefense": 80,
+    "speed": 105
+  },
+  "spriteUrl": "/sprites/78.png",
+  "moves": [
+    "hyper-beam",
+    "giga-impact",
+    "overheat",
+    "solar-beam",
+    "megahorn",
+    "flare-blitz",
+    "fire-blast",
+    "iron-tail",
+    "inferno",
+    "take-down",
+    "flamethrower",
+    "strength",
+    "poison-jab",
+    "facade",
+    "smart-strike",
+    "stomp",
+    "flame-wheel",
+    "flame-charge",
+    "tackle",
+    "ember",
+    "quick-attack",
+    "fire-spin",
+    "swords-dance",
+    "growl",
+    "agility",
+    "protect",
+    "will-o-wisp"
+  ]
+}

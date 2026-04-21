@@ -1,0 +1,14 @@
+{
+  "id": 441,
+  "name": "gunk-shot",
+  "type": "poison",
+  "power": 120,
+  "accuracy": 80,
+  "pp": 5,
+  "damageClass": "physical",
+  "priority": 0,
+  "effect": {
+    "ailment": "poison",
+    "ailmentChance": 30
+  }
+}

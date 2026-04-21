@@ -1,0 +1,58 @@
+{
+  "id": 69,
+  "name": "bellsprout",
+  "types": [
+    "grass",
+    "poison"
+  ],
+  "baseStats": {
+    "hp": 50,
+    "attack": 75,
+    "defense": 35,
+    "specialAttack": 70,
+    "specialDefense": 30,
+    "speed": 40
+  },
+  "spriteUrl": "/sprites/69.png",
+  "moves": [
+    "leaf-storm",
+    "solar-beam",
+    "power-whip",
+    "sludge-wave",
+    "sludge-bomb",
+    "energy-ball",
+    "slam",
+    "leech-life",
+    "poison-jab",
+    "seed-bomb",
+    "lunge",
+    "tera-blast",
+    "giga-drain",
+    "facade",
+    "sucker-punch",
+    "knock-off",
+    "venoshock",
+    "thief",
+    "magical-leaf",
+    "razor-leaf",
+    "grassy-glide",
+    "weather-ball",
+    "clear-smog",
+    "pounce",
+    "trailblaze",
+    "vine-whip",
+    "acid",
+    "acid-spray",
+    "bullet-seed",
+    "wrap",
+    "swords-dance",
+    "poison-powder",
+    "sleep-powder",
+    "reflect",
+    "protect"
+  ],
+  "abilities": [
+    "chlorophyll",
+    "gluttony"
+  ]
+}

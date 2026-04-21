@@ -1,0 +1,14 @@
+{
+  "id": 52,
+  "name": "ember",
+  "type": "fire",
+  "power": 40,
+  "accuracy": 100,
+  "pp": 25,
+  "damageClass": "special",
+  "priority": 0,
+  "effect": {
+    "ailment": "burn",
+    "ailmentChance": 10
+  }
+}

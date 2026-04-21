@@ -1,0 +1,14 @@
+{
+  "id": 86,
+  "name": "thunder-wave",
+  "type": "electric",
+  "power": 0,
+  "accuracy": 90,
+  "pp": 20,
+  "damageClass": "status",
+  "priority": 0,
+  "effect": {
+    "ailment": "paralysis",
+    "ailmentChance": 0
+  }
+}

@@ -1,0 +1,49 @@
+{
+  "id": 32,
+  "name": "nidoran-m",
+  "types": [
+    "poison"
+  ],
+  "baseStats": {
+    "hp": 46,
+    "attack": 57,
+    "defense": 40,
+    "specialAttack": 40,
+    "specialDefense": 40,
+    "speed": 50
+  },
+  "spriteUrl": "/sprites/32.png",
+  "moves": [
+    "head-smash",
+    "thrash",
+    "blizzard",
+    "thunder",
+    "iron-tail",
+    "take-down",
+    "ice-beam",
+    "thunderbolt",
+    "sludge-bomb",
+    "earth-power",
+    "strength",
+    "dig",
+    "poison-jab",
+    "facade",
+    "sucker-punch",
+    "shadow-claw",
+    "horn-attack",
+    "thief",
+    "shock-wave",
+    "water-pulse",
+    "cut",
+    "confusion",
+    "poison-tail",
+    "rock-smash",
+    "peck",
+    "double-kick",
+    "fury-attack",
+    "poison-sting",
+    "leer",
+    "amnesia",
+    "protect"
+  ]
+}

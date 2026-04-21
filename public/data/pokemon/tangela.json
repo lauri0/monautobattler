@@ -1,0 +1,46 @@
+{
+  "id": 114,
+  "name": "tangela",
+  "types": [
+    "grass"
+  ],
+  "baseStats": {
+    "hp": 65,
+    "attack": 55,
+    "defense": 115,
+    "specialAttack": 100,
+    "specialDefense": 40,
+    "speed": 60
+  },
+  "spriteUrl": "/sprites/114.png",
+  "moves": [
+    "hyper-beam",
+    "giga-impact",
+    "leaf-storm",
+    "solar-beam",
+    "power-whip",
+    "sludge-bomb",
+    "energy-ball",
+    "slam",
+    "giga-drain",
+    "facade",
+    "knock-off",
+    "thief",
+    "ancient-power",
+    "shock-wave",
+    "cut",
+    "confusion",
+    "vine-whip",
+    "giga-drain",
+    "rock-smash",
+    "bullet-seed",
+    "absorb",
+    "bind",
+    "swords-dance",
+    "poison-powder",
+    "sleep-powder",
+    "reflect",
+    "amnesia",
+    "protect"
+  ]
+}

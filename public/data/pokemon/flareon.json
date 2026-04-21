@@ -1,0 +1,60 @@
+{
+  "id": 136,
+  "name": "flareon",
+  "types": [
+    "fire"
+  ],
+  "baseStats": {
+    "hp": 65,
+    "attack": 130,
+    "defense": 60,
+    "specialAttack": 95,
+    "specialDefense": 110,
+    "speed": 65
+  },
+  "spriteUrl": "/sprites/136.png",
+  "moves": [
+    "hyper-beam",
+    "giga-impact",
+    "last-resort",
+    "overheat",
+    "double-edge",
+    "flare-blitz",
+    "fire-blast",
+    "heat-wave",
+    "take-down",
+    "flamethrower",
+    "hyper-voice",
+    "body-slam",
+    "dig",
+    "shadow-ball",
+    "lava-plume",
+    "tera-blast",
+    "alluring-voice",
+    "temper-flare",
+    "facade",
+    "burning-jealousy",
+    "scorching-sands",
+    "fire-fang",
+    "bite",
+    "swift",
+    "covet",
+    "weather-ball",
+    "trailblaze",
+    "tackle",
+    "ember",
+    "quick-attack",
+    "fire-spin",
+    "smog",
+    "mud-slap",
+    "stored-power",
+    "growl",
+    "protect",
+    "will-o-wisp",
+    "calm-mind"
+  ],
+  "abilities": [
+    "flash-fire",
+    "guts"
+  ]
+}

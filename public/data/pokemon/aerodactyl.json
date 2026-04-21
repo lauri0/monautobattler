@@ -1,0 +1,52 @@
+{
+  "id": 142,
+  "name": "aerodactyl",
+  "types": [
+    "rock",
+    "flying"
+  ],
+  "baseStats": {
+    "hp": 80,
+    "attack": 105,
+    "defense": 65,
+    "specialAttack": 60,
+    "specialDefense": 75,
+    "speed": 130
+  },
+  "spriteUrl": "/sprites/142.png",
+  "moves": [
+    "hyper-beam",
+    "giga-impact",
+    "fire-blast",
+    "earthquake",
+    "iron-tail",
+    "stone-edge",
+    "fly",
+    "take-down",
+    "flamethrower",
+    "dragon-pulse",
+    "strength",
+    "crunch",
+    "dragon-claw",
+    "iron-head",
+    "rock-slide",
+    "steel-wing",
+    "facade",
+    "wing-attack",
+    "bite",
+    "thief",
+    "dragon-breath",
+    "ancient-power",
+    "rock-tomb",
+    "aerial-ace",
+    "assurance",
+    "bulldoze",
+    "payback",
+    "rock-smash",
+    "agility",
+    "protect",
+    "taunt",
+    "tailwind",
+    "stealth-rock"
+  ]
+}

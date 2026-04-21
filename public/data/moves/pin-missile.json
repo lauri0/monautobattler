@@ -1,0 +1,10 @@
+{
+  "id": 42,
+  "name": "pin-missile",
+  "type": "bug",
+  "power": 25,
+  "accuracy": 95,
+  "pp": 20,
+  "damageClass": "physical",
+  "priority": 0
+}

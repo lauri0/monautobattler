@@ -1,0 +1,49 @@
+{
+  "id": 121,
+  "name": "starmie",
+  "types": [
+    "water",
+    "psychic"
+  ],
+  "baseStats": {
+    "hp": 60,
+    "attack": 75,
+    "defense": 85,
+    "specialAttack": 100,
+    "specialDefense": 85,
+    "speed": 115
+  },
+  "spriteUrl": "/sprites/121.png",
+  "moves": [
+    "hyper-beam",
+    "giga-impact",
+    "hydro-pump",
+    "blizzard",
+    "thunder",
+    "dream-eater",
+    "surf",
+    "ice-beam",
+    "thunderbolt",
+    "psychic",
+    "waterfall",
+    "power-gem",
+    "flash-cannon",
+    "scald",
+    "dazzling-gleam",
+    "facade",
+    "psybeam",
+    "brine",
+    "swift",
+    "water-pulse",
+    "avalanche",
+    "rapid-spin",
+    "tackle",
+    "water-gun",
+    "thunder-wave",
+    "recover",
+    "light-screen",
+    "reflect",
+    "protect",
+    "trick-room"
+  ]
+}

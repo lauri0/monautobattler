@@ -1,0 +1,10 @@
+{
+  "id": 16,
+  "name": "gust",
+  "type": "flying",
+  "power": 40,
+  "accuracy": 100,
+  "pp": 35,
+  "damageClass": "special",
+  "priority": 0
+}

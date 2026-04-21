@@ -1,0 +1,13 @@
+{
+  "id": 80,
+  "name": "petal-dance",
+  "type": "grass",
+  "power": 120,
+  "accuracy": 100,
+  "pp": 10,
+  "damageClass": "special",
+  "priority": 0,
+  "effect": {
+    "confusesUser": true
+  }
+}

@@ -1,0 +1,53 @@
+{
+  "id": 10103,
+  "name": "vulpix-alola",
+  "types": [
+    "ice"
+  ],
+  "baseStats": {
+    "hp": 38,
+    "attack": 41,
+    "defense": 40,
+    "specialAttack": 50,
+    "specialDefense": 65,
+    "speed": 65
+  },
+  "spriteUrl": "/sprites/10103.png",
+  "moves": [
+    "double-edge",
+    "blizzard",
+    "foul-play",
+    "moonblast",
+    "take-down",
+    "ice-beam",
+    "play-rough",
+    "body-slam",
+    "dig",
+    "extrasensory",
+    "dark-pulse",
+    "zen-headbutt",
+    "dazzling-gleam",
+    "tera-blast",
+    "facade",
+    "freeze-dry",
+    "aurora-beam",
+    "hex",
+    "swift",
+    "icy-wind",
+    "weather-ball",
+    "draining-kiss",
+    "chilling-water",
+    "powder-snow",
+    "ice-shard",
+    "disarming-voice",
+    "icicle-spear",
+    "stored-power",
+    "agility",
+    "protect",
+    "nasty-plot"
+  ],
+  "abilities": [
+    "snow-cloak",
+    "snow-warning"
+  ]
+}

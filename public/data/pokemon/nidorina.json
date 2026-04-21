@@ -1,0 +1,44 @@
+{
+  "id": 30,
+  "name": "nidorina",
+  "types": [
+    "poison"
+  ],
+  "baseStats": {
+    "hp": 70,
+    "attack": 62,
+    "defense": 67,
+    "specialAttack": 55,
+    "specialDefense": 55,
+    "speed": 56
+  },
+  "spriteUrl": "/sprites/30.png",
+  "moves": [
+    "blizzard",
+    "thunder",
+    "iron-tail",
+    "ice-beam",
+    "thunderbolt",
+    "sludge-bomb",
+    "earth-power",
+    "strength",
+    "dig",
+    "crunch",
+    "poison-jab",
+    "facade",
+    "shadow-claw",
+    "bite",
+    "thief",
+    "aerial-ace",
+    "shock-wave",
+    "water-pulse",
+    "cut",
+    "scratch",
+    "rock-smash",
+    "double-kick",
+    "fury-swipes",
+    "poison-sting",
+    "growl",
+    "protect"
+  ]
+}

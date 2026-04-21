@@ -9,3 +9,7 @@ export function formatPokemonName(name: string): string {
   if (name.endsWith('-alola'))  return cap(name.slice(0, -6));
   return name.split('-').map(cap).join(' ');
 }
+
+export function formatAbilityName(name: string): string {
+  return name.split('-').map(cap).join(' ');
+}

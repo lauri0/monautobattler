@@ -1,0 +1,15 @@
+{
+  "id": 422,
+  "name": "thunder-fang",
+  "type": "electric",
+  "power": 65,
+  "accuracy": 95,
+  "pp": 15,
+  "damageClass": "physical",
+  "priority": 0,
+  "effect": {
+    "ailment": "paralysis",
+    "ailmentChance": 10,
+    "flinchChance": 10
+  }
+}

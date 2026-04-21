@@ -1,0 +1,53 @@
+{
+  "id": 98,
+  "name": "krabby",
+  "types": [
+    "water"
+  ],
+  "baseStats": {
+    "hp": 30,
+    "attack": 105,
+    "defense": 90,
+    "specialAttack": 25,
+    "specialDefense": 25,
+    "speed": 50
+  },
+  "spriteUrl": "/sprites/98.png",
+  "moves": [
+    "blizzard",
+    "crabhammer",
+    "hammer-arm",
+    "surf",
+    "ice-beam",
+    "slam",
+    "strength",
+    "dig",
+    "x-scissor",
+    "scald",
+    "rock-slide",
+    "brick-break",
+    "razor-shell",
+    "slash",
+    "facade",
+    "night-slash",
+    "stomp",
+    "bubble-beam",
+    "knock-off",
+    "brine",
+    "thief",
+    "ancient-power",
+    "rock-tomb",
+    "water-pulse",
+    "mud-shot",
+    "cut",
+    "metal-claw",
+    "water-gun",
+    "false-swipe",
+    "rock-smash",
+    "swords-dance",
+    "leer",
+    "agility",
+    "amnesia",
+    "protect"
+  ]
+}

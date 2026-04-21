@@ -1,0 +1,10 @@
+{
+  "id": 291,
+  "name": "dive",
+  "type": "water",
+  "power": 80,
+  "accuracy": 100,
+  "pp": 10,
+  "damageClass": "physical",
+  "priority": 0
+}

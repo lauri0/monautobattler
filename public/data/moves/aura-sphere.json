@@ -1,0 +1,10 @@
+{
+  "id": 396,
+  "name": "aura-sphere",
+  "type": "fighting",
+  "power": 80,
+  "accuracy": null,
+  "pp": 20,
+  "damageClass": "special",
+  "priority": 0
+}

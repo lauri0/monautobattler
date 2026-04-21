@@ -1,0 +1,10 @@
+{
+  "id": 572,
+  "name": "petal-blizzard",
+  "type": "grass",
+  "power": 90,
+  "accuracy": 100,
+  "pp": 15,
+  "damageClass": "physical",
+  "priority": 0
+}

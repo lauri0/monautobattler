@@ -1,0 +1,25 @@
+{
+  "id": 349,
+  "name": "dragon-dance",
+  "type": "dragon",
+  "power": 0,
+  "accuracy": null,
+  "pp": 20,
+  "damageClass": "status",
+  "priority": 0,
+  "effect": {
+    "statChanges": [
+      {
+        "stat": "attack",
+        "change": 1,
+        "target": "user"
+      },
+      {
+        "stat": "speed",
+        "change": 1,
+        "target": "user"
+      }
+    ],
+    "statChance": 0
+  }
+}

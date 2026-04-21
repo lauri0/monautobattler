@@ -1,0 +1,10 @@
+{
+  "id": 325,
+  "name": "shadow-punch",
+  "type": "ghost",
+  "power": 60,
+  "accuracy": null,
+  "pp": 20,
+  "damageClass": "physical",
+  "priority": 0
+}

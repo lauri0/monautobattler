@@ -1,0 +1,10 @@
+{
+  "id": 210,
+  "name": "fury-cutter",
+  "type": "bug",
+  "power": 40,
+  "accuracy": 95,
+  "pp": 20,
+  "damageClass": "physical",
+  "priority": 0
+}

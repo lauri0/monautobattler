@@ -1,0 +1,10 @@
+{
+  "id": 83,
+  "name": "fire-spin",
+  "type": "fire",
+  "power": 35,
+  "accuracy": 85,
+  "pp": 15,
+  "damageClass": "special",
+  "priority": 0
+}

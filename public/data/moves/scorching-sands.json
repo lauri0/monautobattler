@@ -1,0 +1,14 @@
+{
+  "id": 815,
+  "name": "scorching-sands",
+  "type": "ground",
+  "power": 70,
+  "accuracy": 100,
+  "pp": 10,
+  "damageClass": "special",
+  "priority": 0,
+  "effect": {
+    "ailment": "burn",
+    "ailmentChance": 30
+  }
+}

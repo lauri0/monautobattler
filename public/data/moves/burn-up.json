@@ -1,0 +1,10 @@
+{
+  "id": 682,
+  "name": "burn-up",
+  "type": "fire",
+  "power": 130,
+  "accuracy": 100,
+  "pp": 5,
+  "damageClass": "special",
+  "priority": 0
+}

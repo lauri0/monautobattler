@@ -1,0 +1,13 @@
+{
+  "id": 127,
+  "name": "waterfall",
+  "type": "water",
+  "power": 80,
+  "accuracy": 100,
+  "pp": 15,
+  "damageClass": "physical",
+  "priority": 0,
+  "effect": {
+    "flinchChance": 20
+  }
+}

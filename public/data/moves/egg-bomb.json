@@ -1,0 +1,10 @@
+{
+  "id": 121,
+  "name": "egg-bomb",
+  "type": "normal",
+  "power": 100,
+  "accuracy": 75,
+  "pp": 10,
+  "damageClass": "physical",
+  "priority": 0
+}

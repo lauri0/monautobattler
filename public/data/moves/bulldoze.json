@@ -1,0 +1,20 @@
+{
+  "id": 523,
+  "name": "bulldoze",
+  "type": "ground",
+  "power": 60,
+  "accuracy": 100,
+  "pp": 20,
+  "damageClass": "physical",
+  "priority": 0,
+  "effect": {
+    "statChanges": [
+      {
+        "stat": "speed",
+        "change": -1,
+        "target": "foe"
+      }
+    ],
+    "statChance": 100
+  }
+}

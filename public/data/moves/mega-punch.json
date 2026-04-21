@@ -1,0 +1,10 @@
+{
+  "id": 5,
+  "name": "mega-punch",
+  "type": "normal",
+  "power": 80,
+  "accuracy": 85,
+  "pp": 20,
+  "damageClass": "physical",
+  "priority": 0
+}

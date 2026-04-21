@@ -1,0 +1,10 @@
+{
+  "id": 814,
+  "name": "dual-wingbeat",
+  "type": "flying",
+  "power": 40,
+  "accuracy": 90,
+  "pp": 10,
+  "damageClass": "physical",
+  "priority": 0
+}

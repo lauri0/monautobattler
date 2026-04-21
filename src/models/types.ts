@@ -96,6 +96,8 @@ export interface Level50Stats {
   speed: number;
 }
 
+export type AbilityId = string; // kebab-case, matches PokeAPI `ability.name`
+
 export interface PokemonData {
   id: number;
   name: string;
@@ -103,6 +105,7 @@ export interface PokemonData {
   baseStats: BaseStats;
   spriteUrl: string;
   availableMoves: Move[];
+  abilities: AbilityId[]; // ordered by PokeAPI slot; empty for LGPE
 }
 
 export interface PokemonPersisted {
@@ -112,6 +115,7 @@ export interface PokemonPersisted {
   losses: number;
   moveset: number[]; // 4 move IDs
   disabled: boolean;
+  selectedAbility?: AbilityId;
 }
 
 export interface BattlePokemon {
@@ -141,6 +145,7 @@ export interface BattlePokemon {
   // True on a pokemon's first turn on the field (start of battle, or fresh after
   // switching in). Cleared at end of turn. Fake Out uses this gate.
   justSwitchedIn?: boolean;
+  ability?: AbilityId;
   statStages: StatStages;
 }
 
@@ -177,7 +182,8 @@ export type TurnEvent =
   | { kind: 'field_expired'; turn: number; effect: FieldEffectKind; side?: SideIndex }
   | { kind: 'stealth_rock_damage'; turn: number; pokemonName: string; damage: number; hpAfter: number }
   | { kind: 'taunted'; turn: number; pokemonName: string; turns: number }
-  | { kind: 'taunt_end'; turn: number; pokemonName: string };
+  | { kind: 'taunt_end'; turn: number; pokemonName: string }
+  | { kind: 'ability_triggered'; turn: number; pokemonName: string; ability: AbilityId };
 
 export interface BattleResult {
   winner: BattlePokemon;

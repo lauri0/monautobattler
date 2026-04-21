@@ -1,0 +1,10 @@
+{
+  "id": 99,
+  "name": "rage",
+  "type": "normal",
+  "power": 20,
+  "accuracy": 100,
+  "pp": 20,
+  "damageClass": "physical",
+  "priority": 0
+}

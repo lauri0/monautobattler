@@ -1,0 +1,26 @@
+{
+  "id": 575,
+  "name": "parting-shot",
+  "type": "dark",
+  "power": 0,
+  "accuracy": 100,
+  "pp": 20,
+  "damageClass": "status",
+  "priority": 0,
+  "effect": {
+    "statChanges": [
+      {
+        "stat": "attack",
+        "change": -1,
+        "target": "foe"
+      },
+      {
+        "stat": "special-attack",
+        "change": -1,
+        "target": "foe"
+      }
+    ],
+    "statChance": 0,
+    "pivotSwitch": true
+  }
+}

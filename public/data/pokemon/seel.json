@@ -1,0 +1,60 @@
+{
+  "id": 86,
+  "name": "seel",
+  "types": [
+    "water"
+  ],
+  "baseStats": {
+    "hp": 65,
+    "attack": 45,
+    "defense": 55,
+    "specialAttack": 45,
+    "specialDefense": 70,
+    "speed": 45
+  },
+  "spriteUrl": "/sprites/86.png",
+  "moves": [
+    "double-edge",
+    "belch",
+    "hydro-pump",
+    "blizzard",
+    "take-down",
+    "surf",
+    "ice-beam",
+    "uproar",
+    "muddy-water",
+    "aqua-tail",
+    "body-slam",
+    "waterfall",
+    "dive",
+    "drill-run",
+    "tera-blast",
+    "ice-spinner",
+    "headbutt",
+    "facade",
+    "smart-strike",
+    "aurora-beam",
+    "brine",
+    "thief",
+    "water-pulse",
+    "avalanche",
+    "flip-turn",
+    "icy-wind",
+    "weather-ball",
+    "chilling-water",
+    "fake-out",
+    "ice-shard",
+    "aqua-jet",
+    "whirlpool",
+    "lick",
+    "icicle-spear",
+    "triple-axel",
+    "growl",
+    "protect"
+  ],
+  "abilities": [
+    "thick-fat",
+    "hydration",
+    "ice-body"
+  ]
+}

@@ -1,0 +1,53 @@
+{
+  "id": 116,
+  "name": "horsea",
+  "types": [
+    "water"
+  ],
+  "baseStats": {
+    "hp": 30,
+    "attack": 40,
+    "defense": 70,
+    "specialAttack": 70,
+    "specialDefense": 25,
+    "speed": 60
+  },
+  "spriteUrl": "/sprites/116.png",
+  "moves": [
+    "outrage",
+    "hydro-pump",
+    "blizzard",
+    "surf",
+    "ice-beam",
+    "muddy-water",
+    "dragon-pulse",
+    "liquidation",
+    "waterfall",
+    "flash-cannon",
+    "tera-blast",
+    "facade",
+    "bubble-beam",
+    "aurora-beam",
+    "swift",
+    "dragon-breath",
+    "water-pulse",
+    "flip-turn",
+    "icy-wind",
+    "weather-ball",
+    "clear-smog",
+    "chilling-water",
+    "water-gun",
+    "twister",
+    "whirlpool",
+    "scale-shot",
+    "leer",
+    "agility",
+    "protect",
+    "dragon-dance"
+  ],
+  "abilities": [
+    "swift-swim",
+    "sniper",
+    "damp"
+  ]
+}

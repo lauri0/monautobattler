@@ -1,0 +1,14 @@
+{
+  "id": 188,
+  "name": "sludge-bomb",
+  "type": "poison",
+  "power": 90,
+  "accuracy": 100,
+  "pp": 10,
+  "damageClass": "special",
+  "priority": 0,
+  "effect": {
+    "ailment": "poison",
+    "ailmentChance": 30
+  }
+}

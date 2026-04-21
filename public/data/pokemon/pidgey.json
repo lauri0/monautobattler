@@ -1,0 +1,39 @@
+{
+  "id": 16,
+  "name": "pidgey",
+  "types": [
+    "normal",
+    "flying"
+  ],
+  "baseStats": {
+    "hp": 40,
+    "attack": 45,
+    "defense": 40,
+    "specialAttack": 35,
+    "specialDefense": 35,
+    "speed": 56
+  },
+  "spriteUrl": "/sprites/16.png",
+  "moves": [
+    "brave-bird",
+    "hurricane",
+    "fly",
+    "uproar",
+    "air-slash",
+    "steel-wing",
+    "facade",
+    "u-turn",
+    "wing-attack",
+    "thief",
+    "air-cutter",
+    "aerial-ace",
+    "pluck",
+    "gust",
+    "tackle",
+    "quick-attack",
+    "twister",
+    "agility",
+    "protect",
+    "tailwind"
+  ]
+}

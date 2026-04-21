@@ -37,6 +37,8 @@ export interface PokemonOverrides {
   lockedMove?: BattlePokemon['lockedMove'];
   protectedThisTurn?: boolean;
   lastMoveProtected?: boolean;
+  ability?: string;
+  abilities?: string[];
 }
 
 export function makePokemon(overrides: PokemonOverrides = {}): BattlePokemon {
@@ -60,6 +62,7 @@ export function makePokemon(overrides: PokemonOverrides = {}): BattlePokemon {
     },
     spriteUrl: '',
     availableMoves: moves,
+    abilities: overrides.abilities ?? (overrides.ability ? [overrides.ability] : []),
   };
   const persisted: PokemonPersisted = {
     id,
@@ -83,6 +86,7 @@ export function makePokemon(overrides: PokemonOverrides = {}): BattlePokemon {
     lockedMove: overrides.lockedMove,
     protectedThisTurn: overrides.protectedThisTurn,
     lastMoveProtected: overrides.lastMoveProtected,
+    ability: overrides.ability,
     statStages: { ...ZERO_STAGES, ...(overrides.statStages ?? {}) },
   };
 }

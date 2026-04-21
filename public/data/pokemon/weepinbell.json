@@ -1,0 +1,61 @@
+{
+  "id": 70,
+  "name": "weepinbell",
+  "types": [
+    "grass",
+    "poison"
+  ],
+  "baseStats": {
+    "hp": 65,
+    "attack": 90,
+    "defense": 50,
+    "specialAttack": 85,
+    "specialDefense": 45,
+    "speed": 55
+  },
+  "spriteUrl": "/sprites/70.png",
+  "moves": [
+    "leaf-storm",
+    "solar-beam",
+    "power-whip",
+    "sludge-wave",
+    "sludge-bomb",
+    "energy-ball",
+    "body-slam",
+    "slam",
+    "leech-life",
+    "poison-jab",
+    "seed-bomb",
+    "lunge",
+    "tera-blast",
+    "giga-drain",
+    "facade",
+    "sucker-punch",
+    "knock-off",
+    "venoshock",
+    "swift",
+    "thief",
+    "magical-leaf",
+    "bug-bite",
+    "razor-leaf",
+    "grassy-glide",
+    "weather-ball",
+    "clear-smog",
+    "pounce",
+    "trailblaze",
+    "vine-whip",
+    "acid",
+    "acid-spray",
+    "bullet-seed",
+    "wrap",
+    "swords-dance",
+    "poison-powder",
+    "sleep-powder",
+    "reflect",
+    "protect"
+  ],
+  "abilities": [
+    "chlorophyll",
+    "gluttony"
+  ]
+}

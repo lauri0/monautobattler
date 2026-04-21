@@ -1,0 +1,13 @@
+{
+  "id": 457,
+  "name": "head-smash",
+  "type": "rock",
+  "power": 150,
+  "accuracy": 80,
+  "pp": 5,
+  "damageClass": "physical",
+  "priority": 0,
+  "effect": {
+    "drain": -50
+  }
+}

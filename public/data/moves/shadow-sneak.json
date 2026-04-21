@@ -1,0 +1,10 @@
+{
+  "id": 425,
+  "name": "shadow-sneak",
+  "type": "ghost",
+  "power": 40,
+  "accuracy": 100,
+  "pp": 30,
+  "damageClass": "physical",
+  "priority": 1
+}

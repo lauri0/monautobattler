@@ -1,0 +1,36 @@
+{
+  "id": 17,
+  "name": "pidgeotto",
+  "types": [
+    "normal",
+    "flying"
+  ],
+  "baseStats": {
+    "hp": 63,
+    "attack": 60,
+    "defense": 55,
+    "specialAttack": 50,
+    "specialDefense": 50,
+    "speed": 71
+  },
+  "spriteUrl": "/sprites/17.png",
+  "moves": [
+    "hurricane",
+    "fly",
+    "air-slash",
+    "steel-wing",
+    "facade",
+    "u-turn",
+    "wing-attack",
+    "thief",
+    "aerial-ace",
+    "pluck",
+    "gust",
+    "tackle",
+    "quick-attack",
+    "twister",
+    "agility",
+    "protect",
+    "tailwind"
+  ]
+}

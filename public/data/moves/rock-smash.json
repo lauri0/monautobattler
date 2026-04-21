@@ -1,0 +1,20 @@
+{
+  "id": 249,
+  "name": "rock-smash",
+  "type": "fighting",
+  "power": 40,
+  "accuracy": 100,
+  "pp": 15,
+  "damageClass": "physical",
+  "priority": 0,
+  "effect": {
+    "statChanges": [
+      {
+        "stat": "defense",
+        "change": -1,
+        "target": "foe"
+      }
+    ],
+    "statChance": 50
+  }
+}

@@ -1,0 +1,42 @@
+{
+  "id": 21,
+  "name": "spearow",
+  "types": [
+    "normal",
+    "flying"
+  ],
+  "baseStats": {
+    "hp": 40,
+    "attack": 60,
+    "defense": 30,
+    "specialAttack": 31,
+    "specialDefense": 31,
+    "speed": 70
+  },
+  "spriteUrl": "/sprites/21.png",
+  "moves": [
+    "sky-attack",
+    "fly",
+    "take-down",
+    "uproar",
+    "drill-peck",
+    "tri-attack",
+    "steel-wing",
+    "facade",
+    "u-turn",
+    "wing-attack",
+    "thief",
+    "aerial-ace",
+    "pluck",
+    "assurance",
+    "quick-attack",
+    "false-swipe",
+    "peck",
+    "astonish",
+    "fury-attack",
+    "leer",
+    "growl",
+    "agility",
+    "protect"
+  ]
+}

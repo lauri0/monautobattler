@@ -1,0 +1,46 @@
+{
+  "id": 133,
+  "name": "eevee",
+  "types": [
+    "normal"
+  ],
+  "baseStats": {
+    "hp": 55,
+    "attack": 55,
+    "defense": 50,
+    "specialAttack": 45,
+    "specialDefense": 65,
+    "speed": 55
+  },
+  "spriteUrl": "/sprites/133.png",
+  "moves": [
+    "last-resort",
+    "double-edge",
+    "take-down",
+    "hyper-voice",
+    "body-slam",
+    "dig",
+    "shadow-ball",
+    "tera-blast",
+    "alluring-voice",
+    "facade",
+    "bite",
+    "swift",
+    "covet",
+    "weather-ball",
+    "trailblaze",
+    "tackle",
+    "quick-attack",
+    "double-kick",
+    "mud-slap",
+    "stored-power",
+    "growl",
+    "protect",
+    "calm-mind"
+  ],
+  "abilities": [
+    "run-away",
+    "adaptability",
+    "anticipation"
+  ]
+}

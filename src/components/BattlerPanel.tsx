@@ -2,7 +2,8 @@ import type { BattlePokemon } from '../models/types';
 import HpBar from './HpBar';
 import TypeBadge from './TypeBadge';
 import { getTypeColor } from '../utils/typeColors';
-import { formatPokemonName } from '../utils/formatName';
+import { formatPokemonName, formatAbilityName } from '../utils/formatName';
+import { isAbilityImplemented } from '../battle/abilities';
 
 const STATUS_STYLES: Record<string, { label: string; bg: string }> = {
   burn:      { label: 'BRN', bg: '#e94560' },
@@ -29,6 +30,14 @@ export default function BattlerPanel({ pokemon, hideMoves }: { pokemon: BattlePo
       <div style={{ display: 'flex', gap: 4, justifyContent: 'center', marginBottom: 8 }}>
         {pokemon.data.types.map(t => <TypeBadge key={t} type={t} />)}
       </div>
+      {pokemon.ability && (
+        <div style={{ textAlign: 'center', fontSize: '0.85em', marginBottom: 6, opacity: 0.85 }}>
+          {formatAbilityName(pokemon.ability)}
+          {!isAbilityImplemented(pokemon.ability) && (
+            <span style={{ opacity: 0.6 }}> (Unimplemented)</span>
+          )}
+        </div>
+      )}
       <HpBar current={pokemon.currentHp} max={pokemon.level50Stats.hp} />
       {!hideMoves && (
         <div className="battler-moves">

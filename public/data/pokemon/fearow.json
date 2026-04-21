@@ -1,0 +1,40 @@
+{
+  "id": 22,
+  "name": "fearow",
+  "types": [
+    "normal",
+    "flying"
+  ],
+  "baseStats": {
+    "hp": 65,
+    "attack": 90,
+    "defense": 65,
+    "specialAttack": 61,
+    "specialDefense": 61,
+    "speed": 100
+  },
+  "spriteUrl": "/sprites/22.png",
+  "moves": [
+    "hyper-beam",
+    "giga-impact",
+    "fly",
+    "take-down",
+    "drill-peck",
+    "drill-run",
+    "steel-wing",
+    "facade",
+    "u-turn",
+    "wing-attack",
+    "thief",
+    "aerial-ace",
+    "pluck",
+    "assurance",
+    "false-swipe",
+    "peck",
+    "fury-attack",
+    "leer",
+    "growl",
+    "agility",
+    "protect"
+  ]
+}

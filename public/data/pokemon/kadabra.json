@@ -1,0 +1,43 @@
+{
+  "id": 64,
+  "name": "kadabra",
+  "types": [
+    "psychic"
+  ],
+  "baseStats": {
+    "hp": 40,
+    "attack": 35,
+    "defense": 30,
+    "specialAttack": 120,
+    "specialDefense": 70,
+    "speed": 105
+  },
+  "spriteUrl": "/sprites/64.png",
+  "moves": [
+    "focus-punch",
+    "future-sight",
+    "dream-eater",
+    "iron-tail",
+    "psychic",
+    "energy-ball",
+    "shadow-ball",
+    "psyshock",
+    "dazzling-gleam",
+    "drain-punch",
+    "facade",
+    "psycho-cut",
+    "psybeam",
+    "thief",
+    "shock-wave",
+    "confusion",
+    "charge-beam",
+    "thunder-wave",
+    "recover",
+    "light-screen",
+    "reflect",
+    "protect",
+    "taunt",
+    "calm-mind",
+    "trick-room"
+  ]
+}

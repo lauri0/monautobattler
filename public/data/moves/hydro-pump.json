@@ -1,0 +1,10 @@
+{
+  "id": 56,
+  "name": "hydro-pump",
+  "type": "water",
+  "power": 110,
+  "accuracy": 80,
+  "pp": 5,
+  "damageClass": "special",
+  "priority": 0
+}

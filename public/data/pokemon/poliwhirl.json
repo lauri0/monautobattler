@@ -1,0 +1,58 @@
+{
+  "id": 61,
+  "name": "poliwhirl",
+  "types": [
+    "water"
+  ],
+  "baseStats": {
+    "hp": 65,
+    "attack": 65,
+    "defense": 65,
+    "specialAttack": 50,
+    "specialDefense": 50,
+    "speed": 90
+  },
+  "spriteUrl": "/sprites/61.png",
+  "moves": [
+    "focus-punch",
+    "double-edge",
+    "hydro-pump",
+    "blizzard",
+    "earthquake",
+    "take-down",
+    "surf",
+    "ice-beam",
+    "psychic",
+    "muddy-water",
+    "earth-power",
+    "body-slam",
+    "liquidation",
+    "dig",
+    "waterfall",
+    "tera-blast",
+    "ice-punch",
+    "brick-break",
+    "facade",
+    "bubble-beam",
+    "low-sweep",
+    "swift",
+    "thief",
+    "water-pulse",
+    "bulldoze",
+    "icy-wind",
+    "mud-shot",
+    "weather-ball",
+    "chilling-water",
+    "pound",
+    "water-gun",
+    "whirlpool",
+    "mud-slap",
+    "amnesia",
+    "protect"
+  ],
+  "abilities": [
+    "water-absorb",
+    "damp",
+    "swift-swim"
+  ]
+}

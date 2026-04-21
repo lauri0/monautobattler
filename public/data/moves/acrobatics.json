@@ -1,0 +1,10 @@
+{
+  "id": 512,
+  "name": "acrobatics",
+  "type": "flying",
+  "power": 55,
+  "accuracy": 100,
+  "pp": 15,
+  "damageClass": "physical",
+  "priority": 0
+}

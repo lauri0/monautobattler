@@ -1,0 +1,13 @@
+{
+  "id": 158,
+  "name": "hyper-fang",
+  "type": "normal",
+  "power": 80,
+  "accuracy": 90,
+  "pp": 15,
+  "damageClass": "physical",
+  "priority": 0,
+  "effect": {
+    "flinchChance": 10
+  }
+}

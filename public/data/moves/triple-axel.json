@@ -1,0 +1,10 @@
+{
+  "id": 813,
+  "name": "triple-axel",
+  "type": "ice",
+  "power": 20,
+  "accuracy": 90,
+  "pp": 10,
+  "damageClass": "physical",
+  "priority": 0
+}

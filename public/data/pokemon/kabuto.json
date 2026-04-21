@@ -1,0 +1,52 @@
+{
+  "id": 140,
+  "name": "kabuto",
+  "types": [
+    "rock",
+    "water"
+  ],
+  "baseStats": {
+    "hp": 30,
+    "attack": 80,
+    "defense": 90,
+    "specialAttack": 55,
+    "specialDefense": 45,
+    "speed": 55
+  },
+  "spriteUrl": "/sprites/140.png",
+  "moves": [
+    "blizzard",
+    "stone-edge",
+    "take-down",
+    "surf",
+    "ice-beam",
+    "liquidation",
+    "dig",
+    "waterfall",
+    "leech-life",
+    "scald",
+    "rock-slide",
+    "giga-drain",
+    "facade",
+    "bubble-beam",
+    "aurora-beam",
+    "knock-off",
+    "brine",
+    "thief",
+    "ancient-power",
+    "rock-tomb",
+    "aerial-ace",
+    "water-pulse",
+    "icy-wind",
+    "mud-shot",
+    "rapid-spin",
+    "scratch",
+    "giga-drain",
+    "rock-smash",
+    "aqua-jet",
+    "absorb",
+    "leer",
+    "protect",
+    "stealth-rock"
+  ]
+}

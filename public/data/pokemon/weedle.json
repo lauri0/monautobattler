@@ -1,0 +1,21 @@
+{
+  "id": 13,
+  "name": "weedle",
+  "types": [
+    "bug",
+    "poison"
+  ],
+  "baseStats": {
+    "hp": 40,
+    "attack": 35,
+    "defense": 30,
+    "specialAttack": 20,
+    "specialDefense": 20,
+    "speed": 50
+  },
+  "spriteUrl": "/sprites/13.png",
+  "moves": [
+    "bug-bite",
+    "poison-sting"
+  ]
+}

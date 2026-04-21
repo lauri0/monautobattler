@@ -1,0 +1,13 @@
+{
+  "id": 202,
+  "name": "giga-drain",
+  "type": "grass",
+  "power": 75,
+  "accuracy": 100,
+  "pp": 10,
+  "damageClass": "special",
+  "priority": 0,
+  "effect": {
+    "drain": 50
+  }
+}

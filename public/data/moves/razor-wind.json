@@ -1,0 +1,13 @@
+{
+  "id": 13,
+  "name": "razor-wind",
+  "type": "normal",
+  "power": 80,
+  "accuracy": 100,
+  "pp": 10,
+  "damageClass": "special",
+  "priority": 0,
+  "effect": {
+    "critRate": 1
+  }
+}

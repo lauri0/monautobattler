@@ -1,0 +1,20 @@
+{
+  "id": 132,
+  "name": "constrict",
+  "type": "normal",
+  "power": 10,
+  "accuracy": 100,
+  "pp": 35,
+  "damageClass": "physical",
+  "priority": 0,
+  "effect": {
+    "statChanges": [
+      {
+        "stat": "speed",
+        "change": -1,
+        "target": "foe"
+      }
+    ],
+    "statChance": 10
+  }
+}

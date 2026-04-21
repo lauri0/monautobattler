@@ -1,0 +1,47 @@
+{
+  "id": 139,
+  "name": "omastar",
+  "types": [
+    "rock",
+    "water"
+  ],
+  "baseStats": {
+    "hp": 70,
+    "attack": 60,
+    "defense": 125,
+    "specialAttack": 115,
+    "specialDefense": 70,
+    "speed": 55
+  },
+  "spriteUrl": "/sprites/139.png",
+  "moves": [
+    "hyper-beam",
+    "giga-impact",
+    "hydro-pump",
+    "blizzard",
+    "stone-edge",
+    "surf",
+    "ice-beam",
+    "rock-climb",
+    "waterfall",
+    "crunch",
+    "scald",
+    "rock-slide",
+    "facade",
+    "brine",
+    "thief",
+    "ancient-power",
+    "rock-tomb",
+    "water-pulse",
+    "mud-shot",
+    "water-gun",
+    "rock-smash",
+    "rollout",
+    "rock-blast",
+    "bind",
+    "leer",
+    "protect",
+    "stealth-rock",
+    "shell-smash"
+  ]
+}

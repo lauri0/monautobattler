@@ -1,0 +1,20 @@
+{
+  "id": 62,
+  "name": "aurora-beam",
+  "type": "ice",
+  "power": 65,
+  "accuracy": 100,
+  "pp": 20,
+  "damageClass": "special",
+  "priority": 0,
+  "effect": {
+    "statChanges": [
+      {
+        "stat": "attack",
+        "change": -1,
+        "target": "foe"
+      }
+    ],
+    "statChance": 10
+  }
+}

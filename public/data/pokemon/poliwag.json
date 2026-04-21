@@ -1,0 +1,54 @@
+{
+  "id": 60,
+  "name": "poliwag",
+  "types": [
+    "water"
+  ],
+  "baseStats": {
+    "hp": 40,
+    "attack": 50,
+    "defense": 40,
+    "specialAttack": 40,
+    "specialDefense": 40,
+    "speed": 90
+  },
+  "spriteUrl": "/sprites/60.png",
+  "moves": [
+    "focus-punch",
+    "double-edge",
+    "hydro-pump",
+    "blizzard",
+    "take-down",
+    "surf",
+    "ice-beam",
+    "psychic",
+    "muddy-water",
+    "earth-power",
+    "body-slam",
+    "liquidation",
+    "dig",
+    "waterfall",
+    "tera-blast",
+    "facade",
+    "bubble-beam",
+    "swift",
+    "thief",
+    "water-pulse",
+    "bulldoze",
+    "icy-wind",
+    "mud-shot",
+    "weather-ball",
+    "chilling-water",
+    "pound",
+    "water-gun",
+    "whirlpool",
+    "mud-slap",
+    "amnesia",
+    "protect"
+  ],
+  "abilities": [
+    "water-absorb",
+    "damp",
+    "swift-swim"
+  ]
+}

@@ -1,0 +1,10 @@
+{
+  "id": 499,
+  "name": "clear-smog",
+  "type": "poison",
+  "power": 50,
+  "accuracy": null,
+  "pp": 15,
+  "damageClass": "special",
+  "priority": 0
+}

@@ -1,0 +1,10 @@
+{
+  "id": 669,
+  "name": "solar-blade",
+  "type": "grass",
+  "power": 125,
+  "accuracy": 100,
+  "pp": 10,
+  "damageClass": "physical",
+  "priority": 0
+}

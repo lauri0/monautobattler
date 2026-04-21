@@ -1,0 +1,48 @@
+{
+  "id": 81,
+  "name": "magnemite",
+  "types": [
+    "electric",
+    "steel"
+  ],
+  "baseStats": {
+    "hp": 25,
+    "attack": 35,
+    "defense": 70,
+    "specialAttack": 95,
+    "specialDefense": 55,
+    "speed": 45
+  },
+  "spriteUrl": "/sprites/81.png",
+  "moves": [
+    "explosion",
+    "steel-beam",
+    "zap-cannon",
+    "thunder",
+    "take-down",
+    "thunderbolt",
+    "wild-charge",
+    "flash-cannon",
+    "discharge",
+    "iron-head",
+    "tera-blast",
+    "facade",
+    "volt-switch",
+    "spark",
+    "swift",
+    "electroweb",
+    "charge-beam",
+    "tackle",
+    "thunder-shock",
+    "thunder-wave",
+    "light-screen",
+    "reflect",
+    "protect",
+    "iron-defense"
+  ],
+  "abilities": [
+    "magnet-pull",
+    "sturdy",
+    "analytic"
+  ]
+}

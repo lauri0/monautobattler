@@ -1,0 +1,20 @@
+{
+  "id": 451,
+  "name": "charge-beam",
+  "type": "electric",
+  "power": 50,
+  "accuracy": 90,
+  "pp": 10,
+  "damageClass": "special",
+  "priority": 0,
+  "effect": {
+    "statChanges": [
+      {
+        "stat": "special-attack",
+        "change": 1,
+        "target": "user"
+      }
+    ],
+    "statChance": 70
+  }
+}

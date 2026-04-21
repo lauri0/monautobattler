@@ -1,0 +1,15 @@
+{
+  "id": 424,
+  "name": "fire-fang",
+  "type": "fire",
+  "power": 65,
+  "accuracy": 95,
+  "pp": 15,
+  "damageClass": "physical",
+  "priority": 0,
+  "effect": {
+    "ailment": "burn",
+    "ailmentChance": 10,
+    "flinchChance": 10
+  }
+}

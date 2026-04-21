@@ -1,0 +1,60 @@
+{
+  "id": 71,
+  "name": "victreebel",
+  "types": [
+    "grass",
+    "poison"
+  ],
+  "baseStats": {
+    "hp": 80,
+    "attack": 105,
+    "defense": 65,
+    "specialAttack": 100,
+    "specialDefense": 70,
+    "speed": 70
+  },
+  "spriteUrl": "/sprites/71.png",
+  "moves": [
+    "hyper-beam",
+    "giga-impact",
+    "leaf-storm",
+    "solar-beam",
+    "power-whip",
+    "sludge-wave",
+    "sludge-bomb",
+    "leaf-blade",
+    "energy-ball",
+    "body-slam",
+    "leech-life",
+    "poison-jab",
+    "seed-bomb",
+    "lunge",
+    "tera-blast",
+    "giga-drain",
+    "facade",
+    "sucker-punch",
+    "knock-off",
+    "venoshock",
+    "swift",
+    "thief",
+    "magical-leaf",
+    "bug-bite",
+    "razor-leaf",
+    "grassy-glide",
+    "weather-ball",
+    "clear-smog",
+    "pounce",
+    "trailblaze",
+    "vine-whip",
+    "acid-spray",
+    "bullet-seed",
+    "swords-dance",
+    "sleep-powder",
+    "reflect",
+    "protect"
+  ],
+  "abilities": [
+    "chlorophyll",
+    "gluttony"
+  ]
+}

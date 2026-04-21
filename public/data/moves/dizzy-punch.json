@@ -1,0 +1,14 @@
+{
+  "id": 146,
+  "name": "dizzy-punch",
+  "type": "normal",
+  "power": 70,
+  "accuracy": 100,
+  "pp": 10,
+  "damageClass": "physical",
+  "priority": 0,
+  "effect": {
+    "confuses": true,
+    "confusionChance": 20
+  }
+}

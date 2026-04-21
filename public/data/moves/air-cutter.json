@@ -1,0 +1,13 @@
+{
+  "id": 314,
+  "name": "air-cutter",
+  "type": "flying",
+  "power": 60,
+  "accuracy": 95,
+  "pp": 25,
+  "damageClass": "special",
+  "priority": 0,
+  "effect": {
+    "critRate": 1
+  }
+}

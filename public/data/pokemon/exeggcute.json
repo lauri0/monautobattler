@@ -1,0 +1,52 @@
+{
+  "id": 102,
+  "name": "exeggcute",
+  "types": [
+    "grass",
+    "psychic"
+  ],
+  "baseStats": {
+    "hp": 60,
+    "attack": 40,
+    "defense": 80,
+    "specialAttack": 60,
+    "specialDefense": 45,
+    "speed": 40
+  },
+  "spriteUrl": "/sprites/102.png",
+  "moves": [
+    "leaf-storm",
+    "solar-beam",
+    "psychic",
+    "sludge-bomb",
+    "uproar",
+    "energy-ball",
+    "extrasensory",
+    "seed-bomb",
+    "zen-headbutt",
+    "psyshock",
+    "tera-blast",
+    "giga-drain",
+    "psychic-noise",
+    "facade",
+    "psybeam",
+    "thief",
+    "ancient-power",
+    "grassy-glide",
+    "confusion",
+    "giga-drain",
+    "bullet-seed",
+    "absorb",
+    "stored-power",
+    "swords-dance",
+    "poison-powder",
+    "sleep-powder",
+    "light-screen",
+    "reflect",
+    "protect"
+  ],
+  "abilities": [
+    "chlorophyll",
+    "harvest"
+  ]
+}

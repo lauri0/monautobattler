@@ -1,0 +1,10 @@
+{
+  "id": 371,
+  "name": "payback",
+  "type": "dark",
+  "power": 50,
+  "accuracy": 100,
+  "pp": 10,
+  "damageClass": "physical",
+  "priority": 0
+}

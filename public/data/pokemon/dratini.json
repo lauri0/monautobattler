@@ -1,0 +1,63 @@
+{
+  "id": 147,
+  "name": "dratini",
+  "types": [
+    "dragon"
+  ],
+  "baseStats": {
+    "hp": 41,
+    "attack": 64,
+    "defense": 45,
+    "specialAttack": 50,
+    "specialDefense": 50,
+    "speed": 50
+  },
+  "spriteUrl": "/sprites/147.png",
+  "moves": [
+    "hyper-beam",
+    "giga-impact",
+    "draco-meteor",
+    "outrage",
+    "hydro-pump",
+    "blizzard",
+    "thunder",
+    "fire-blast",
+    "dragon-rush",
+    "take-down",
+    "flamethrower",
+    "surf",
+    "ice-beam",
+    "thunderbolt",
+    "aqua-tail",
+    "body-slam",
+    "dragon-pulse",
+    "slam",
+    "waterfall",
+    "extreme-speed",
+    "iron-head",
+    "tera-blast",
+    "facade",
+    "swift",
+    "dragon-breath",
+    "water-pulse",
+    "dragon-tail",
+    "breaking-swipe",
+    "icy-wind",
+    "chilling-water",
+    "twister",
+    "aqua-jet",
+    "fire-spin",
+    "scale-shot",
+    "wrap",
+    "leer",
+    "thunder-wave",
+    "agility",
+    "light-screen",
+    "protect",
+    "dragon-dance"
+  ],
+  "abilities": [
+    "shed-skin",
+    "marvel-scale"
+  ]
+}

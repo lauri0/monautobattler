@@ -1,0 +1,60 @@
+{
+  "id": 58,
+  "name": "growlithe",
+  "types": [
+    "fire"
+  ],
+  "baseStats": {
+    "hp": 55,
+    "attack": 70,
+    "defense": 45,
+    "specialAttack": 70,
+    "specialDefense": 50,
+    "speed": 60
+  },
+  "spriteUrl": "/sprites/58.png",
+  "moves": [
+    "overheat",
+    "thrash",
+    "double-edge",
+    "outrage",
+    "close-combat",
+    "flare-blitz",
+    "raging-fury",
+    "fire-blast",
+    "heat-wave",
+    "take-down",
+    "flamethrower",
+    "wild-charge",
+    "play-rough",
+    "body-slam",
+    "psychic-fangs",
+    "dig",
+    "crunch",
+    "tera-blast",
+    "temper-flare",
+    "facade",
+    "retaliate",
+    "thunder-fang",
+    "fire-fang",
+    "bite",
+    "swift",
+    "thief",
+    "flame-wheel",
+    "covet",
+    "snarl",
+    "flame-charge",
+    "ember",
+    "fire-spin",
+    "double-kick",
+    "leer",
+    "agility",
+    "protect",
+    "will-o-wisp"
+  ],
+  "abilities": [
+    "intimidate",
+    "flash-fire",
+    "justified"
+  ]
+}

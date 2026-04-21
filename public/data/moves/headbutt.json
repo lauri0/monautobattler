@@ -1,0 +1,13 @@
+{
+  "id": 29,
+  "name": "headbutt",
+  "type": "normal",
+  "power": 70,
+  "accuracy": 100,
+  "pp": 15,
+  "damageClass": "physical",
+  "priority": 0,
+  "effect": {
+    "flinchChance": 30
+  }
+}

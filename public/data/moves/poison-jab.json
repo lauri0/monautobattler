@@ -1,0 +1,14 @@
+{
+  "id": 398,
+  "name": "poison-jab",
+  "type": "poison",
+  "power": 80,
+  "accuracy": 100,
+  "pp": 20,
+  "damageClass": "physical",
+  "priority": 0,
+  "effect": {
+    "ailment": "poison",
+    "ailmentChance": 30
+  }
+}

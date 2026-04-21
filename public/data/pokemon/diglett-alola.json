@@ -1,0 +1,61 @@
+{
+  "id": 10105,
+  "name": "diglett-alola",
+  "types": [
+    "ground",
+    "steel"
+  ],
+  "baseStats": {
+    "hp": 10,
+    "attack": 55,
+    "defense": 30,
+    "specialAttack": 35,
+    "specialDefense": 45,
+    "speed": 90
+  },
+  "spriteUrl": "/sprites/10105.png",
+  "moves": [
+    "steel-beam",
+    "thrash",
+    "earthquake",
+    "stone-edge",
+    "foul-play",
+    "take-down",
+    "sludge-bomb",
+    "earth-power",
+    "body-slam",
+    "dig",
+    "flash-cannon",
+    "iron-head",
+    "tera-blast",
+    "rock-slide",
+    "stomping-tantrum",
+    "headbutt",
+    "facade",
+    "sucker-punch",
+    "shadow-claw",
+    "scorching-sands",
+    "thief",
+    "ancient-power",
+    "rock-tomb",
+    "bulldoze",
+    "mud-shot",
+    "metal-claw",
+    "smack-down",
+    "sand-tomb",
+    "astonish",
+    "rock-blast",
+    "mud-slap",
+    "swords-dance",
+    "growl",
+    "agility",
+    "protect",
+    "iron-defense",
+    "stealth-rock"
+  ],
+  "abilities": [
+    "sand-veil",
+    "tangling-hair",
+    "sand-force"
+  ]
+}

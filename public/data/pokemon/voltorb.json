@@ -1,0 +1,48 @@
+{
+  "id": 100,
+  "name": "voltorb",
+  "types": [
+    "electric"
+  ],
+  "baseStats": {
+    "hp": 40,
+    "attack": 30,
+    "defense": 50,
+    "specialAttack": 55,
+    "specialDefense": 55,
+    "speed": 100
+  },
+  "spriteUrl": "/sprites/100.png",
+  "moves": [
+    "explosion",
+    "self-destruct",
+    "double-edge",
+    "thunder",
+    "foul-play",
+    "take-down",
+    "thunderbolt",
+    "wild-charge",
+    "discharge",
+    "tera-blast",
+    "facade",
+    "volt-switch",
+    "spark",
+    "swift",
+    "thief",
+    "electroweb",
+    "charge-beam",
+    "tackle",
+    "thunder-shock",
+    "rollout",
+    "thunder-wave",
+    "agility",
+    "light-screen",
+    "protect",
+    "taunt"
+  ],
+  "abilities": [
+    "soundproof",
+    "static",
+    "aftermath"
+  ]
+}

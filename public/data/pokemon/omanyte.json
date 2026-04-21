@@ -1,0 +1,49 @@
+{
+  "id": 138,
+  "name": "omanyte",
+  "types": [
+    "rock",
+    "water"
+  ],
+  "baseStats": {
+    "hp": 35,
+    "attack": 40,
+    "defense": 100,
+    "specialAttack": 90,
+    "specialDefense": 55,
+    "speed": 35
+  },
+  "spriteUrl": "/sprites/138.png",
+  "moves": [
+    "hydro-pump",
+    "blizzard",
+    "surf",
+    "ice-beam",
+    "muddy-water",
+    "slam",
+    "waterfall",
+    "scald",
+    "rock-slide",
+    "facade",
+    "bubble-beam",
+    "aurora-beam",
+    "knock-off",
+    "brine",
+    "bite",
+    "thief",
+    "ancient-power",
+    "rock-tomb",
+    "water-pulse",
+    "mud-shot",
+    "water-gun",
+    "rock-smash",
+    "whirlpool",
+    "rollout",
+    "rock-blast",
+    "bind",
+    "leer",
+    "protect",
+    "stealth-rock",
+    "shell-smash"
+  ]
+}

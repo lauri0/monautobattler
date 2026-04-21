@@ -1,0 +1,13 @@
+{
+  "id": 528,
+  "name": "wild-charge",
+  "type": "electric",
+  "power": 90,
+  "accuracy": 100,
+  "pp": 15,
+  "damageClass": "physical",
+  "priority": 0,
+  "effect": {
+    "drain": -25
+  }
+}

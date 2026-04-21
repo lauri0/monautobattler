@@ -1,0 +1,59 @@
+{
+  "id": 7,
+  "name": "squirtle",
+  "types": [
+    "water"
+  ],
+  "baseStats": {
+    "hp": 44,
+    "attack": 48,
+    "defense": 65,
+    "specialAttack": 50,
+    "specialDefense": 64,
+    "speed": 43
+  },
+  "spriteUrl": "/sprites/7.png",
+  "moves": [
+    "focus-punch",
+    "water-spout",
+    "double-edge",
+    "wave-crash",
+    "hydro-pump",
+    "blizzard",
+    "take-down",
+    "surf",
+    "ice-beam",
+    "muddy-water",
+    "aqua-tail",
+    "body-slam",
+    "liquidation",
+    "dig",
+    "zen-headbutt",
+    "water-pledge",
+    "tera-blast",
+    "ice-spinner",
+    "ice-punch",
+    "brick-break",
+    "facade",
+    "bite",
+    "water-pulse",
+    "flip-turn",
+    "icy-wind",
+    "mud-shot",
+    "rapid-spin",
+    "weather-ball",
+    "chilling-water",
+    "tackle",
+    "water-gun",
+    "fake-out",
+    "aqua-jet",
+    "whirlpool",
+    "protect",
+    "iron-defense",
+    "shell-smash"
+  ],
+  "abilities": [
+    "torrent",
+    "rain-dish"
+  ]
+}

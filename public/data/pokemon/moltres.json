@@ -1,0 +1,62 @@
+{
+  "id": 146,
+  "name": "moltres",
+  "types": [
+    "fire",
+    "flying"
+  ],
+  "baseStats": {
+    "hp": 90,
+    "attack": 100,
+    "defense": 90,
+    "specialAttack": 125,
+    "specialDefense": 85,
+    "speed": 90
+  },
+  "spriteUrl": "/sprites/146.png",
+  "moves": [
+    "hyper-beam",
+    "giga-impact",
+    "sky-attack",
+    "overheat",
+    "double-edge",
+    "solar-beam",
+    "flare-blitz",
+    "brave-bird",
+    "fire-blast",
+    "hurricane",
+    "heat-wave",
+    "fly",
+    "take-down",
+    "flamethrower",
+    "tera-blast",
+    "air-slash",
+    "temper-flare",
+    "facade",
+    "u-turn",
+    "burning-jealousy",
+    "scorching-sands",
+    "wing-attack",
+    "swift",
+    "ancient-power",
+    "air-cutter",
+    "aerial-ace",
+    "incinerate",
+    "acrobatics",
+    "weather-ball",
+    "flame-charge",
+    "gust",
+    "ember",
+    "dual-wingbeat",
+    "fire-spin",
+    "leer",
+    "agility",
+    "protect",
+    "will-o-wisp",
+    "tailwind"
+  ],
+  "abilities": [
+    "pressure",
+    "flame-body"
+  ]
+}

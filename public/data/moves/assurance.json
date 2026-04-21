@@ -1,0 +1,10 @@
+{
+  "id": 372,
+  "name": "assurance",
+  "type": "dark",
+  "power": 60,
+  "accuracy": 100,
+  "pp": 10,
+  "damageClass": "physical",
+  "priority": 0
+}

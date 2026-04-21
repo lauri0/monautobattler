@@ -1,0 +1,14 @@
+{
+  "id": 503,
+  "name": "scald",
+  "type": "water",
+  "power": 80,
+  "accuracy": 100,
+  "pp": 15,
+  "damageClass": "special",
+  "priority": 0,
+  "effect": {
+    "ailment": "burn",
+    "ailmentChance": 30
+  }
+}

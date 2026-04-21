@@ -1,0 +1,20 @@
+{
+  "id": 232,
+  "name": "metal-claw",
+  "type": "steel",
+  "power": 50,
+  "accuracy": 95,
+  "pp": 35,
+  "damageClass": "physical",
+  "priority": 0,
+  "effect": {
+    "statChanges": [
+      {
+        "stat": "attack",
+        "change": 1,
+        "target": "user"
+      }
+    ],
+    "statChance": 10
+  }
+}

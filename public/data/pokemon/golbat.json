@@ -1,0 +1,43 @@
+{
+  "id": 42,
+  "name": "golbat",
+  "types": [
+    "poison",
+    "flying"
+  ],
+  "baseStats": {
+    "hp": 75,
+    "attack": 80,
+    "defense": 70,
+    "specialAttack": 65,
+    "specialDefense": 75,
+    "speed": 90
+  },
+  "spriteUrl": "/sprites/42.png",
+  "moves": [
+    "hyper-beam",
+    "giga-impact",
+    "fly",
+    "sludge-bomb",
+    "leech-life",
+    "shadow-ball",
+    "giga-drain",
+    "air-slash",
+    "steel-wing",
+    "facade",
+    "u-turn",
+    "venoshock",
+    "bite",
+    "thief",
+    "air-cutter",
+    "aerial-ace",
+    "pluck",
+    "poison-fang",
+    "payback",
+    "astonish",
+    "absorb",
+    "protect",
+    "taunt",
+    "nasty-plot"
+  ]
+}

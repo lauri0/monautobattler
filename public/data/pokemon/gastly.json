@@ -1,0 +1,59 @@
+{
+  "id": 92,
+  "name": "gastly",
+  "types": [
+    "ghost",
+    "poison"
+  ],
+  "baseStats": {
+    "hp": 30,
+    "attack": 35,
+    "defense": 30,
+    "specialAttack": 100,
+    "specialDefense": 35,
+    "speed": 80
+  },
+  "spriteUrl": "/sprites/92.png",
+  "moves": [
+    "gunk-shot",
+    "thunder",
+    "poltergeist",
+    "dream-eater",
+    "sludge-wave",
+    "foul-play",
+    "thunderbolt",
+    "psychic",
+    "sludge-bomb",
+    "energy-ball",
+    "shadow-ball",
+    "poison-jab",
+    "dark-pulse",
+    "dazzling-gleam",
+    "tera-blast",
+    "fire-punch",
+    "ice-punch",
+    "thunder-punch",
+    "giga-drain",
+    "facade",
+    "sucker-punch",
+    "skitter-smack",
+    "venoshock",
+    "hex",
+    "thief",
+    "icy-wind",
+    "payback",
+    "clear-smog",
+    "acid-spray",
+    "lick",
+    "smog",
+    "astonish",
+    "protect",
+    "will-o-wisp",
+    "taunt",
+    "nasty-plot",
+    "trick-room"
+  ],
+  "abilities": [
+    "levitate"
+  ]
+}

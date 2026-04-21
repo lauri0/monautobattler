@@ -1,0 +1,61 @@
+{
+  "id": 72,
+  "name": "tentacool",
+  "types": [
+    "water",
+    "poison"
+  ],
+  "baseStats": {
+    "hp": 40,
+    "attack": 40,
+    "defense": 35,
+    "specialAttack": 50,
+    "specialDefense": 100,
+    "speed": 70
+  },
+  "spriteUrl": "/sprites/72.png",
+  "moves": [
+    "gunk-shot",
+    "hydro-pump",
+    "blizzard",
+    "sludge-wave",
+    "surf",
+    "ice-beam",
+    "sludge-bomb",
+    "muddy-water",
+    "liquidation",
+    "poison-jab",
+    "dazzling-gleam",
+    "throat-chop",
+    "tera-blast",
+    "giga-drain",
+    "facade",
+    "bubble-beam",
+    "aurora-beam",
+    "knock-off",
+    "venoshock",
+    "hex",
+    "swift",
+    "thief",
+    "water-pulse",
+    "flip-turn",
+    "icy-wind",
+    "mud-shot",
+    "rapid-spin",
+    "pounce",
+    "chilling-water",
+    "acid",
+    "water-gun",
+    "acid-spray",
+    "whirlpool",
+    "wrap",
+    "poison-sting",
+    "swords-dance",
+    "protect"
+  ],
+  "abilities": [
+    "clear-body",
+    "liquid-ooze",
+    "rain-dish"
+  ]
+}

@@ -1,0 +1,20 @@
+{
+  "id": 51,
+  "name": "acid",
+  "type": "poison",
+  "power": 40,
+  "accuracy": 100,
+  "pp": 30,
+  "damageClass": "special",
+  "priority": 0,
+  "effect": {
+    "statChanges": [
+      {
+        "stat": "special-defense",
+        "change": -1,
+        "target": "foe"
+      }
+    ],
+    "statChance": 10
+  }
+}

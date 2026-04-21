@@ -1,0 +1,20 @@
+{
+  "id": 97,
+  "name": "agility",
+  "type": "psychic",
+  "power": 0,
+  "accuracy": null,
+  "pp": 30,
+  "damageClass": "status",
+  "priority": 0,
+  "effect": {
+    "statChanges": [
+      {
+        "stat": "speed",
+        "change": 2,
+        "target": "user"
+      }
+    ],
+    "statChance": 0
+  }
+}

@@ -1,0 +1,10 @@
+{
+  "id": 4,
+  "name": "comet-punch",
+  "type": "normal",
+  "power": 18,
+  "accuracy": 85,
+  "pp": 15,
+  "damageClass": "physical",
+  "priority": 0
+}

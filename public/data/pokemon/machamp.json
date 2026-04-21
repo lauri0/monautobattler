@@ -1,0 +1,50 @@
+{
+  "id": 68,
+  "name": "machamp",
+  "types": [
+    "fighting"
+  ],
+  "baseStats": {
+    "hp": 90,
+    "attack": 130,
+    "defense": 80,
+    "specialAttack": 65,
+    "specialDefense": 85,
+    "speed": 55
+  },
+  "spriteUrl": "/sprites/68.png",
+  "moves": [
+    "hyper-beam",
+    "focus-punch",
+    "giga-impact",
+    "double-edge",
+    "focus-blast",
+    "fire-blast",
+    "earthquake",
+    "dynamic-punch",
+    "cross-chop",
+    "stone-edge",
+    "flamethrower",
+    "rock-climb",
+    "strength",
+    "dig",
+    "poison-jab",
+    "rock-slide",
+    "brick-break",
+    "vital-throw",
+    "facade",
+    "knock-off",
+    "low-sweep",
+    "thief",
+    "revenge",
+    "rock-tomb",
+    "bulldoze",
+    "payback",
+    "rock-smash",
+    "dual-chop",
+    "leer",
+    "light-screen",
+    "protect",
+    "bulk-up"
+  ]
+}

@@ -1,0 +1,13 @@
+{
+  "id": 326,
+  "name": "extrasensory",
+  "type": "psychic",
+  "power": 80,
+  "accuracy": 100,
+  "pp": 20,
+  "damageClass": "special",
+  "priority": 0,
+  "effect": {
+    "flinchChance": 10
+  }
+}

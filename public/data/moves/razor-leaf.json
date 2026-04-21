@@ -1,0 +1,13 @@
+{
+  "id": 75,
+  "name": "razor-leaf",
+  "type": "grass",
+  "power": 55,
+  "accuracy": 95,
+  "pp": 25,
+  "damageClass": "physical",
+  "priority": 0,
+  "effect": {
+    "critRate": 1
+  }
+}

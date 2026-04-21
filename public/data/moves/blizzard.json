@@ -1,0 +1,14 @@
+{
+  "id": 59,
+  "name": "blizzard",
+  "type": "ice",
+  "power": 110,
+  "accuracy": 70,
+  "pp": 5,
+  "damageClass": "special",
+  "priority": 0,
+  "effect": {
+    "ailment": "freeze",
+    "ailmentChance": 10
+  }
+}

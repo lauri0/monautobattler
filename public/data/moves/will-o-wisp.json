@@ -1,0 +1,14 @@
+{
+  "id": 261,
+  "name": "will-o-wisp",
+  "type": "fire",
+  "power": 0,
+  "accuracy": 85,
+  "pp": 15,
+  "damageClass": "status",
+  "priority": 0,
+  "effect": {
+    "ailment": "burn",
+    "ailmentChance": 0
+  }
+}

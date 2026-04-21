@@ -1,0 +1,53 @@
+{
+  "id": 84,
+  "name": "doduo",
+  "types": [
+    "normal",
+    "flying"
+  ],
+  "baseStats": {
+    "hp": 35,
+    "attack": 85,
+    "defense": 45,
+    "specialAttack": 35,
+    "specialDefense": 35,
+    "speed": 75
+  },
+  "spriteUrl": "/sprites/84.png",
+  "moves": [
+    "sky-attack",
+    "thrash",
+    "double-edge",
+    "brave-bird",
+    "take-down",
+    "uproar",
+    "body-slam",
+    "drill-peck",
+    "throat-chop",
+    "lunge",
+    "tera-blast",
+    "facade",
+    "knock-off",
+    "swift",
+    "thief",
+    "aerial-ace",
+    "pluck",
+    "assurance",
+    "acrobatics",
+    "quick-attack",
+    "peck",
+    "double-hit",
+    "mud-slap",
+    "fury-attack",
+    "swords-dance",
+    "growl",
+    "agility",
+    "protect",
+    "tailwind"
+  ],
+  "abilities": [
+    "run-away",
+    "early-bird",
+    "tangled-feet"
+  ]
+}

@@ -1,0 +1,14 @@
+{
+  "id": 517,
+  "name": "inferno",
+  "type": "fire",
+  "power": 100,
+  "accuracy": 50,
+  "pp": 5,
+  "damageClass": "special",
+  "priority": 0,
+  "effect": {
+    "ailment": "burn",
+    "ailmentChance": 100
+  }
+}

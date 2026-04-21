@@ -1,0 +1,40 @@
+{
+  "id": 504,
+  "name": "shell-smash",
+  "type": "normal",
+  "power": 0,
+  "accuracy": null,
+  "pp": 15,
+  "damageClass": "status",
+  "priority": 0,
+  "effect": {
+    "statChanges": [
+      {
+        "stat": "attack",
+        "change": 2,
+        "target": "user"
+      },
+      {
+        "stat": "special-attack",
+        "change": 2,
+        "target": "user"
+      },
+      {
+        "stat": "speed",
+        "change": 2,
+        "target": "user"
+      },
+      {
+        "stat": "defense",
+        "change": -1,
+        "target": "user"
+      },
+      {
+        "stat": "special-defense",
+        "change": -1,
+        "target": "user"
+      }
+    ],
+    "statChance": 0
+  }
+}

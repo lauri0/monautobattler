@@ -1,0 +1,13 @@
+{
+  "id": 366,
+  "name": "tailwind",
+  "type": "flying",
+  "power": 0,
+  "accuracy": null,
+  "pp": 15,
+  "damageClass": "status",
+  "priority": 0,
+  "effect": {
+    "fieldEffect": "tailwind"
+  }
+}

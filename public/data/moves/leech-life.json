@@ -1,0 +1,13 @@
+{
+  "id": 141,
+  "name": "leech-life",
+  "type": "bug",
+  "power": 80,
+  "accuracy": 100,
+  "pp": 10,
+  "damageClass": "physical",
+  "priority": 0,
+  "effect": {
+    "drain": 50
+  }
+}

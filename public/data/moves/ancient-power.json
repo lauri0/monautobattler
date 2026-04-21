@@ -1,0 +1,40 @@
+{
+  "id": 246,
+  "name": "ancient-power",
+  "type": "rock",
+  "power": 60,
+  "accuracy": 100,
+  "pp": 5,
+  "damageClass": "special",
+  "priority": 0,
+  "effect": {
+    "statChanges": [
+      {
+        "stat": "attack",
+        "change": 1,
+        "target": "user"
+      },
+      {
+        "stat": "defense",
+        "change": 1,
+        "target": "user"
+      },
+      {
+        "stat": "special-attack",
+        "change": 1,
+        "target": "user"
+      },
+      {
+        "stat": "special-defense",
+        "change": 1,
+        "target": "user"
+      },
+      {
+        "stat": "speed",
+        "change": 1,
+        "target": "user"
+      }
+    ],
+    "statChance": 10
+  }
+}

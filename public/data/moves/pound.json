@@ -1,0 +1,10 @@
+{
+  "id": 1,
+  "name": "pound",
+  "type": "normal",
+  "power": 40,
+  "accuracy": 100,
+  "pp": 35,
+  "damageClass": "physical",
+  "priority": 0
+}

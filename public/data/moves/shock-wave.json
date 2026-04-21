@@ -1,0 +1,10 @@
+{
+  "id": 351,
+  "name": "shock-wave",
+  "type": "electric",
+  "power": 60,
+  "accuracy": null,
+  "pp": 20,
+  "damageClass": "special",
+  "priority": 0
+}

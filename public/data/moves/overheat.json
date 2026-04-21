@@ -1,0 +1,20 @@
+{
+  "id": 315,
+  "name": "overheat",
+  "type": "fire",
+  "power": 130,
+  "accuracy": 90,
+  "pp": 5,
+  "damageClass": "special",
+  "priority": 0,
+  "effect": {
+    "statChanges": [
+      {
+        "stat": "special-attack",
+        "change": -2,
+        "target": "user"
+      }
+    ],
+    "statChance": 100
+  }
+}

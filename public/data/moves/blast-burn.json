@@ -1,0 +1,10 @@
+{
+  "id": 307,
+  "name": "blast-burn",
+  "type": "fire",
+  "power": 150,
+  "accuracy": 90,
+  "pp": 5,
+  "damageClass": "special",
+  "priority": 0
+}

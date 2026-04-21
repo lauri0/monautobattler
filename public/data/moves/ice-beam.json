@@ -1,0 +1,14 @@
+{
+  "id": 58,
+  "name": "ice-beam",
+  "type": "ice",
+  "power": 90,
+  "accuracy": 100,
+  "pp": 10,
+  "damageClass": "special",
+  "priority": 0,
+  "effect": {
+    "ailment": "freeze",
+    "ailmentChance": 10
+  }
+}

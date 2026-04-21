@@ -1,0 +1,20 @@
+{
+  "id": 317,
+  "name": "rock-tomb",
+  "type": "rock",
+  "power": 60,
+  "accuracy": 95,
+  "pp": 15,
+  "damageClass": "physical",
+  "priority": 0,
+  "effect": {
+    "statChanges": [
+      {
+        "stat": "speed",
+        "change": -1,
+        "target": "foe"
+      }
+    ],
+    "statChance": 100
+  }
+}

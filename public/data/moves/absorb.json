@@ -1,0 +1,13 @@
+{
+  "id": 71,
+  "name": "absorb",
+  "type": "grass",
+  "power": 20,
+  "accuracy": 100,
+  "pp": 25,
+  "damageClass": "special",
+  "priority": 0,
+  "effect": {
+    "drain": 50
+  }
+}

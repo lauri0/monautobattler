@@ -1,0 +1,14 @@
+{
+  "id": 431,
+  "name": "rock-climb",
+  "type": "normal",
+  "power": 90,
+  "accuracy": 85,
+  "pp": 20,
+  "damageClass": "physical",
+  "priority": 0,
+  "effect": {
+    "confuses": true,
+    "confusionChance": 20
+  }
+}

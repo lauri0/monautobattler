@@ -1,0 +1,14 @@
+{
+  "id": 225,
+  "name": "dragon-breath",
+  "type": "dragon",
+  "power": 60,
+  "accuracy": 100,
+  "pp": 20,
+  "damageClass": "special",
+  "priority": 0,
+  "effect": {
+    "ailment": "paralysis",
+    "ailmentChance": 30
+  }
+}

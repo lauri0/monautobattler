@@ -1,0 +1,14 @@
+{
+  "id": 352,
+  "name": "water-pulse",
+  "type": "water",
+  "power": 60,
+  "accuracy": 100,
+  "pp": 20,
+  "damageClass": "special",
+  "priority": 0,
+  "effect": {
+    "confuses": true,
+    "confusionChance": 20
+  }
+}

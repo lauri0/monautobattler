@@ -1,0 +1,13 @@
+{
+  "id": 173,
+  "name": "snore",
+  "type": "normal",
+  "power": 50,
+  "accuracy": 100,
+  "pp": 15,
+  "damageClass": "special",
+  "priority": 0,
+  "effect": {
+    "flinchChance": 30
+  }
+}

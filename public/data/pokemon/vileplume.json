@@ -1,0 +1,56 @@
+{
+  "id": 45,
+  "name": "vileplume",
+  "types": [
+    "grass",
+    "poison"
+  ],
+  "baseStats": {
+    "hp": 75,
+    "attack": 80,
+    "defense": 85,
+    "specialAttack": 110,
+    "specialDefense": 90,
+    "speed": 50
+  },
+  "spriteUrl": "/sprites/45.png",
+  "moves": [
+    "hyper-beam",
+    "giga-impact",
+    "leaf-storm",
+    "solar-blade",
+    "solar-beam",
+    "petal-dance",
+    "sludge-wave",
+    "moonblast",
+    "sludge-bomb",
+    "energy-ball",
+    "petal-blizzard",
+    "pollen-puff",
+    "body-slam",
+    "seed-bomb",
+    "dazzling-gleam",
+    "tera-blast",
+    "giga-drain",
+    "facade",
+    "venoshock",
+    "magical-leaf",
+    "razor-leaf",
+    "grassy-glide",
+    "weather-ball",
+    "trailblaze",
+    "acid",
+    "giga-drain",
+    "acid-spray",
+    "bullet-seed",
+    "absorb",
+    "swords-dance",
+    "poison-powder",
+    "sleep-powder",
+    "protect"
+  ],
+  "abilities": [
+    "chlorophyll",
+    "effect-spore"
+  ]
+}

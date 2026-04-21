@@ -1,0 +1,14 @@
+{
+  "id": 252,
+  "name": "fake-out",
+  "type": "normal",
+  "power": 40,
+  "accuracy": 100,
+  "pp": 10,
+  "damageClass": "physical",
+  "priority": 3,
+  "effect": {
+    "flinchChance": 100,
+    "firstTurnOnly": true
+  }
+}

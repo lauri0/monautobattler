@@ -1,0 +1,10 @@
+{
+  "id": 364,
+  "name": "feint",
+  "type": "normal",
+  "power": 30,
+  "accuracy": 100,
+  "pp": 10,
+  "damageClass": "physical",
+  "priority": 2
+}

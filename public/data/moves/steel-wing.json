@@ -1,0 +1,20 @@
+{
+  "id": 211,
+  "name": "steel-wing",
+  "type": "steel",
+  "power": 70,
+  "accuracy": 90,
+  "pp": 25,
+  "damageClass": "physical",
+  "priority": 0,
+  "effect": {
+    "statChanges": [
+      {
+        "stat": "defense",
+        "change": 1,
+        "target": "user"
+      }
+    ],
+    "statChance": 10
+  }
+}

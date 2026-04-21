@@ -1,0 +1,56 @@
+{
+  "id": 145,
+  "name": "zapdos",
+  "types": [
+    "electric",
+    "flying"
+  ],
+  "baseStats": {
+    "hp": 90,
+    "attack": 90,
+    "defense": 85,
+    "specialAttack": 125,
+    "specialDefense": 90,
+    "speed": 100
+  },
+  "spriteUrl": "/sprites/145.png",
+  "moves": [
+    "hyper-beam",
+    "giga-impact",
+    "zap-cannon",
+    "brave-bird",
+    "thunder",
+    "hurricane",
+    "supercell-slam",
+    "heat-wave",
+    "fly",
+    "take-down",
+    "thunderbolt",
+    "wild-charge",
+    "drill-peck",
+    "discharge",
+    "tera-blast",
+    "facade",
+    "u-turn",
+    "volt-switch",
+    "swift",
+    "ancient-power",
+    "air-cutter",
+    "aerial-ace",
+    "pluck",
+    "acrobatics",
+    "weather-ball",
+    "thunder-shock",
+    "dual-wingbeat",
+    "peck",
+    "thunder-wave",
+    "agility",
+    "light-screen",
+    "protect",
+    "tailwind"
+  ],
+  "abilities": [
+    "pressure",
+    "static"
+  ]
+}

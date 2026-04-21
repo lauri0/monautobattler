@@ -1,0 +1,13 @@
+{
+  "id": 269,
+  "name": "taunt",
+  "type": "dark",
+  "power": 0,
+  "accuracy": 100,
+  "pp": 20,
+  "damageClass": "status",
+  "priority": 0,
+  "effect": {
+    "taunt": true
+  }
+}

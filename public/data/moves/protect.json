@@ -1,0 +1,13 @@
+{
+  "id": 182,
+  "name": "protect",
+  "type": "normal",
+  "power": 0,
+  "accuracy": null,
+  "pp": 10,
+  "damageClass": "status",
+  "priority": 4,
+  "effect": {
+    "protect": true
+  }
+}

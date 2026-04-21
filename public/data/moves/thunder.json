@@ -1,0 +1,14 @@
+{
+  "id": 87,
+  "name": "thunder",
+  "type": "electric",
+  "power": 110,
+  "accuracy": 70,
+  "pp": 10,
+  "damageClass": "special",
+  "priority": 0,
+  "effect": {
+    "ailment": "paralysis",
+    "ailmentChance": 30
+  }
+}

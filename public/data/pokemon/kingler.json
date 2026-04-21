@@ -1,0 +1,49 @@
+{
+  "id": 99,
+  "name": "kingler",
+  "types": [
+    "water"
+  ],
+  "baseStats": {
+    "hp": 55,
+    "attack": 130,
+    "defense": 115,
+    "specialAttack": 50,
+    "specialDefense": 50,
+    "speed": 75
+  },
+  "spriteUrl": "/sprites/99.png",
+  "moves": [
+    "hyper-beam",
+    "giga-impact",
+    "blizzard",
+    "crabhammer",
+    "hammer-arm",
+    "surf",
+    "ice-beam",
+    "slam",
+    "strength",
+    "dig",
+    "x-scissor",
+    "scald",
+    "rock-slide",
+    "brick-break",
+    "razor-shell",
+    "facade",
+    "stomp",
+    "bubble-beam",
+    "brine",
+    "thief",
+    "rock-tomb",
+    "water-pulse",
+    "mud-shot",
+    "cut",
+    "metal-claw",
+    "water-gun",
+    "false-swipe",
+    "rock-smash",
+    "swords-dance",
+    "leer",
+    "protect"
+  ]
+}

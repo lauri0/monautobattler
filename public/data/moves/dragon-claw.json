@@ -1,0 +1,10 @@
+{
+  "id": 337,
+  "name": "dragon-claw",
+  "type": "dragon",
+  "power": 80,
+  "accuracy": 100,
+  "pp": 15,
+  "damageClass": "physical",
+  "priority": 0
+}

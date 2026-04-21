@@ -1,0 +1,14 @@
+{
+  "id": 143,
+  "name": "sky-attack",
+  "type": "flying",
+  "power": 140,
+  "accuracy": 90,
+  "pp": 5,
+  "damageClass": "physical",
+  "priority": 0,
+  "effect": {
+    "flinchChance": 30,
+    "critRate": 1
+  }
+}

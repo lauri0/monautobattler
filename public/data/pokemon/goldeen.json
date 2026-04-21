@@ -1,0 +1,39 @@
+{
+  "id": 118,
+  "name": "goldeen",
+  "types": [
+    "water"
+  ],
+  "baseStats": {
+    "hp": 45,
+    "attack": 67,
+    "defense": 60,
+    "specialAttack": 35,
+    "specialDefense": 50,
+    "speed": 63
+  },
+  "spriteUrl": "/sprites/118.png",
+  "moves": [
+    "skull-bash",
+    "megahorn",
+    "hydro-pump",
+    "blizzard",
+    "surf",
+    "ice-beam",
+    "aqua-tail",
+    "body-slam",
+    "waterfall",
+    "poison-jab",
+    "scald",
+    "facade",
+    "horn-attack",
+    "psybeam",
+    "water-pulse",
+    "mud-shot",
+    "peck",
+    "mud-slap",
+    "swords-dance",
+    "agility",
+    "protect"
+  ]
+}

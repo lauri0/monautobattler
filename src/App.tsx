@@ -1,6 +1,6 @@
 import { useState, useEffect, useCallback } from 'react';
 import type { PokemonData } from './models/types';
-import { getAllPokemonData } from './persistence/db';
+import { loadAllPokemonData } from './data/loadLocalData';
 import MainMenu from './components/MainMenu';
 import PokedexPage from './components/PokedexPage';
 import PokemonDetail from './components/PokemonDetail';
@@ -23,8 +23,7 @@ export default function App() {
   const [dataLoaded, setDataLoaded] = useState(false);
 
   const loadData = useCallback(async () => {
-    const data = await getAllPokemonData();
-    data.sort((a, b) => a.id - b.id);
+    const data = await loadAllPokemonData();
     setAllPokemon(data);
     setDataLoaded(true);
   }, []);

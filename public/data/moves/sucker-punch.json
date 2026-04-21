@@ -1,0 +1,10 @@
+{
+  "id": 389,
+  "name": "sucker-punch",
+  "type": "dark",
+  "power": 70,
+  "accuracy": 100,
+  "pp": 5,
+  "damageClass": "physical",
+  "priority": 1
+}

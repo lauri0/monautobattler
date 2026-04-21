@@ -1,0 +1,55 @@
+{
+  "id": 137,
+  "name": "porygon",
+  "types": [
+    "normal"
+  ],
+  "baseStats": {
+    "hp": 65,
+    "attack": 60,
+    "defense": 70,
+    "specialAttack": 85,
+    "specialDefense": 75,
+    "speed": 40
+  },
+  "spriteUrl": "/sprites/137.png",
+  "moves": [
+    "hyper-beam",
+    "giga-impact",
+    "double-edge",
+    "solar-beam",
+    "zap-cannon",
+    "blizzard",
+    "thunder",
+    "foul-play",
+    "take-down",
+    "ice-beam",
+    "thunderbolt",
+    "psychic",
+    "tri-attack",
+    "shadow-ball",
+    "zen-headbutt",
+    "discharge",
+    "psyshock",
+    "tera-blast",
+    "facade",
+    "psybeam",
+    "swift",
+    "thief",
+    "icy-wind",
+    "electroweb",
+    "charge-beam",
+    "tackle",
+    "thunder-shock",
+    "thunder-wave",
+    "agility",
+    "recover",
+    "protect",
+    "trick-room"
+  ],
+  "abilities": [
+    "trace",
+    "download",
+    "analytic"
+  ]
+}

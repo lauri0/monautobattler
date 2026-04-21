@@ -1,0 +1,10 @@
+{
+  "id": 304,
+  "name": "hyper-voice",
+  "type": "normal",
+  "power": 90,
+  "accuracy": 100,
+  "pp": 10,
+  "damageClass": "special",
+  "priority": 0
+}

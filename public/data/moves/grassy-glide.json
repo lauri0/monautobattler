@@ -1,0 +1,10 @@
+{
+  "id": 803,
+  "name": "grassy-glide",
+  "type": "grass",
+  "power": 55,
+  "accuracy": 100,
+  "pp": 20,
+  "damageClass": "physical",
+  "priority": 0
+}

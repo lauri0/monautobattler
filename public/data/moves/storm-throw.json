@@ -1,0 +1,13 @@
+{
+  "id": 480,
+  "name": "storm-throw",
+  "type": "fighting",
+  "power": 60,
+  "accuracy": 100,
+  "pp": 10,
+  "damageClass": "physical",
+  "priority": 0,
+  "effect": {
+    "critRate": 6
+  }
+}

@@ -1,7 +1,7 @@
 import { useState, useRef, useEffect } from 'react';
 import type { PokemonData, BattlePokemon, TurnEvent } from '../models/types';
 import { buildBattlePokemon } from '../battle/buildBattlePokemon';
-import { resolveTurn } from '../battle/battleEngine';
+import { resolveTurn, applyInitialSwitchIns } from '../battle/battleEngine';
 import { expectiminimaxAI } from '../ai/expectiminimaxAI';
 import { getPokemonPersisted, setPokemonPersisted, getBattleSelection, setBattleSelection } from '../persistence/userStorage';
 import BattlerPanel from './BattlerPanel';
@@ -45,9 +45,10 @@ export default function BattlePage({ allPokemon, onBack }: Props) {
     const dataB = allPokemon.find(p => p.id === selB);
     if (!dataA || !dataB || selA === selB) return;
     setBattleSelection(selA, selB);
-    setP1(buildBattlePokemon(dataA));
-    setP2(buildBattlePokemon(dataB));
-    setLog([]);
+    const init = applyInitialSwitchIns(buildBattlePokemon(dataA), buildBattlePokemon(dataB));
+    setP1(init.p1);
+    setP2(init.p2);
+    setLog(init.events);
     setTurn(1);
     setBattleOver(false);
     setPhase('battle');
@@ -86,9 +87,10 @@ export default function BattlePage({ allPokemon, onBack }: Props) {
     const dataA = allPokemon.find(p => p.id === p1.data.id);
     const dataB = allPokemon.find(p => p.id === p2.data.id);
     if (!dataA || !dataB) return;
-    setP1(buildBattlePokemon(dataA));
-    setP2(buildBattlePokemon(dataB));
-    setLog([]);
+    const init = applyInitialSwitchIns(buildBattlePokemon(dataA), buildBattlePokemon(dataB));
+    setP1(init.p1);
+    setP2(init.p2);
+    setLog(init.events);
     setTurn(1);
     setBattleOver(false);
     setPhase('battle');

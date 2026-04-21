@@ -1,0 +1,14 @@
+{
+  "id": 257,
+  "name": "heat-wave",
+  "type": "fire",
+  "power": 95,
+  "accuracy": 90,
+  "pp": 10,
+  "damageClass": "special",
+  "priority": 0,
+  "effect": {
+    "ailment": "burn",
+    "ailmentChance": 10
+  }
+}

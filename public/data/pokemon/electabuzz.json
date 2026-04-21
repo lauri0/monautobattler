@@ -1,0 +1,63 @@
+{
+  "id": 125,
+  "name": "electabuzz",
+  "types": [
+    "electric"
+  ],
+  "baseStats": {
+    "hp": 65,
+    "attack": 83,
+    "defense": 57,
+    "specialAttack": 95,
+    "specialDefense": 85,
+    "speed": 105
+  },
+  "spriteUrl": "/sprites/125.png",
+  "moves": [
+    "hyper-beam",
+    "focus-punch",
+    "giga-impact",
+    "double-edge",
+    "focus-blast",
+    "thunder",
+    "dynamic-punch",
+    "cross-chop",
+    "hammer-arm",
+    "supercell-slam",
+    "take-down",
+    "thunderbolt",
+    "psychic",
+    "uproar",
+    "wild-charge",
+    "body-slam",
+    "discharge",
+    "tera-blast",
+    "fire-punch",
+    "ice-punch",
+    "thunder-punch",
+    "brick-break",
+    "facade",
+    "volt-switch",
+    "knock-off",
+    "low-sweep",
+    "swift",
+    "thief",
+    "shock-wave",
+    "electroweb",
+    "charge-beam",
+    "trailblaze",
+    "thunder-shock",
+    "quick-attack",
+    "feint",
+    "leer",
+    "thunder-wave",
+    "light-screen",
+    "protect",
+    "taunt",
+    "bulk-up"
+  ],
+  "abilities": [
+    "static",
+    "vital-spirit"
+  ]
+}

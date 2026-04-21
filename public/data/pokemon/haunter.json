@@ -1,0 +1,60 @@
+{
+  "id": 93,
+  "name": "haunter",
+  "types": [
+    "ghost",
+    "poison"
+  ],
+  "baseStats": {
+    "hp": 45,
+    "attack": 50,
+    "defense": 45,
+    "specialAttack": 115,
+    "specialDefense": 55,
+    "speed": 95
+  },
+  "spriteUrl": "/sprites/93.png",
+  "moves": [
+    "focus-blast",
+    "gunk-shot",
+    "thunder",
+    "poltergeist",
+    "dream-eater",
+    "sludge-wave",
+    "foul-play",
+    "thunderbolt",
+    "psychic",
+    "sludge-bomb",
+    "energy-ball",
+    "phantom-force",
+    "shadow-ball",
+    "poison-jab",
+    "dark-pulse",
+    "dazzling-gleam",
+    "tera-blast",
+    "fire-punch",
+    "ice-punch",
+    "thunder-punch",
+    "giga-drain",
+    "facade",
+    "sucker-punch",
+    "shadow-claw",
+    "skitter-smack",
+    "venoshock",
+    "hex",
+    "thief",
+    "shadow-punch",
+    "icy-wind",
+    "payback",
+    "acid-spray",
+    "lick",
+    "protect",
+    "will-o-wisp",
+    "taunt",
+    "nasty-plot",
+    "trick-room"
+  ],
+  "abilities": [
+    "levitate"
+  ]
+}

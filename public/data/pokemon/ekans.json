@@ -1,0 +1,63 @@
+{
+  "id": 23,
+  "name": "ekans",
+  "types": [
+    "poison"
+  ],
+  "baseStats": {
+    "hp": 35,
+    "attack": 60,
+    "defense": 44,
+    "specialAttack": 40,
+    "specialDefense": 54,
+    "speed": 55
+  },
+  "spriteUrl": "/sprites/23.png",
+  "moves": [
+    "double-edge",
+    "gunk-shot",
+    "belch",
+    "earthquake",
+    "sludge-wave",
+    "take-down",
+    "sludge-bomb",
+    "psychic-fangs",
+    "dig",
+    "leech-life",
+    "crunch",
+    "poison-jab",
+    "dark-pulse",
+    "seed-bomb",
+    "tera-blast",
+    "rock-slide",
+    "giga-drain",
+    "lash-out",
+    "facade",
+    "sucker-punch",
+    "skitter-smack",
+    "knock-off",
+    "fire-fang",
+    "venoshock",
+    "bite",
+    "thief",
+    "rock-tomb",
+    "mud-shot",
+    "snarl",
+    "poison-fang",
+    "poison-tail",
+    "trailblaze",
+    "acid",
+    "acid-spray",
+    "scale-shot",
+    "mud-slap",
+    "wrap",
+    "poison-sting",
+    "leer",
+    "protect"
+  ],
+  "abilities": [
+    "intimidate",
+    "shed-skin",
+    "unnerve"
+  ]
+}

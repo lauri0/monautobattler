@@ -1,0 +1,10 @@
+{
+  "id": 17,
+  "name": "wing-attack",
+  "type": "flying",
+  "power": 60,
+  "accuracy": 100,
+  "pp": 35,
+  "damageClass": "physical",
+  "priority": 0
+}

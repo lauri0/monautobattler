@@ -1,0 +1,10 @@
+{
+  "id": 509,
+  "name": "circle-throw",
+  "type": "fighting",
+  "power": 60,
+  "accuracy": 90,
+  "pp": 10,
+  "damageClass": "physical",
+  "priority": -6
+}

@@ -1,0 +1,14 @@
+{
+  "id": 93,
+  "name": "confusion",
+  "type": "psychic",
+  "power": 50,
+  "accuracy": 100,
+  "pp": 25,
+  "damageClass": "special",
+  "priority": 0,
+  "effect": {
+    "confuses": true,
+    "confusionChance": 10
+  }
+}

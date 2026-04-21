@@ -1,4 +1,5 @@
 import type { TurnEvent } from '../models/types';
+import { formatAbilityName } from '../utils/formatName';
 
 function effectivenessText(e: number): string {
   if (e === 0) return "It had no effect!";
@@ -261,6 +262,16 @@ export default function LogEntry({ ev }: { ev: TurnEvent }) {
         <span className="log-turn">T{ev.turn}</span>
         <span className="log-attacker">{ev.pokemonName}</span>
         <span className="log-eff"> shook off the taunt.</span>
+      </div>
+    );
+  }
+
+  if (ev.kind === 'ability_triggered') {
+    return (
+      <div className="log-entry log-entry--effect">
+        <span className="log-turn">T{ev.turn}</span>
+        <span className="log-attacker">{ev.pokemonName}</span>
+        <span className="log-eff">'s {formatAbilityName(ev.ability)} activated!</span>
       </div>
     );
   }

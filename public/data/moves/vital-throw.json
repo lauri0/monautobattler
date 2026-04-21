@@ -1,0 +1,10 @@
+{
+  "id": 233,
+  "name": "vital-throw",
+  "type": "fighting",
+  "power": 70,
+  "accuracy": null,
+  "pp": 10,
+  "damageClass": "physical",
+  "priority": -1
+}

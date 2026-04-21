@@ -1,0 +1,14 @@
+{
+  "id": 53,
+  "name": "flamethrower",
+  "type": "fire",
+  "power": 90,
+  "accuracy": 100,
+  "pp": 15,
+  "damageClass": "special",
+  "priority": 0,
+  "effect": {
+    "ailment": "burn",
+    "ailmentChance": 10
+  }
+}

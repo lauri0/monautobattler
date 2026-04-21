@@ -1,0 +1,61 @@
+{
+  "id": 148,
+  "name": "dragonair",
+  "types": [
+    "dragon"
+  ],
+  "baseStats": {
+    "hp": 61,
+    "attack": 84,
+    "defense": 65,
+    "specialAttack": 70,
+    "specialDefense": 70,
+    "speed": 70
+  },
+  "spriteUrl": "/sprites/148.png",
+  "moves": [
+    "hyper-beam",
+    "giga-impact",
+    "draco-meteor",
+    "outrage",
+    "hydro-pump",
+    "blizzard",
+    "thunder",
+    "fire-blast",
+    "dragon-rush",
+    "take-down",
+    "flamethrower",
+    "surf",
+    "ice-beam",
+    "thunderbolt",
+    "aqua-tail",
+    "body-slam",
+    "dragon-pulse",
+    "slam",
+    "waterfall",
+    "iron-head",
+    "tera-blast",
+    "facade",
+    "swift",
+    "water-pulse",
+    "dragon-tail",
+    "breaking-swipe",
+    "icy-wind",
+    "weather-ball",
+    "chilling-water",
+    "twister",
+    "fire-spin",
+    "scale-shot",
+    "wrap",
+    "leer",
+    "thunder-wave",
+    "agility",
+    "light-screen",
+    "protect",
+    "dragon-dance"
+  ],
+  "abilities": [
+    "shed-skin",
+    "marvel-scale"
+  ]
+}

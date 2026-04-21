@@ -34,6 +34,11 @@ export function getPokemonPersisted(id: number): PokemonPersisted {
   };
 }
 
+export function setSelectedAbility(id: number, ability: string | undefined): void {
+  const existing = getPokemonPersisted(id);
+  setPokemonPersisted({ ...existing, selectedAbility: ability });
+}
+
 export function setPokemonPersisted(data: PokemonPersisted): void {
   const all = loadAllStats();
   all[data.id] = data;
@@ -150,7 +155,7 @@ export function setMoveLearnSettings(settings: MoveLearnSettings): void {
 
 const GAME_VERSION_KEY = 'game_version';
 
-export type GameVersion = 'bdsp' | 'lgpe';
+export type GameVersion = 'bdsp' | 'lgpe' | 'sv';
 
 export interface GameVersionInfo {
   id: GameVersion;
@@ -161,6 +166,7 @@ export interface GameVersionInfo {
 export const GAME_VERSIONS: readonly GameVersionInfo[] = [
   { id: 'bdsp', label: 'Brilliant Diamond / Shining Pearl', versionGroup: 'brilliant-diamond-shining-pearl' },
   { id: 'lgpe', label: "Let's Go Pikachu / Eevee", versionGroup: 'lets-go-pikachu-lets-go-eevee' },
+  { id: 'sv', label: 'Scarlet / Violet', versionGroup: 'scarlet-violet' },
 ];
 
 const DEFAULT_GAME_VERSION: GameVersion = 'bdsp';
@@ -168,7 +174,7 @@ const DEFAULT_GAME_VERSION: GameVersion = 'bdsp';
 export function getSelectedGame(): GameVersion {
   try {
     const raw = localStorage.getItem(GAME_VERSION_KEY);
-    if (raw === 'bdsp' || raw === 'lgpe') return raw;
+    if (raw === 'bdsp' || raw === 'lgpe' || raw === 'sv') return raw;
   } catch {
     // fall through
   }

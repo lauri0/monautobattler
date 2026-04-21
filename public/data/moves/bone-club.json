@@ -1,0 +1,13 @@
+{
+  "id": 125,
+  "name": "bone-club",
+  "type": "ground",
+  "power": 65,
+  "accuracy": 85,
+  "pp": 20,
+  "damageClass": "physical",
+  "priority": 0,
+  "effect": {
+    "flinchChance": 10
+  }
+}

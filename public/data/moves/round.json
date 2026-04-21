@@ -1,0 +1,10 @@
+{
+  "id": 496,
+  "name": "round",
+  "type": "normal",
+  "power": 60,
+  "accuracy": 100,
+  "pp": 15,
+  "damageClass": "special",
+  "priority": 0
+}

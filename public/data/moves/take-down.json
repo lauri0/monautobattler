@@ -1,0 +1,13 @@
+{
+  "id": 36,
+  "name": "take-down",
+  "type": "normal",
+  "power": 90,
+  "accuracy": 85,
+  "pp": 20,
+  "damageClass": "physical",
+  "priority": 0,
+  "effect": {
+    "drain": -25
+  }
+}

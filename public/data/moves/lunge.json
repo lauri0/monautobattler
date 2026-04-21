@@ -1,0 +1,20 @@
+{
+  "id": 679,
+  "name": "lunge",
+  "type": "bug",
+  "power": 80,
+  "accuracy": 100,
+  "pp": 15,
+  "damageClass": "physical",
+  "priority": 0,
+  "effect": {
+    "statChanges": [
+      {
+        "stat": "attack",
+        "change": -1,
+        "target": "foe"
+      }
+    ],
+    "statChance": 100
+  }
+}

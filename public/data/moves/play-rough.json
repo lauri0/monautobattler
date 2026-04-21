@@ -1,0 +1,20 @@
+{
+  "id": 583,
+  "name": "play-rough",
+  "type": "fairy",
+  "power": 90,
+  "accuracy": 90,
+  "pp": 10,
+  "damageClass": "physical",
+  "priority": 0,
+  "effect": {
+    "statChanges": [
+      {
+        "stat": "attack",
+        "change": -1,
+        "target": "foe"
+      }
+    ],
+    "statChance": 10
+  }
+}

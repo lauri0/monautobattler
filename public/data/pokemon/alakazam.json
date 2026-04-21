@@ -1,0 +1,47 @@
+{
+  "id": 65,
+  "name": "alakazam",
+  "types": [
+    "psychic"
+  ],
+  "baseStats": {
+    "hp": 55,
+    "attack": 50,
+    "defense": 45,
+    "specialAttack": 135,
+    "specialDefense": 95,
+    "speed": 120
+  },
+  "spriteUrl": "/sprites/65.png",
+  "moves": [
+    "hyper-beam",
+    "focus-punch",
+    "giga-impact",
+    "future-sight",
+    "focus-blast",
+    "dream-eater",
+    "iron-tail",
+    "psychic",
+    "energy-ball",
+    "shadow-ball",
+    "psyshock",
+    "dazzling-gleam",
+    "drain-punch",
+    "facade",
+    "psycho-cut",
+    "psybeam",
+    "thief",
+    "shock-wave",
+    "confusion",
+    "charge-beam",
+    "thunder-wave",
+    "recover",
+    "light-screen",
+    "reflect",
+    "protect",
+    "taunt",
+    "calm-mind",
+    "nasty-plot",
+    "trick-room"
+  ]
+}

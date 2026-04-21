@@ -1,0 +1,42 @@
+{
+  "id": 12,
+  "name": "butterfree",
+  "types": [
+    "bug",
+    "flying"
+  ],
+  "baseStats": {
+    "hp": 60,
+    "attack": 45,
+    "defense": 50,
+    "specialAttack": 90,
+    "specialDefense": 80,
+    "speed": 70
+  },
+  "spriteUrl": "/sprites/12.png",
+  "moves": [
+    "hyper-beam",
+    "giga-impact",
+    "solar-beam",
+    "dream-eater",
+    "psychic",
+    "bug-buzz",
+    "energy-ball",
+    "shadow-ball",
+    "giga-drain",
+    "air-slash",
+    "facade",
+    "u-turn",
+    "psybeam",
+    "thief",
+    "aerial-ace",
+    "bug-bite",
+    "confusion",
+    "gust",
+    "tackle",
+    "poison-powder",
+    "sleep-powder",
+    "protect",
+    "tailwind"
+  ]
+}

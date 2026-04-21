@@ -1,0 +1,13 @@
+{
+  "id": 279,
+  "name": "revenge",
+  "type": "fighting",
+  "power": 60,
+  "accuracy": 100,
+  "pp": 10,
+  "damageClass": "physical",
+  "priority": -4,
+  "effect": {
+    "doublePowerIfHit": true
+  }
+}

@@ -1,0 +1,46 @@
+{
+  "id": 41,
+  "name": "zubat",
+  "types": [
+    "poison",
+    "flying"
+  ],
+  "baseStats": {
+    "hp": 40,
+    "attack": 45,
+    "defense": 35,
+    "specialAttack": 30,
+    "specialDefense": 40,
+    "speed": 55
+  },
+  "spriteUrl": "/sprites/41.png",
+  "moves": [
+    "brave-bird",
+    "fly",
+    "sludge-bomb",
+    "leech-life",
+    "shadow-ball",
+    "zen-headbutt",
+    "giga-drain",
+    "air-slash",
+    "steel-wing",
+    "facade",
+    "u-turn",
+    "venoshock",
+    "wing-attack",
+    "bite",
+    "thief",
+    "air-cutter",
+    "aerial-ace",
+    "pluck",
+    "poison-fang",
+    "payback",
+    "gust",
+    "quick-attack",
+    "astonish",
+    "absorb",
+    "protect",
+    "taunt",
+    "nasty-plot"
+  ]
+}

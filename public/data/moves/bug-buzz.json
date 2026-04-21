@@ -1,0 +1,20 @@
+{
+  "id": 405,
+  "name": "bug-buzz",
+  "type": "bug",
+  "power": 90,
+  "accuracy": 100,
+  "pp": 10,
+  "damageClass": "special",
+  "priority": 0,
+  "effect": {
+    "statChanges": [
+      {
+        "stat": "special-defense",
+        "change": -1,
+        "target": "foe"
+      }
+    ],
+    "statChance": 10
+  }
+}

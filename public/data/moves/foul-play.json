@@ -1,0 +1,13 @@
+{
+  "id": 492,
+  "name": "foul-play",
+  "type": "dark",
+  "power": 95,
+  "accuracy": 100,
+  "pp": 15,
+  "damageClass": "physical",
+  "priority": 0,
+  "effect": {
+    "useFoeAttack": true
+  }
+}

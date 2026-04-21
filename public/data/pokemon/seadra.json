@@ -1,0 +1,55 @@
+{
+  "id": 117,
+  "name": "seadra",
+  "types": [
+    "water"
+  ],
+  "baseStats": {
+    "hp": 55,
+    "attack": 65,
+    "defense": 95,
+    "specialAttack": 95,
+    "specialDefense": 45,
+    "speed": 85
+  },
+  "spriteUrl": "/sprites/117.png",
+  "moves": [
+    "hyper-beam",
+    "giga-impact",
+    "outrage",
+    "hydro-pump",
+    "blizzard",
+    "surf",
+    "ice-beam",
+    "muddy-water",
+    "dragon-pulse",
+    "liquidation",
+    "waterfall",
+    "flash-cannon",
+    "tera-blast",
+    "facade",
+    "bubble-beam",
+    "aurora-beam",
+    "swift",
+    "dragon-breath",
+    "water-pulse",
+    "flip-turn",
+    "icy-wind",
+    "weather-ball",
+    "clear-smog",
+    "chilling-water",
+    "water-gun",
+    "twister",
+    "whirlpool",
+    "scale-shot",
+    "leer",
+    "agility",
+    "protect",
+    "dragon-dance"
+  ],
+  "abilities": [
+    "poison-point",
+    "sniper",
+    "damp"
+  ]
+}

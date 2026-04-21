@@ -1,0 +1,51 @@
+{
+  "id": 101,
+  "name": "electrode",
+  "types": [
+    "electric"
+  ],
+  "baseStats": {
+    "hp": 60,
+    "attack": 50,
+    "defense": 70,
+    "specialAttack": 80,
+    "specialDefense": 80,
+    "speed": 150
+  },
+  "spriteUrl": "/sprites/101.png",
+  "moves": [
+    "explosion",
+    "self-destruct",
+    "hyper-beam",
+    "giga-impact",
+    "double-edge",
+    "thunder",
+    "supercell-slam",
+    "foul-play",
+    "take-down",
+    "thunderbolt",
+    "wild-charge",
+    "discharge",
+    "tera-blast",
+    "facade",
+    "volt-switch",
+    "spark",
+    "swift",
+    "thief",
+    "electroweb",
+    "charge-beam",
+    "tackle",
+    "thunder-shock",
+    "rollout",
+    "thunder-wave",
+    "agility",
+    "light-screen",
+    "protect",
+    "taunt"
+  ],
+  "abilities": [
+    "soundproof",
+    "static",
+    "aftermath"
+  ]
+}

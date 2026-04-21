@@ -1,0 +1,20 @@
+{
+  "id": 806,
+  "name": "skitter-smack",
+  "type": "bug",
+  "power": 70,
+  "accuracy": 90,
+  "pp": 10,
+  "damageClass": "physical",
+  "priority": 0,
+  "effect": {
+    "statChanges": [
+      {
+        "stat": "special-attack",
+        "change": -1,
+        "target": "foe"
+      }
+    ],
+    "statChance": 100
+  }
+}

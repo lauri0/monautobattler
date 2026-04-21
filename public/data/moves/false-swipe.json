@@ -1,0 +1,10 @@
+{
+  "id": 206,
+  "name": "false-swipe",
+  "type": "normal",
+  "power": 40,
+  "accuracy": 100,
+  "pp": 40,
+  "damageClass": "physical",
+  "priority": 0
+}

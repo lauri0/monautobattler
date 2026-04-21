@@ -1,0 +1,10 @@
+{
+  "id": 205,
+  "name": "rollout",
+  "type": "rock",
+  "power": 30,
+  "accuracy": 90,
+  "pp": 20,
+  "damageClass": "physical",
+  "priority": 0
+}

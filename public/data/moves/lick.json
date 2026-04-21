@@ -1,0 +1,14 @@
+{
+  "id": 122,
+  "name": "lick",
+  "type": "ghost",
+  "power": 30,
+  "accuracy": 100,
+  "pp": 30,
+  "damageClass": "physical",
+  "priority": 0,
+  "effect": {
+    "ailment": "paralysis",
+    "ailmentChance": 30
+  }
+}

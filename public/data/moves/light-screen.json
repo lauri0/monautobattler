@@ -1,0 +1,13 @@
+{
+  "id": 113,
+  "name": "light-screen",
+  "type": "psychic",
+  "power": 0,
+  "accuracy": null,
+  "pp": 30,
+  "damageClass": "status",
+  "priority": 0,
+  "effect": {
+    "fieldEffect": "lightScreen"
+  }
+}

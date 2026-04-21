@@ -1,0 +1,47 @@
+{
+  "id": 67,
+  "name": "machoke",
+  "types": [
+    "fighting"
+  ],
+  "baseStats": {
+    "hp": 80,
+    "attack": 100,
+    "defense": 70,
+    "specialAttack": 50,
+    "specialDefense": 60,
+    "speed": 45
+  },
+  "spriteUrl": "/sprites/67.png",
+  "moves": [
+    "focus-punch",
+    "double-edge",
+    "focus-blast",
+    "fire-blast",
+    "earthquake",
+    "dynamic-punch",
+    "cross-chop",
+    "flamethrower",
+    "rock-climb",
+    "strength",
+    "dig",
+    "poison-jab",
+    "rock-slide",
+    "brick-break",
+    "vital-throw",
+    "facade",
+    "knock-off",
+    "low-sweep",
+    "thief",
+    "revenge",
+    "rock-tomb",
+    "bulldoze",
+    "payback",
+    "rock-smash",
+    "dual-chop",
+    "leer",
+    "light-screen",
+    "protect",
+    "bulk-up"
+  ]
+}

@@ -1,0 +1,10 @@
+{
+  "id": 323,
+  "name": "water-spout",
+  "type": "water",
+  "power": 150,
+  "accuracy": 100,
+  "pp": 5,
+  "damageClass": "special",
+  "priority": 0
+}

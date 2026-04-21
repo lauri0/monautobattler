@@ -1,0 +1,13 @@
+{
+  "id": 444,
+  "name": "stone-edge",
+  "type": "rock",
+  "power": 100,
+  "accuracy": 80,
+  "pp": 5,
+  "damageClass": "physical",
+  "priority": 0,
+  "effect": {
+    "critRate": 1
+  }
+}

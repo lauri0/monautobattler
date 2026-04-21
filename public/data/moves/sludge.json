@@ -1,0 +1,14 @@
+{
+  "id": 124,
+  "name": "sludge",
+  "type": "poison",
+  "power": 65,
+  "accuracy": 100,
+  "pp": 20,
+  "damageClass": "special",
+  "priority": 0,
+  "effect": {
+    "ailment": "poison",
+    "ailmentChance": 30
+  }
+}

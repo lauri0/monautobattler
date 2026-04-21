@@ -1,0 +1,10 @@
+{
+  "id": 26,
+  "name": "jump-kick",
+  "type": "fighting",
+  "power": 100,
+  "accuracy": 95,
+  "pp": 10,
+  "damageClass": "physical",
+  "priority": 0
+}

@@ -1,0 +1,10 @@
+{
+  "id": 918,
+  "name": "upper-hand",
+  "type": "fighting",
+  "power": 65,
+  "accuracy": 100,
+  "pp": 15,
+  "damageClass": "physical",
+  "priority": 3
+}

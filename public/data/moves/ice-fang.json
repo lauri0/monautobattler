@@ -1,0 +1,15 @@
+{
+  "id": 423,
+  "name": "ice-fang",
+  "type": "ice",
+  "power": 65,
+  "accuracy": 95,
+  "pp": 15,
+  "damageClass": "physical",
+  "priority": 0,
+  "effect": {
+    "ailment": "freeze",
+    "ailmentChance": 10,
+    "flinchChance": 10
+  }
+}

@@ -1,0 +1,14 @@
+{
+  "id": 181,
+  "name": "powder-snow",
+  "type": "ice",
+  "power": 40,
+  "accuracy": 100,
+  "pp": 25,
+  "damageClass": "special",
+  "priority": 0,
+  "effect": {
+    "ailment": "freeze",
+    "ailmentChance": 10
+  }
+}

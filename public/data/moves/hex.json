@@ -1,0 +1,13 @@
+{
+  "id": 506,
+  "name": "hex",
+  "type": "ghost",
+  "power": 65,
+  "accuracy": 100,
+  "pp": 10,
+  "damageClass": "special",
+  "priority": 0,
+  "effect": {
+    "doublePowerIfTargetStatus": true
+  }
+}

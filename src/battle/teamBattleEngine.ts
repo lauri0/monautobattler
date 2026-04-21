@@ -18,6 +18,7 @@ import type {
 import { buildBattlePokemon } from './buildBattlePokemon';
 import { applyEndOfTurnStatus, applyStealthRockOnEntry, effectivePriority, makeInitialField, resolveSingleAttack, tickTaunt, usableMoves } from './battleEngine';
 import { effectiveSpeed } from './damageCalc';
+import { applySwitchInAbility } from './abilities';
 
 const MAX_TURNS = 500;
 
@@ -41,7 +42,21 @@ export function buildTeamBattleState(
     }),
     activeIdx: 0,
   });
-  return { teams: [mkTeam(team0Ids), mkTeam(team1Ids)], turn: 1, phase: 'choose', field: makeInitialField() };
+  const teams: [Team, Team] = [mkTeam(team0Ids), mkTeam(team1Ids)];
+  return { teams, turn: 1, phase: 'choose', field: makeInitialField() };
+}
+
+// Apply switch-in abilities for both initial actives. Callers should invoke
+// this once, right after building the state, to seed the battle log. Separated
+// from buildTeamBattleState so the function stays a pure constructor.
+export function applyInitialSwitchInsTeam(
+  state: TeamBattleState,
+): { state: TeamBattleState; events: TeamTurnEvent[] } {
+  const events: TeamTurnEvent[] = [];
+  const teams: [Team, Team] = [state.teams[0], state.teams[1]];
+  applySwitchInInTeam(teams, 0, state.turn, events);
+  applySwitchInInTeam(teams, 1, state.turn, events);
+  return { state: { ...state, teams }, events };
 }
 
 // ── Helpers ───────────────────────────────────────────────────────────────────
@@ -250,6 +265,28 @@ function tickFieldInTeam(
   return next;
 }
 
+// Apply the incoming pokemon's switch-in ability (e.g. Intimidate) against the
+// opposing active. Emits tagged team events.
+function applySwitchInInTeam(
+  teams: [Team, Team],
+  incomingSide: SideIndex,
+  turn: number,
+  events: TeamTurnEvent[],
+): void {
+  const opponentSide: SideIndex = incomingSide === 0 ? 1 : 0;
+  const incoming = teams[incomingSide].pokemon[teams[incomingSide].activeIdx];
+  const opponent = teams[opponentSide].pokemon[teams[opponentSide].activeIdx];
+  if (incoming.currentHp <= 0 || opponent.currentHp <= 0) return;
+  const inner: TurnEvent[] = [];
+  const updated = applySwitchInAbility(incoming, opponent, turn, inner);
+  if (updated !== opponent) {
+    teams[opponentSide] = writeActive(teams[opponentSide], updated);
+    for (const ev of inner) {
+      events.push({ side: opponentSide, ...ev });
+    }
+  }
+}
+
 // Apply stealth rock to the active pokemon on `side` if hazards are set there.
 // Writes the (possibly damaged) pokemon back into `teams` and logs the event.
 function applySrToActive(
@@ -343,6 +380,7 @@ export function applyActions(
       outName: outgoing.data.name, inName: incoming.data.name,
     });
     applySrToActive(teams, pivotSide, field, state.turn, events);
+    applySwitchInInTeam(teams, pivotSide, state.turn, events);
 
     // If SR KO'd the incoming pokemon, skip the pending attack and let the
     // normal phase logic surface a replace request.
@@ -389,6 +427,7 @@ export function applyActions(
         outName: outgoing.data.name, inName: incoming.data.name,
       });
       applySrToActive(teams, side, field, state.turn, events);
+      applySwitchInInTeam(teams, side, state.turn, events);
     }
 
     const phase = computePhaseAfterAttack(teams);
@@ -415,6 +454,7 @@ export function applyActions(
       outName: outgoing.data.name, inName: incoming.data.name,
     });
     applySrToActive(teams, side, field, state.turn, events);
+    applySwitchInInTeam(teams, side, state.turn, events);
   }
 
   // A pokemon switched in and fainted to SR: surface replacement via phase.
@@ -484,8 +524,9 @@ export function runFullTeamBattle(
   ai0: TeamAIStrategy,
   ai1: TeamAIStrategy,
 ): TeamBattleResult {
-  let state = initial;
-  const log: TeamTurnEvent[] = [];
+  const startup = applyInitialSwitchInsTeam(initial);
+  let state = startup.state;
+  const log: TeamTurnEvent[] = [...startup.events];
   let guard = 0;
 
   while (battleWinner(state) === null && guard < MAX_TURNS) {

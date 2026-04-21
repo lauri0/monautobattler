@@ -1,0 +1,20 @@
+{
+  "id": 10,
+  "name": "caterpie",
+  "types": [
+    "bug"
+  ],
+  "baseStats": {
+    "hp": 45,
+    "attack": 30,
+    "defense": 35,
+    "specialAttack": 20,
+    "specialDefense": 20,
+    "speed": 45
+  },
+  "spriteUrl": "/sprites/10.png",
+  "moves": [
+    "bug-bite",
+    "tackle"
+  ]
+}

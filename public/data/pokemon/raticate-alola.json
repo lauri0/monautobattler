@@ -1,0 +1,42 @@
+{
+  "id": 10092,
+  "name": "raticate-alola",
+  "types": [
+    "dark",
+    "normal"
+  ],
+  "baseStats": {
+    "hp": 75,
+    "attack": 71,
+    "defense": 70,
+    "specialAttack": 40,
+    "specialDefense": 80,
+    "speed": 77
+  },
+  "spriteUrl": "/sprites/10092.png",
+  "moves": [
+    "hyper-beam",
+    "double-edge",
+    "blizzard",
+    "iron-tail",
+    "ice-beam",
+    "sludge-bomb",
+    "dig",
+    "hyper-fang",
+    "crunch",
+    "shadow-ball",
+    "dark-pulse",
+    "headbutt",
+    "facade",
+    "u-turn",
+    "sucker-punch",
+    "bite",
+    "tackle",
+    "quick-attack",
+    "fury-swipes",
+    "swords-dance",
+    "protect",
+    "taunt",
+    "bulk-up"
+  ]
+}

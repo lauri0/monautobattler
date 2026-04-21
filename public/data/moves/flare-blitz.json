@@ -1,0 +1,15 @@
+{
+  "id": 394,
+  "name": "flare-blitz",
+  "type": "fire",
+  "power": 120,
+  "accuracy": 100,
+  "pp": 15,
+  "damageClass": "physical",
+  "priority": 0,
+  "effect": {
+    "drain": -33,
+    "ailment": "burn",
+    "ailmentChance": 10
+  }
+}

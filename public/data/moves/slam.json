@@ -1,0 +1,10 @@
+{
+  "id": 21,
+  "name": "slam",
+  "type": "normal",
+  "power": 80,
+  "accuracy": 75,
+  "pp": 20,
+  "damageClass": "physical",
+  "priority": 0
+}

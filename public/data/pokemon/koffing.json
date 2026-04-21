@@ -1,0 +1,51 @@
+{
+  "id": 109,
+  "name": "koffing",
+  "types": [
+    "poison"
+  ],
+  "baseStats": {
+    "hp": 40,
+    "attack": 65,
+    "defense": 95,
+    "specialAttack": 60,
+    "specialDefense": 45,
+    "speed": 35
+  },
+  "spriteUrl": "/sprites/109.png",
+  "moves": [
+    "explosion",
+    "self-destruct",
+    "gunk-shot",
+    "belch",
+    "thunder",
+    "fire-blast",
+    "sludge-wave",
+    "take-down",
+    "flamethrower",
+    "thunderbolt",
+    "sludge-bomb",
+    "body-slam",
+    "shadow-ball",
+    "dark-pulse",
+    "tera-blast",
+    "facade",
+    "psybeam",
+    "sludge",
+    "venoshock",
+    "thief",
+    "assurance",
+    "clear-smog",
+    "tackle",
+    "acid-spray",
+    "smog",
+    "protect",
+    "will-o-wisp",
+    "taunt"
+  ],
+  "abilities": [
+    "levitate",
+    "neutralizing-gas",
+    "stench"
+  ]
+}

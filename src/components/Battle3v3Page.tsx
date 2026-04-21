@@ -4,7 +4,7 @@ import type {
   SideIndex,
   TeamSlotIndex,
 } from '../models/types';
-import { buildTeamBattleState } from '../battle/teamBattleEngine';
+import { buildTeamBattleState, applyInitialSwitchInsTeam } from '../battle/teamBattleEngine';
 import {
   getPokemonPersisted,
   getTeam3v3Selection,
@@ -65,13 +65,11 @@ export default function Battle3v3Page({ allPokemon, onBack }: Props) {
     setTeam3v3Selection({ team0: team0Ids, team1: team1Ids });
   }, [team0Ids, team1Ids]);
 
-  // Lazily build the initial state when a battle starts — before that, a placeholder
-  // is never rendered because phase === 'select' returns early.
   const [initialState, setInitialState] = useState(() =>
-    buildTeamBattleState(team0Ids, team1Ids, allPokemon),
+    applyInitialSwitchInsTeam(buildTeamBattleState(team0Ids, team1Ids, allPokemon)),
   );
   const { state, log, thinking, winner, done, nextTurn, submitPlayerAction, reset } =
-    useTeamBattleController(initialState);
+    useTeamBattleController(initialState.state, initialState.events);
 
   useEffect(() => {
     if (logRef.current) logRef.current.scrollTop = logRef.current.scrollHeight;
@@ -91,9 +89,9 @@ export default function Battle3v3Page({ allPokemon, onBack }: Props) {
 
   function startBattle(newMode: 'spectate' | 'play') {
     if (!canStart) return;
-    const init = buildTeamBattleState(team0Ids, team1Ids, allPokemon);
+    const init = applyInitialSwitchInsTeam(buildTeamBattleState(team0Ids, team1Ids, allPokemon));
     setInitialState(init);
-    reset(init);
+    reset(init.state, init.events);
     setMode(newMode);
     setPhase('battle');
   }

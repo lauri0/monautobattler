@@ -1,0 +1,60 @@
+{
+  "id": 25,
+  "name": "pikachu",
+  "types": [
+    "electric"
+  ],
+  "baseStats": {
+    "hp": 35,
+    "attack": 55,
+    "defense": 40,
+    "specialAttack": 50,
+    "specialDefense": 50,
+    "speed": 90
+  },
+  "spriteUrl": "/sprites/25.png",
+  "moves": [
+    "focus-punch",
+    "thunder",
+    "iron-tail",
+    "take-down",
+    "surf",
+    "thunderbolt",
+    "wild-charge",
+    "play-rough",
+    "body-slam",
+    "dig",
+    "discharge",
+    "tera-blast",
+    "alluring-voice",
+    "thunder-punch",
+    "brick-break",
+    "facade",
+    "volt-switch",
+    "spark",
+    "knock-off",
+    "upper-hand",
+    "swift",
+    "thief",
+    "electroweb",
+    "charge-beam",
+    "draining-kiss",
+    "trailblaze",
+    "thunder-shock",
+    "quick-attack",
+    "disarming-voice",
+    "feint",
+    "nuzzle",
+    "growl",
+    "thunder-wave",
+    "agility",
+    "light-screen",
+    "reflect",
+    "protect",
+    "nasty-plot"
+  ],
+  "abilities": [
+    "static",
+    "lightning-rod"
+  ]
+}

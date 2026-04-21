@@ -1,0 +1,14 @@
+{
+  "id": 60,
+  "name": "psybeam",
+  "type": "psychic",
+  "power": 65,
+  "accuracy": 100,
+  "pp": 20,
+  "damageClass": "special",
+  "priority": 0,
+  "effect": {
+    "confuses": true,
+    "confusionChance": 10
+  }
+}

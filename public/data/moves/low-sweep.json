@@ -1,0 +1,20 @@
+{
+  "id": 490,
+  "name": "low-sweep",
+  "type": "fighting",
+  "power": 65,
+  "accuracy": 100,
+  "pp": 20,
+  "damageClass": "physical",
+  "priority": 0,
+  "effect": {
+    "statChanges": [
+      {
+        "stat": "speed",
+        "change": -1,
+        "target": "foe"
+      }
+    ],
+    "statChance": 100
+  }
+}

@@ -1,0 +1,46 @@
+{
+  "id": 46,
+  "name": "paras",
+  "types": [
+    "bug",
+    "grass"
+  ],
+  "baseStats": {
+    "hp": 35,
+    "attack": 70,
+    "defense": 55,
+    "specialAttack": 45,
+    "specialDefense": 55,
+    "speed": 25
+  },
+  "spriteUrl": "/sprites/46.png",
+  "moves": [
+    "solar-beam",
+    "sludge-bomb",
+    "dig",
+    "x-scissor",
+    "giga-drain",
+    "brick-break",
+    "slash",
+    "facade",
+    "cross-poison",
+    "psybeam",
+    "thief",
+    "aerial-ace",
+    "bug-bite",
+    "cut",
+    "metal-claw",
+    "fell-stinger",
+    "scratch",
+    "false-swipe",
+    "fury-cutter",
+    "rock-smash",
+    "bullet-seed",
+    "absorb",
+    "swords-dance",
+    "poison-powder",
+    "agility",
+    "light-screen",
+    "protect"
+  ]
+}

@@ -1,0 +1,10 @@
+{
+  "id": 154,
+  "name": "fury-swipes",
+  "type": "normal",
+  "power": 18,
+  "accuracy": 80,
+  "pp": 15,
+  "damageClass": "physical",
+  "priority": 0
+}

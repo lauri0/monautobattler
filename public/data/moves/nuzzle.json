@@ -1,0 +1,14 @@
+{
+  "id": 609,
+  "name": "nuzzle",
+  "type": "electric",
+  "power": 20,
+  "accuracy": 100,
+  "pp": 20,
+  "damageClass": "physical",
+  "priority": 0,
+  "effect": {
+    "ailment": "paralysis",
+    "ailmentChance": 100
+  }
+}

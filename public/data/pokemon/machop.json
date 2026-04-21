@@ -1,0 +1,53 @@
+{
+  "id": 66,
+  "name": "machop",
+  "types": [
+    "fighting"
+  ],
+  "baseStats": {
+    "hp": 70,
+    "attack": 80,
+    "defense": 50,
+    "specialAttack": 35,
+    "specialDefense": 35,
+    "speed": 35
+  },
+  "spriteUrl": "/sprites/66.png",
+  "moves": [
+    "focus-punch",
+    "double-edge",
+    "close-combat",
+    "focus-blast",
+    "fire-blast",
+    "earthquake",
+    "dynamic-punch",
+    "cross-chop",
+    "flamethrower",
+    "rock-climb",
+    "submission",
+    "strength",
+    "dig",
+    "poison-jab",
+    "fire-punch",
+    "ice-punch",
+    "thunder-punch",
+    "rock-slide",
+    "brick-break",
+    "vital-throw",
+    "facade",
+    "knock-off",
+    "low-sweep",
+    "thief",
+    "revenge",
+    "rock-tomb",
+    "bulldoze",
+    "payback",
+    "rock-smash",
+    "bullet-punch",
+    "dual-chop",
+    "leer",
+    "light-screen",
+    "protect",
+    "bulk-up"
+  ]
+}

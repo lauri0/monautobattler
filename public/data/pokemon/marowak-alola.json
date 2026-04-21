@@ -1,0 +1,51 @@
+{
+  "id": 10115,
+  "name": "marowak-alola",
+  "types": [
+    "fire",
+    "ghost"
+  ],
+  "baseStats": {
+    "hp": 60,
+    "attack": 80,
+    "defense": 110,
+    "specialAttack": 50,
+    "specialDefense": 80,
+    "speed": 45
+  },
+  "spriteUrl": "/sprites/10115.png",
+  "moves": [
+    "hyper-beam",
+    "thrash",
+    "outrage",
+    "flare-blitz",
+    "blizzard",
+    "thunder",
+    "fire-blast",
+    "earthquake",
+    "dream-eater",
+    "iron-tail",
+    "flamethrower",
+    "ice-beam",
+    "thunderbolt",
+    "dig",
+    "shadow-ball",
+    "dark-pulse",
+    "fire-punch",
+    "thunder-punch",
+    "rock-slide",
+    "brick-break",
+    "headbutt",
+    "facade",
+    "bone-club",
+    "bonemerang",
+    "fire-spin",
+    "rage",
+    "swords-dance",
+    "leer",
+    "growl",
+    "protect",
+    "will-o-wisp",
+    "stealth-rock"
+  ]
+}

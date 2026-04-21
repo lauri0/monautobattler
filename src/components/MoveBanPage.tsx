@@ -1,6 +1,6 @@
 import { useState, useEffect, useLayoutEffect, useRef, useMemo } from 'react';
 import type { PokemonData, Move } from '../models/types';
-import { getAllPokemonData, getAllMoves } from '../persistence/db';
+import { loadAllPokemonData, loadAllMoves } from '../data/loadLocalData';
 import { getAllowedMoveIds, setAllowedMoveIds } from '../persistence/userStorage';
 import { getTypeColor } from '../utils/typeColors';
 import { effectSummary } from '../utils/moveEffectSummary';
@@ -51,8 +51,8 @@ export default function MoveBanPage({ onBack }: Props) {
   const [allMoves, setAllMoves] = useState<Move[]>([]);
 
   useEffect(() => {
-    getAllPokemonData().then(setAllPokemon);
-    getAllMoves().then(setAllMoves);
+    loadAllPokemonData().then(setAllPokemon);
+    loadAllMoves().then(setAllMoves);
   }, []);
 
   const moveIndex = useMemo(() => {

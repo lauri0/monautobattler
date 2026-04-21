@@ -1,8 +1,6 @@
 import { useState } from 'react';
 import { fetchAndStoreRange } from '../api/pokeapi';
-import { clearAllPokemonData } from '../persistence/db';
 import {
-  clearLoadedRange,
   getLoadedRange,
   resetAllStats,
   getMoveLearnSettings,
@@ -69,6 +67,7 @@ export default function SettingsPage({ onBack, onDataLoaded }: Props) {
   }
 
   const isLgpe = game === 'lgpe';
+  const supportsAlolan = game === 'lgpe' || game === 'sv';
 
   const anyLearnEnabled = Object.values(learnSettings).some(Boolean);
 
@@ -106,13 +105,6 @@ export default function SettingsPage({ onBack, onDataLoaded }: Props) {
       setLoading(false);
       setProgress(1);
     }
-  }
-
-  async function handleDeleteData() {
-    if (!confirm('Delete all cached Pokemon data? You will need to re-download.')) return;
-    await clearAllPokemonData();
-    clearLoadedRange();
-    onDataLoaded();
   }
 
   function handleResetStats() {
@@ -242,22 +234,22 @@ export default function SettingsPage({ onBack, onDataLoaded }: Props) {
             fontSize: '0.78rem', fontWeight: 700, textTransform: 'uppercase',
             letterSpacing: '0.05em', color: 'var(--text-muted)', display: 'block', marginBottom: '0.5rem',
           }}>
-            Variants (Let's Go only)
+            Variants
           </span>
           <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
             <label style={{
               display: 'flex', alignItems: 'center', gap: '0.4rem',
-              cursor: (!isLgpe || loading) ? 'not-allowed' : 'pointer',
+              cursor: (!supportsAlolan || loading) ? 'not-allowed' : 'pointer',
               fontSize: '0.9rem',
-              opacity: isLgpe ? 1 : 0.4,
+              opacity: supportsAlolan ? 1 : 0.4,
             }}>
               <input
                 type="checkbox"
                 checked={variantSettings.useAlolan}
                 onChange={() => toggleVariant('useAlolan')}
-                disabled={!isLgpe || loading}
+                disabled={!supportsAlolan || loading}
               />
-              Replace with Alolan forms (e.g. Meowth → Dark-type Alolan Meowth)
+              Replace with Alolan forms (e.g. Meowth → Dark-type Alolan Meowth) — Let's Go or Scarlet/Violet
             </label>
             <label style={{
               display: 'flex', alignItems: 'center', gap: '0.4rem',
@@ -402,14 +394,6 @@ export default function SettingsPage({ onBack, onDataLoaded }: Props) {
           <p style={{ color: 'var(--text-muted)', marginTop: '0.5rem', fontSize: '0.85rem' }}>{summary}</p>
         )}
 
-        <div style={{ marginTop: '1.2rem', borderTop: '1px solid var(--border)', paddingTop: '1rem' }}>
-          <button className="btn-danger" onClick={handleDeleteData} disabled={loading}>
-            Delete All Pokemon Data
-          </button>
-          <p style={{ fontSize: '0.8rem', color: 'var(--text-muted)', marginTop: '0.4rem' }}>
-            Clears all cached data. You'll need to re-download.
-          </p>
-        </div>
       </div>
 
       <div className="card" style={{ marginBottom: '1.5rem' }}>

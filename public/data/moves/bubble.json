@@ -1,0 +1,20 @@
+{
+  "id": 145,
+  "name": "bubble",
+  "type": "water",
+  "power": 40,
+  "accuracy": 100,
+  "pp": 30,
+  "damageClass": "special",
+  "priority": 0,
+  "effect": {
+    "statChanges": [
+      {
+        "stat": "speed",
+        "change": -1,
+        "target": "foe"
+      }
+    ],
+    "statChance": 10
+  }
+}

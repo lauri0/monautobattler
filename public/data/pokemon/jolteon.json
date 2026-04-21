@@ -1,0 +1,60 @@
+{
+  "id": 135,
+  "name": "jolteon",
+  "types": [
+    "electric"
+  ],
+  "baseStats": {
+    "hp": 65,
+    "attack": 65,
+    "defense": 60,
+    "specialAttack": 110,
+    "specialDefense": 95,
+    "speed": 130
+  },
+  "spriteUrl": "/sprites/135.png",
+  "moves": [
+    "hyper-beam",
+    "giga-impact",
+    "last-resort",
+    "double-edge",
+    "thunder",
+    "take-down",
+    "thunderbolt",
+    "hyper-voice",
+    "wild-charge",
+    "body-slam",
+    "dig",
+    "shadow-ball",
+    "discharge",
+    "tera-blast",
+    "alluring-voice",
+    "facade",
+    "volt-switch",
+    "thunder-fang",
+    "bite",
+    "swift",
+    "covet",
+    "electroweb",
+    "weather-ball",
+    "trailblaze",
+    "tackle",
+    "thunder-shock",
+    "quick-attack",
+    "false-swipe",
+    "double-kick",
+    "pin-missile",
+    "mud-slap",
+    "stored-power",
+    "growl",
+    "thunder-wave",
+    "agility",
+    "light-screen",
+    "protect",
+    "calm-mind"
+  ],
+  "abilities": [
+    "volt-absorb",
+    "quick-feet"
+  ]
+}

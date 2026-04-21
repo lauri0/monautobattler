@@ -1,0 +1,13 @@
+{
+  "id": 44,
+  "name": "bite",
+  "type": "dark",
+  "power": 60,
+  "accuracy": 100,
+  "pp": 25,
+  "damageClass": "physical",
+  "priority": 0,
+  "effect": {
+    "flinchChance": 30
+  }
+}

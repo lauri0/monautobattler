@@ -1,0 +1,14 @@
+{
+  "id": 85,
+  "name": "thunderbolt",
+  "type": "electric",
+  "power": 90,
+  "accuracy": 100,
+  "pp": 15,
+  "damageClass": "special",
+  "priority": 0,
+  "effect": {
+    "ailment": "paralysis",
+    "ailmentChance": 10
+  }
+}

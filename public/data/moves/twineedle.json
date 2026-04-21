@@ -1,0 +1,14 @@
+{
+  "id": 41,
+  "name": "twineedle",
+  "type": "bug",
+  "power": 25,
+  "accuracy": 100,
+  "pp": 20,
+  "damageClass": "physical",
+  "priority": 0,
+  "effect": {
+    "ailment": "poison",
+    "ailmentChance": 20
+  }
+}
