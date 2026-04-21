@@ -206,6 +206,11 @@ async function fetchMoveData(moveUrl: string): Promise<Move | null> {
       effect = { ...effect, pivotSwitch: true };
     }
 
+    // Brick Break: removes Reflect and Light Screen on the defender's side before hitting
+    if (data.name === 'brick-break') {
+      effect = { ...effect, removesScreens: true };
+    }
+
     return {
       id: data.id,
       name: data.name,

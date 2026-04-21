@@ -91,13 +91,17 @@ export function effectSummary(move: Move): string {
     parts.push('taunt 3t');
   }
 
+  if (eff.removesScreens) {
+    parts.push('breaks screens');
+  }
+
   if (eff.fieldEffect) {
     const labels: Record<string, string> = {
       trickRoom: 'trick room 5t',
       tailwind: 'tailwind 4t',
       lightScreen: 'light screen 5t',
       reflect: 'reflect 5t',
-      stealthRock: 'stealth Rock',
+      stealthRock: 'stealth rock',
     };
     parts.push(labels[eff.fieldEffect] ?? eff.fieldEffect);
   }

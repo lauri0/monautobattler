@@ -36,6 +36,7 @@ export interface MoveEffect {
   protect?: boolean;       // marks Protect
   fieldEffect?: FieldEffectKind; // marks a field/side-condition-setting status move
   taunt?: boolean;         // applies Taunt to the target (blocks status moves for N turns)
+  removesScreens?: boolean; // removes Reflect and Light Screen on defender's side before the hit (Brick Break)
 }
 
 export type FieldEffectKind =

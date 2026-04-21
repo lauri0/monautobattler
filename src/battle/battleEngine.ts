@@ -801,6 +801,25 @@ export function resolveSingleAttack(
 
   const wasLockedBefore = !!attacker.lockedMove && attacker.lockedMove.moveId === move.id;
   const effMove = effectivePowerMove(move, defender, ctx.foeHitUserThisTurn);
+
+  // Brick Break: strip Reflect / Light Screen on the defender's side before
+  // damage is calculated, so this attack (and any follow-up) ignores them.
+  if (move.effect?.removesScreens) {
+    const defSide = field.sides[defenderSide];
+    if (defSide.reflectTurns > 0 || defSide.lightScreenTurns > 0) {
+      const updatedSide: SideFieldState = { ...defSide };
+      const hadReflect = updatedSide.reflectTurns > 0;
+      const hadLightScreen = updatedSide.lightScreenTurns > 0;
+      updatedSide.reflectTurns = 0;
+      updatedSide.lightScreenTurns = 0;
+      const sides: [SideFieldState, SideFieldState] = [field.sides[0], field.sides[1]];
+      sides[defenderSide] = updatedSide;
+      field = { ...field, sides };
+      if (hadReflect) events.push({ kind: 'field_expired', turn: turnNumber, effect: 'reflect', side: defenderSide });
+      if (hadLightScreen) events.push({ kind: 'field_expired', turn: turnNumber, effect: 'lightScreen', side: defenderSide });
+    }
+  }
+
   const result = calcDamage(attacker, defender, effMove, undefined, defenderScreensFor(field, defenderSide));
   const actualDamage = Math.min(result.damage, defender.currentHp);
   const newDefHp = defender.currentHp - actualDamage;

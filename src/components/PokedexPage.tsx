@@ -37,8 +37,17 @@ export default function PokedexPage({ allPokemon, onSelectPokemon, onBack }: Pro
   }, [hoveredId]);
 
   const filtered = useMemo(() => {
+    const q = search.toLowerCase().trim();
+    const qCompact = q.replace(/[\s-]/g, '');
+    const matchesSearch = (p: PokemonData) => {
+      if (!q) return true;
+      if (p.name.toLowerCase().includes(q)) return true;
+      if (formatPokemonName(p.name).toLowerCase().includes(q)) return true;
+      if (qCompact && p.availableMoves.some(m => m.name.toLowerCase().replace(/-/g, '').includes(qCompact))) return true;
+      return false;
+    };
     return allPokemon
-      .filter(p => p.name.toLowerCase().includes(search.toLowerCase()) || formatPokemonName(p.name).toLowerCase().includes(search.toLowerCase()))
+      .filter(matchesSearch)
       .filter(p => !typeFilter || p.types.includes(typeFilter))
       .filter(p => showDisabled || !getPokemonPersisted(p.id).disabled)
       .sort((a, b) => a.id - b.id);
@@ -63,7 +72,7 @@ export default function PokedexPage({ allPokemon, onSelectPokemon, onBack }: Pro
         <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
           <input
             type="text"
-            placeholder="Search by name..."
+            placeholder="Search by name or move..."
             value={search}
             onChange={e => setSearch(e.target.value)}
             style={{ flex: 1, minWidth: 200 }}
