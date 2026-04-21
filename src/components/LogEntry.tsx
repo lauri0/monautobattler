@@ -266,6 +266,46 @@ export default function LogEntry({ ev }: { ev: TurnEvent }) {
     );
   }
 
+  if (ev.kind === 'weather_set') {
+    const starts: Record<string, string> = {
+      sun: 'The sunlight turned harsh!',
+      rain: 'It started to rain!',
+      sandstorm: 'A sandstorm kicked up!',
+      snow: 'It started to snow!',
+    };
+    return (
+      <div className="log-entry log-entry--effect">
+        <span className="log-turn">T{ev.turn}</span>
+        <span className="log-eff">{starts[ev.weather]}</span>
+      </div>
+    );
+  }
+
+  if (ev.kind === 'weather_expired') {
+    const ends: Record<string, string> = {
+      sun: 'The harsh sunlight faded.',
+      rain: 'The rain stopped.',
+      sandstorm: 'The sandstorm subsided.',
+      snow: 'The snow stopped.',
+    };
+    return (
+      <div className="log-entry log-entry--status">
+        <span className="log-turn">T{ev.turn}</span>
+        <span>{ends[ev.weather]}</span>
+      </div>
+    );
+  }
+
+  if (ev.kind === 'weather_damage') {
+    return (
+      <div className="log-entry log-entry--status">
+        <span className="log-turn">T{ev.turn}</span>
+        <span className="log-attacker">{ev.pokemonName}</span>
+        <span> was buffeted by the sandstorm! (-{ev.damage} HP)</span>
+      </div>
+    );
+  }
+
   if (ev.kind === 'ability_triggered') {
     return (
       <div className="log-entry log-entry--effect">

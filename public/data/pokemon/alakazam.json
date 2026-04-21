@@ -43,5 +43,10 @@
     "calm-mind",
     "nasty-plot",
     "trick-room"
+  ],
+  "abilities": [
+    "synchronize",
+    "inner-focus",
+    "magic-guard"
   ]
 }

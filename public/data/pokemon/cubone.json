@@ -50,5 +50,10 @@
     "growl",
     "protect",
     "stealth-rock"
+  ],
+  "abilities": [
+    "rock-head",
+    "lightning-rod",
+    "battle-armor"
   ]
 }

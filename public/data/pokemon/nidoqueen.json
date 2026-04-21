@@ -62,5 +62,10 @@
     "protect",
     "taunt",
     "stealth-rock"
+  ],
+  "abilities": [
+    "poison-point",
+    "rivalry",
+    "sheer-force"
   ]
 }

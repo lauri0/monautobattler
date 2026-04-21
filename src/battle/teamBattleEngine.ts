@@ -16,7 +16,7 @@ import type {
   StatStages,
 } from '../models/types';
 import { buildBattlePokemon } from './buildBattlePokemon';
-import { applyEndOfTurnStatus, applyStealthRockOnEntry, effectivePriority, makeInitialField, resolveSingleAttack, tickTaunt, usableMoves } from './battleEngine';
+import { applyEndOfTurnStatus, applyEndOfTurnWeather, applyStealthRockOnEntry, effectivePriority, makeInitialField, resolveSingleAttack, tickTaunt, usableMoves } from './battleEngine';
 import { effectiveSpeed } from './damageCalc';
 import { applySwitchInAbility } from './abilities';
 
@@ -54,9 +54,10 @@ export function applyInitialSwitchInsTeam(
 ): { state: TeamBattleState; events: TeamTurnEvent[] } {
   const events: TeamTurnEvent[] = [];
   const teams: [Team, Team] = [state.teams[0], state.teams[1]];
-  applySwitchInInTeam(teams, 0, state.turn, events);
-  applySwitchInInTeam(teams, 1, state.turn, events);
-  return { state: { ...state, teams }, events };
+  let field = state.field;
+  field = applySwitchInInTeam(teams, 0, field, state.turn, events);
+  field = applySwitchInInTeam(teams, 1, field, state.turn, events);
+  return { state: { ...state, teams, field }, events };
 }
 
 // ── Helpers ───────────────────────────────────────────────────────────────────
@@ -216,6 +217,8 @@ function completeTurn(
   const a1 = teams[1].pokemon[teams[1].activeIdx];
   let a0Ticked = applyEndOfTurnStatus(a0, turn, inner);
   let a1Ticked = applyEndOfTurnStatus(a1, turn, inner);
+  a0Ticked = applyEndOfTurnWeather(a0Ticked, field, turn, inner);
+  a1Ticked = applyEndOfTurnWeather(a1Ticked, field, turn, inner);
   a0Ticked = tickTaunt(a0Ticked, turn, inner);
   a1Ticked = tickTaunt(a1Ticked, turn, inner);
   if (a0Ticked.protectedThisTurn) a0Ticked = { ...a0Ticked, protectedThisTurn: false };
@@ -239,12 +242,21 @@ function tickFieldInTeam(
 ): FieldState {
   const next: FieldState = {
     trickRoomTurns: field.trickRoomTurns,
+    weather: field.weather,
+    weatherTurns: field.weatherTurns,
     sides: [{ ...field.sides[0] }, { ...field.sides[1] }],
   };
   if (next.trickRoomTurns > 0) {
     next.trickRoomTurns--;
     if (next.trickRoomTurns === 0) {
       out.push({ side: 0, kind: 'field_expired', turn, effect: 'trickRoom' });
+    }
+  }
+  if (next.weatherTurns > 0 && next.weather) {
+    next.weatherTurns--;
+    if (next.weatherTurns === 0) {
+      out.push({ side: 0, kind: 'weather_expired', turn, weather: next.weather });
+      next.weather = undefined;
     }
   }
   for (const s of [0, 1] as SideIndex[]) {
@@ -270,21 +282,28 @@ function tickFieldInTeam(
 function applySwitchInInTeam(
   teams: [Team, Team],
   incomingSide: SideIndex,
+  field: FieldState,
   turn: number,
   events: TeamTurnEvent[],
-): void {
+): FieldState {
   const opponentSide: SideIndex = incomingSide === 0 ? 1 : 0;
   const incoming = teams[incomingSide].pokemon[teams[incomingSide].activeIdx];
   const opponent = teams[opponentSide].pokemon[teams[opponentSide].activeIdx];
-  if (incoming.currentHp <= 0 || opponent.currentHp <= 0) return;
+  if (incoming.currentHp <= 0 || opponent.currentHp <= 0) return field;
   const inner: TurnEvent[] = [];
-  const updated = applySwitchInAbility(incoming, opponent, turn, inner);
-  if (updated !== opponent) {
-    teams[opponentSide] = writeActive(teams[opponentSide], updated);
-    for (const ev of inner) {
-      events.push({ side: opponentSide, ...ev });
-    }
+  const result = applySwitchInAbility(incoming, opponent, field, turn, inner);
+  if (inner.length === 0) return field;
+  if (result.opponent !== opponent) {
+    teams[opponentSide] = writeActive(teams[opponentSide], result.opponent);
   }
+  // Events emitted by a switch-in ability describe the incoming pokemon's
+  // effect on the opposing side (stat drops, weather changes broadcast by the
+  // active). Tag with the opponent side for wording consistency with the
+  // existing Intimidate event flow.
+  for (const ev of inner) {
+    events.push({ side: opponentSide, ...ev });
+  }
+  return result.field;
 }
 
 // Apply stealth rock to the active pokemon on `side` if hazards are set there.
@@ -380,7 +399,7 @@ export function applyActions(
       outName: outgoing.data.name, inName: incoming.data.name,
     });
     applySrToActive(teams, pivotSide, field, state.turn, events);
-    applySwitchInInTeam(teams, pivotSide, state.turn, events);
+    field = applySwitchInInTeam(teams, pivotSide, field, state.turn, events);
 
     // If SR KO'd the incoming pokemon, skip the pending attack and let the
     // normal phase logic surface a replace request.
@@ -427,7 +446,7 @@ export function applyActions(
         outName: outgoing.data.name, inName: incoming.data.name,
       });
       applySrToActive(teams, side, field, state.turn, events);
-      applySwitchInInTeam(teams, side, state.turn, events);
+      field = applySwitchInInTeam(teams, side, field, state.turn, events);
     }
 
     const phase = computePhaseAfterAttack(teams);
@@ -454,7 +473,7 @@ export function applyActions(
       outName: outgoing.data.name, inName: incoming.data.name,
     });
     applySrToActive(teams, side, field, state.turn, events);
-    applySwitchInInTeam(teams, side, state.turn, events);
+    field = applySwitchInInTeam(teams, side, field, state.turn, events);
   }
 
   // A pokemon switched in and fainted to SR: surface replacement via phase.

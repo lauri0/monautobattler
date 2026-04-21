@@ -49,5 +49,10 @@
     "agility",
     "amnesia",
     "protect"
+  ],
+  "abilities": [
+    "hyper-cutter",
+    "shell-armor",
+    "sheer-force"
   ]
 }

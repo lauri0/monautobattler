@@ -11,6 +11,8 @@ import {
   setTeam3v3Selection,
 } from '../persistence/userStorage';
 import TeamView from './TeamView';
+import WeatherDisplay from './WeatherDisplay';
+import TerrainDisplay from './TerrainDisplay';
 import PlayerActionBar from './PlayerActionBar';
 import { renderTeamEvent } from './TeamEventLog';
 import { useTeamBattleController } from './useTeamBattleController';
@@ -173,7 +175,11 @@ export default function Battle3v3Page({ allPokemon, onBack }: Props) {
             ? (slot) => submitPlayerAction({ kind: 'switch', targetIdx: slot })
             : undefined}
         />
-        <div className="arena-vs">VS</div>
+        <div className="arena-center">
+          <WeatherDisplay field={state.field} />
+          <div className="arena-vs">VS</div>
+          <TerrainDisplay field={state.field} />
+        </div>
         <TeamView state={state} side={1} />
       </div>
 

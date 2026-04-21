@@ -50,5 +50,10 @@
     "calm-mind",
     "nasty-plot",
     "trick-room"
+  ],
+  "abilities": [
+    "soundproof",
+    "filter",
+    "technician"
   ]
 }

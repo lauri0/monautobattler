@@ -34,5 +34,10 @@
     "quick-attack",
     "protect",
     "taunt"
+  ],
+  "abilities": [
+    "gluttony",
+    "hustle",
+    "thick-fat"
   ]
 }

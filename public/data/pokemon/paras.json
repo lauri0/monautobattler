@@ -42,5 +42,10 @@
     "agility",
     "light-screen",
     "protect"
+  ],
+  "abilities": [
+    "effect-spore",
+    "dry-skin",
+    "damp"
   ]
 }

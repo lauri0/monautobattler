@@ -45,5 +45,10 @@
     "protect",
     "taunt",
     "stealth-rock"
+  ],
+  "abilities": [
+    "rock-head",
+    "sturdy",
+    "weak-armor"
   ]
 }

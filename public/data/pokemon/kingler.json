@@ -45,5 +45,10 @@
     "swords-dance",
     "leer",
     "protect"
+  ],
+  "abilities": [
+    "hyper-cutter",
+    "shell-armor",
+    "sheer-force"
   ]
 }

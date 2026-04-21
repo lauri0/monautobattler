@@ -42,5 +42,10 @@
     "reflect",
     "amnesia",
     "protect"
+  ],
+  "abilities": [
+    "chlorophyll",
+    "leaf-guard",
+    "regenerator"
   ]
 }

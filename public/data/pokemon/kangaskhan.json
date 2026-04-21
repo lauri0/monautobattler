@@ -63,5 +63,10 @@
     "double-hit",
     "growl",
     "protect"
+  ],
+  "abilities": [
+    "early-bird",
+    "scrappy",
+    "inner-focus"
   ]
 }

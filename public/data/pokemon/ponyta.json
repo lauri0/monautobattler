@@ -38,5 +38,10 @@
     "agility",
     "protect",
     "will-o-wisp"
+  ],
+  "abilities": [
+    "run-away",
+    "flash-fire",
+    "flame-body"
   ]
 }

@@ -51,5 +51,10 @@
     "leer",
     "protect",
     "stealth-rock"
+  ],
+  "abilities": [
+    "swift-swim",
+    "battle-armor",
+    "weak-armor"
   ]
 }

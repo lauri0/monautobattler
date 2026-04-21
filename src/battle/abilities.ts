@@ -1,13 +1,21 @@
-import type { AbilityId, BattlePokemon, Move, StatStageName, TurnEvent, StatStages } from '../models/types';
+import type { AbilityId, BattlePokemon, FieldState, Move, StatStageName, TurnEvent, StatStages, WeatherKind } from '../models/types';
 
 // Registry of abilities whose effects are wired into the battle engine. Any
 // ability name not present here displays as "(Unimplemented)" in the UI and
 // has no in-battle effect.
 
+export const WEATHER_TURNS = 5;
+
 export interface AbilityEffect {
   // Applied when the bearer switches in (including the start of a battle).
-  // Returns the updated opposing active. May push events.
-  onSwitchIn?: (self: BattlePokemon, opponent: BattlePokemon, turn: number, events: TurnEvent[]) => BattlePokemon;
+  // Returns the updated opponent and field. May push events.
+  onSwitchIn?: (
+    self: BattlePokemon,
+    opponent: BattlePokemon,
+    field: FieldState,
+    turn: number,
+    events: TurnEvent[],
+  ) => { opponent: BattlePokemon; field: FieldState };
   // Multiplier applied to the bearer's outgoing damage.
   damageMultiplier?: (self: BattlePokemon, move: Move) => number;
 }
@@ -30,11 +38,24 @@ function applyStatChange(
   return { ...p, statStages: { ...p.statStages, [stat]: newStage } as StatStages };
 }
 
+function setWeather(
+  weather: WeatherKind,
+  self: BattlePokemon,
+  opponent: BattlePokemon,
+  field: FieldState,
+  turn: number,
+  events: TurnEvent[],
+): { opponent: BattlePokemon; field: FieldState } {
+  if (field.weather === weather) return { opponent, field };
+  events.push({ kind: 'weather_set', turn, weather, turns: WEATHER_TURNS, pokemonName: self.data.name });
+  return { opponent, field: { ...field, weather, weatherTurns: WEATHER_TURNS } };
+}
+
 export const IMPLEMENTED_ABILITIES: Record<string, AbilityEffect> = {
   'intimidate': {
-    onSwitchIn: (_self, opponent, turn, events) => {
-      if (opponent.currentHp <= 0) return opponent;
-      return applyStatChange(opponent, 'attack', -1, turn, events);
+    onSwitchIn: (_self, opponent, field, turn, events) => {
+      if (opponent.currentHp <= 0) return { opponent, field };
+      return { opponent: applyStatChange(opponent, 'attack', -1, turn, events), field };
     },
   },
   'overgrow': {
@@ -44,6 +65,10 @@ export const IMPLEMENTED_ABILITIES: Record<string, AbilityEffect> = {
       return 1;
     },
   },
+  'drought':       { onSwitchIn: (self, opp, field, turn, ev) => setWeather('sun',       self, opp, field, turn, ev) },
+  'drizzle':       { onSwitchIn: (self, opp, field, turn, ev) => setWeather('rain',      self, opp, field, turn, ev) },
+  'sand-stream':   { onSwitchIn: (self, opp, field, turn, ev) => setWeather('sandstorm', self, opp, field, turn, ev) },
+  'snow-warning':  { onSwitchIn: (self, opp, field, turn, ev) => setWeather('snow',      self, opp, field, turn, ev) },
 };
 
 export function isAbilityImplemented(name: AbilityId | undefined): boolean {
@@ -58,24 +83,25 @@ export function getAbilityDamageMultiplier(attacker: BattlePokemon, move: Move):
   return entry?.damageMultiplier?.(attacker, move) ?? 1;
 }
 
-// Applies the incoming pokemon's switch-in ability against the opponent.
-// Returns the (possibly updated) opponent. Emits an `ability_triggered` event
-// when the ability actually produced an effect.
+// Applies the incoming pokemon's switch-in ability against the opponent and
+// field. Returns the (possibly updated) opponent and field. Emits an
+// `ability_triggered` event when the ability actually produced any events.
 export function applySwitchInAbility(
   incoming: BattlePokemon,
   opponent: BattlePokemon,
+  field: FieldState,
   turn: number,
   events: TurnEvent[],
-): BattlePokemon {
+): { opponent: BattlePokemon; field: FieldState } {
   const ability = incoming.ability;
-  if (!ability) return opponent;
+  if (!ability) return { opponent, field };
   const entry = IMPLEMENTED_ABILITIES[ability];
-  if (!entry?.onSwitchIn) return opponent;
+  if (!entry?.onSwitchIn) return { opponent, field };
   const marker: TurnEvent[] = [];
-  const updated = entry.onSwitchIn(incoming, opponent, turn, marker);
+  const result = entry.onSwitchIn(incoming, opponent, field, turn, marker);
   if (marker.length > 0) {
     events.push({ kind: 'ability_triggered', turn, pokemonName: incoming.data.name, ability });
     for (const ev of marker) events.push(ev);
   }
-  return updated;
+  return result;
 }

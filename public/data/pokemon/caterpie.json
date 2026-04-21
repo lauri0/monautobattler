@@ -16,5 +16,9 @@
   "moves": [
     "bug-bite",
     "tackle"
+  ],
+  "abilities": [
+    "shield-dust",
+    "run-away"
   ]
 }

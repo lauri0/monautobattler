@@ -59,5 +59,10 @@
     "swords-dance",
     "amnesia",
     "protect"
+  ],
+  "abilities": [
+    "own-tempo",
+    "oblivious",
+    "cloud-nine"
   ]
 }

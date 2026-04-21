@@ -48,5 +48,10 @@
     "taunt",
     "tailwind",
     "stealth-rock"
+  ],
+  "abilities": [
+    "rock-head",
+    "pressure",
+    "unnerve"
   ]
 }

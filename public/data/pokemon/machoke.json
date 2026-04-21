@@ -43,5 +43,10 @@
     "light-screen",
     "protect",
     "bulk-up"
+  ],
+  "abilities": [
+    "guts",
+    "no-guard",
+    "steadfast"
   ]
 }

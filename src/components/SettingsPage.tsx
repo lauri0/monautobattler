@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { fetchAndStoreRange } from '../api/pokeapi';
+import { fetchAndStoreRange, repairMissingAbilities } from '../api/pokeapi';
 import {
   getLoadedRange,
   resetAllStats,
@@ -100,6 +100,35 @@ export default function SettingsPage({ onBack, onDataLoaded }: Props) {
       onDataLoaded();
     } catch (e) {
       setError('Failed to load data. Check your connection.');
+      console.error(e);
+    } finally {
+      setLoading(false);
+      setProgress(1);
+    }
+  }
+
+  async function handleRepairAbilities() {
+    const range = getLoadedRange();
+    if (range.ids.length === 0) {
+      setError('No Pokemon loaded yet.');
+      return;
+    }
+    setError('');
+    setSummary('');
+    setLoading(true);
+    setProgress(0);
+    try {
+      const result = await repairMissingAbilities(range.ids, (msg, done, total) => {
+        setProgressMsg(msg);
+        setProgress(total > 0 ? done / total : 0);
+      });
+      const msg = result.repaired.length === 0
+        ? 'All Pokemon already have abilities — nothing to repair.'
+        : `Repaired abilities for ${result.repaired.length} Pokemon.`;
+      setSummary(msg);
+      if (result.repaired.length > 0) onDataLoaded();
+    } catch (e) {
+      setError('Failed to repair abilities. Check your connection.');
       console.error(e);
     } finally {
       setLoading(false);
@@ -377,6 +406,10 @@ export default function SettingsPage({ onBack, onDataLoaded }: Props) {
           <button className="btn-primary" onClick={handleLoad} disabled={loading}>
             {loading && <span className="spinner" />}
             Load Pokemon
+          </button>
+          <button className="btn-primary" onClick={handleRepairAbilities} disabled={loading || loadedRange.ids.length === 0} title="Fetch and add missing abilities to already-loaded Pokemon">
+            {loading && <span className="spinner" />}
+            Repair Abilities
           </button>
         </div>
 

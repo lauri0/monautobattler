@@ -30,5 +30,10 @@
     "swords-dance",
     "agility",
     "protect"
+  ],
+  "abilities": [
+    "swift-swim",
+    "water-veil",
+    "lightning-rod"
   ]
 }

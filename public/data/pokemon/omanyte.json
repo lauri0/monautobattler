@@ -45,5 +45,10 @@
     "protect",
     "stealth-rock",
     "shell-smash"
+  ],
+  "abilities": [
+    "swift-swim",
+    "shell-armor",
+    "weak-armor"
   ]
 }

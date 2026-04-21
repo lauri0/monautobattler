@@ -14,5 +14,8 @@
     "speed": 35
   },
   "spriteUrl": "/sprites/14.png",
-  "moves": []
+  "moves": [],
+  "abilities": [
+    "shed-skin"
+  ]
 }

@@ -45,5 +45,10 @@
     "calm-mind",
     "nasty-plot",
     "trick-room"
+  ],
+  "abilities": [
+    "oblivious",
+    "forewarn",
+    "dry-skin"
   ]
 }

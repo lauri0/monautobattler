@@ -39,5 +39,10 @@
     "taunt",
     "calm-mind",
     "trick-room"
+  ],
+  "abilities": [
+    "synchronize",
+    "inner-focus",
+    "magic-guard"
   ]
 }

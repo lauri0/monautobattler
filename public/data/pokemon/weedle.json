@@ -17,5 +17,9 @@
   "moves": [
     "bug-bite",
     "poison-sting"
+  ],
+  "abilities": [
+    "shield-dust",
+    "run-away"
   ]
 }

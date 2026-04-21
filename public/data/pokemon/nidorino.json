@@ -38,5 +38,10 @@
     "poison-sting",
     "leer",
     "protect"
+  ],
+  "abilities": [
+    "poison-point",
+    "rivalry",
+    "hustle"
   ]
 }

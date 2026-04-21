@@ -45,5 +45,10 @@
     "leer",
     "amnesia",
     "protect"
+  ],
+  "abilities": [
+    "poison-point",
+    "rivalry",
+    "hustle"
   ]
 }

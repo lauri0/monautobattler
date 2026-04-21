@@ -1,6 +1,41 @@
-import type { BattlePokemon, Move } from '../models/types';
+import type { BattlePokemon, FieldState, Move, TypeName, WeatherKind } from '../models/types';
 import { getTypeEffectiveness } from '../utils/typeChart';
 import { getAbilityDamageMultiplier } from './abilities';
+
+// Weather-dependent accuracy override for moves whose hit chance is keyed to
+// the weather. Returns `null` when the move always hits under the current
+// weather, otherwise the (possibly scaled) percentage accuracy to roll against.
+function effectiveAccuracy(move: Move, weather: WeatherKind | undefined): number | null {
+  if (move.accuracy === null) return null;
+  if (weather === 'snow' && move.name === 'blizzard') return null;
+  if (weather === 'rain' && (move.name === 'thunder' || move.name === 'hurricane')) return null;
+  if (weather === 'sun' && (move.name === 'thunder' || move.name === 'hurricane')) return move.accuracy * 0.5;
+  return move.accuracy;
+}
+
+function weatherMoveMult(moveType: TypeName, weather: WeatherKind | undefined): number {
+  if (weather === 'sun') {
+    if (moveType === 'fire') return 1.5;
+    if (moveType === 'water') return 0.5;
+  } else if (weather === 'rain') {
+    if (moveType === 'water') return 1.5;
+    if (moveType === 'fire') return 0.5;
+  }
+  return 1;
+}
+
+// Weather-based defense multiplier applied to the defender's D stat:
+//  - Sandstorm: Rock-type defenders get +50% SpD against special moves.
+//  - Snow: Ice-type defenders get +50% Def against physical moves.
+function weatherDefenseMult(
+  defenderTypes: TypeName[],
+  damageClass: Move['damageClass'],
+  weather: WeatherKind | undefined,
+): number {
+  if (weather === 'sandstorm' && damageClass === 'special' && defenderTypes.includes('rock')) return 1.5;
+  if (weather === 'snow' && damageClass === 'physical' && defenderTypes.includes('ice')) return 1.5;
+  return 1;
+}
 
 export interface DamageResult {
   damage: number;
@@ -42,11 +77,13 @@ export function calcDamage(
   move: Move,
   randomRoll?: number, // 0.85–1.00; if not provided, random
   defenderScreens?: DefenderScreens,
+  field?: FieldState,
 ): DamageResult {
-  // Check accuracy
-  if (move.accuracy !== null) {
+  // Check accuracy (with weather-based overrides for Blizzard / Thunder / Hurricane).
+  const acc = effectiveAccuracy(move, field?.weather);
+  if (acc !== null) {
     const hitRoll = Math.random();
-    if (hitRoll > move.accuracy / 100) {
+    if (hitRoll > acc / 100) {
       return { damage: 0, isCrit: false, missed: true, effectiveness: 1 };
     }
   }
@@ -75,13 +112,16 @@ export function calcDamage(
     D = defender.level50Stats.specialDefense * statStageMult(defender.statStages['special-defense']);
   }
 
+  D *= weatherDefenseMult(defender.data.types, move.damageClass, field?.weather);
+
   const stab = attacker.data.types.includes(move.type) ? 1.5 : 1.0;
   const critMult = isCrit ? 1.5 : 1.0;
   const screenMult = screenApplies(move, defenderScreens, isCrit) ? 0.5 : 1.0;
   const abilityMult = getAbilityDamageMultiplier(attacker, move);
+  const weatherMult = weatherMoveMult(move.type, field?.weather);
 
   const base = Math.floor(Math.floor((Math.floor(2 * 50 / 5) + 2) * move.power * A / D) / 50 + 2);
-  const damage = Math.floor(base * critMult * roll * stab * effectiveness * screenMult * abilityMult);
+  const damage = Math.floor(base * critMult * roll * stab * effectiveness * screenMult * abilityMult * weatherMult);
 
   return {
     damage: Math.max(1, damage),
@@ -96,6 +136,7 @@ export function calcMinDamage(
   defender: BattlePokemon,
   move: Move,
   defenderScreens?: DefenderScreens,
+  field?: FieldState,
 ): number {
   const effectiveness = getTypeEffectiveness(move.type, defender.data.types, move.effect?.superEffectiveAgainst);
   if (effectiveness === 0) return 0;
@@ -113,11 +154,14 @@ export function calcMinDamage(
     D = defender.level50Stats.specialDefense * statStageMult(defender.statStages['special-defense']);
   }
 
+  D *= weatherDefenseMult(defender.data.types, move.damageClass, field?.weather);
+
   const stab = attacker.data.types.includes(move.type) ? 1.5 : 1.0;
   const screenMult = screenApplies(move, defenderScreens, false) ? 0.5 : 1.0;
   const abilityMult = getAbilityDamageMultiplier(attacker, move);
+  const weatherMult = weatherMoveMult(move.type, field?.weather);
   const base = Math.floor(Math.floor((Math.floor(2 * 50 / 5) + 2) * move.power * A / D) / 50 + 2);
-  const damage = Math.floor(base * 1.0 * 0.85 * stab * effectiveness * screenMult * abilityMult);
+  const damage = Math.floor(base * 1.0 * 0.85 * stab * effectiveness * screenMult * abilityMult * weatherMult);
   return Math.max(1, damage);
 }
 
@@ -126,6 +170,7 @@ export function calcExpectedDamage(
   defender: BattlePokemon,
   move: Move,
   defenderScreens?: DefenderScreens,
+  field?: FieldState,
 ): number {
   const effectiveness = getTypeEffectiveness(move.type, defender.data.types, move.effect?.superEffectiveAgainst);
   if (effectiveness === 0) return 0;
@@ -143,11 +188,14 @@ export function calcExpectedDamage(
     D = defender.level50Stats.specialDefense * statStageMult(defender.statStages['special-defense']);
   }
 
+  D *= weatherDefenseMult(defender.data.types, move.damageClass, field?.weather);
+
   const stab = attacker.data.types.includes(move.type) ? 1.5 : 1.0;
   const roll = 0.925; // average of 0.85–1.00
   const screenMult = screenApplies(move, defenderScreens, false) ? 0.5 : 1.0;
   const abilityMult = getAbilityDamageMultiplier(attacker, move);
+  const weatherMult = weatherMoveMult(move.type, field?.weather);
   const base = Math.floor(Math.floor((Math.floor(2 * 50 / 5) + 2) * move.power * A / D) / 50 + 2);
-  const damage = Math.floor(base * 1.0 * roll * stab * effectiveness * screenMult * abilityMult);
+  const damage = Math.floor(base * 1.0 * roll * stab * effectiveness * screenMult * abilityMult * weatherMult);
   return Math.max(1, damage);
 }

@@ -38,5 +38,10 @@
     "protect",
     "taunt",
     "bulk-up"
+  ],
+  "abilities": [
+    "gluttony",
+    "hustle",
+    "thick-fat"
   ]
 }

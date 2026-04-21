@@ -45,5 +45,10 @@
     "reflect",
     "protect",
     "trick-room"
+  ],
+  "abilities": [
+    "illuminate",
+    "natural-cure",
+    "analytic"
   ]
 }

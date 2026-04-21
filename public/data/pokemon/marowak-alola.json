@@ -47,5 +47,10 @@
     "protect",
     "will-o-wisp",
     "stealth-rock"
+  ],
+  "abilities": [
+    "cursed-body",
+    "lightning-rod",
+    "rock-head"
   ]
 }

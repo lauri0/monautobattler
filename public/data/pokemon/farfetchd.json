@@ -46,5 +46,10 @@
     "leer",
     "agility",
     "protect"
+  ],
+  "abilities": [
+    "keen-eye",
+    "inner-focus",
+    "defiant"
   ]
 }

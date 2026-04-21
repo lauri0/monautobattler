@@ -50,5 +50,10 @@
     "protect",
     "bulk-up",
     "stealth-rock"
+  ],
+  "abilities": [
+    "hyper-cutter",
+    "mold-breaker",
+    "moxie"
   ]
 }

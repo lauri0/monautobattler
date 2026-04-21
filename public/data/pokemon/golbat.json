@@ -39,5 +39,9 @@
     "protect",
     "taunt",
     "nasty-plot"
+  ],
+  "abilities": [
+    "inner-focus",
+    "infiltrator"
   ]
 }

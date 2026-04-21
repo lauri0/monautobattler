@@ -39,5 +39,10 @@
     "light-screen",
     "reflect",
     "protect"
+  ],
+  "abilities": [
+    "illuminate",
+    "natural-cure",
+    "analytic"
   ]
 }

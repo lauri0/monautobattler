@@ -1,4 +1,4 @@
-import type { BattlePokemon, Move, TurnEvent, BattleResult, StatStageName, StatStages, AIStrategy, FieldState, FieldEffectKind, SideIndex, SideFieldState } from '../models/types';
+import type { BattlePokemon, Move, TurnEvent, BattleResult, StatStageName, StatStages, AIStrategy, FieldState, FieldEffectKind, SideIndex, SideFieldState, TypeName } from '../models/types';
 import { calcDamage, calcExpectedDamage, effectiveSpeed, type DefenderScreens } from './damageCalc';
 import { defaultAI } from '../ai/aiModule';
 import { getTypeEffectiveness } from '../utils/typeChart';
@@ -14,7 +14,26 @@ function makeSide(): SideFieldState {
 }
 
 export function makeInitialField(): FieldState {
-  return { trickRoomTurns: 0, sides: [makeSide(), makeSide()] };
+  return { trickRoomTurns: 0, weatherTurns: 0, sides: [makeSide(), makeSide()] };
+}
+
+const SANDSTORM_IMMUNE_TYPES: TypeName[] = ['rock', 'ground', 'steel'];
+
+// Sandstorm chip damage on the active pokemon. No-op for any other weather
+// (snow explicitly does not deal chip damage per modern mechanics).
+export function applyEndOfTurnWeather(
+  p: BattlePokemon,
+  field: FieldState,
+  turn: number,
+  events: TurnEvent[],
+): BattlePokemon {
+  if (field.weather !== 'sandstorm') return p;
+  if (p.currentHp <= 0) return p;
+  if (p.data.types.some(t => SANDSTORM_IMMUNE_TYPES.includes(t))) return p;
+  const damage = Math.max(1, Math.floor(p.level50Stats.hp / 16));
+  const hpAfter = Math.max(0, p.currentHp - damage);
+  events.push({ kind: 'weather_damage', turn, pokemonName: p.data.name, weather: 'sandstorm', damage, hpAfter });
+  return { ...p, currentHp: hpAfter };
 }
 
 function opposite(side: SideIndex): SideIndex {
@@ -57,12 +76,21 @@ export function applyStealthRockOnEntry(
 function tickField(field: FieldState, turn: number, events: TurnEvent[]): FieldState {
   const next: FieldState = {
     trickRoomTurns: field.trickRoomTurns,
+    weather: field.weather,
+    weatherTurns: field.weatherTurns,
     sides: [{ ...field.sides[0] }, { ...field.sides[1] }],
   };
   if (next.trickRoomTurns > 0) {
     next.trickRoomTurns--;
     if (next.trickRoomTurns === 0) {
       events.push({ kind: 'field_expired', turn, effect: 'trickRoom' });
+    }
+  }
+  if (next.weatherTurns > 0 && next.weather) {
+    next.weatherTurns--;
+    if (next.weatherTurns === 0) {
+      events.push({ kind: 'weather_expired', turn, weather: next.weather });
+      next.weather = undefined;
     }
   }
   for (const s of [0, 1] as SideIndex[]) {
@@ -821,7 +849,7 @@ export function resolveSingleAttack(
     }
   }
 
-  const result = calcDamage(attacker, defender, effMove, undefined, defenderScreensFor(field, defenderSide));
+  const result = calcDamage(attacker, defender, effMove, undefined, defenderScreensFor(field, defenderSide), field);
   const actualDamage = Math.min(result.damage, defender.currentHp);
   const newDefHp = defender.currentHp - actualDamage;
   defender = { ...defender, currentHp: newDefHp };
@@ -979,6 +1007,13 @@ export function resolveTurnWithMoves(
     if (p1.currentHp <= 0 || p2.currentHp <= 0) battleOver = true;
   }
 
+  // End-of-turn weather chip damage (sandstorm only).
+  if (!battleOver) {
+    p1 = applyEndOfTurnWeather(p1, field, turnNumber, events);
+    p2 = applyEndOfTurnWeather(p2, field, turnNumber, events);
+    if (p1.currentHp <= 0 || p2.currentHp <= 0) battleOver = true;
+  }
+
   // Taunt countdown (runs regardless of KO).
   p1 = tickTaunt(p1, turnNumber, events);
   p2 = tickTaunt(p2, turnNumber, events);
@@ -1003,13 +1038,15 @@ export function resolveTurnWithMoves(
 export function applyInitialSwitchIns(
   pokemon1: BattlePokemon,
   pokemon2: BattlePokemon,
-): { p1: BattlePokemon; p2: BattlePokemon; events: TurnEvent[] } {
+  initialField: FieldState = makeInitialField(),
+): { p1: BattlePokemon; p2: BattlePokemon; events: TurnEvent[]; field: FieldState } {
   const events: TurnEvent[] = [];
   let p1 = pokemon1;
   let p2 = pokemon2;
-  p2 = applySwitchInAbility(p1, p2, 1, events);
-  p1 = applySwitchInAbility(p2, p1, 1, events);
-  return { p1, p2, events };
+  let field = initialField;
+  ({ opponent: p2, field } = applySwitchInAbility(p1, p2, field, 1, events));
+  ({ opponent: p1, field } = applySwitchInAbility(p2, p1, field, 1, events));
+  return { p1, p2, events, field };
 }
 
 export function runFullBattle(
@@ -1024,7 +1061,7 @@ export function runFullBattle(
   const allEvents: TurnEvent[] = [...init.events];
   let turn = 1;
   const MAX_TURNS = 500;
-  let field = makeInitialField();
+  let field = init.field;
 
   let lastAttackerIsP1: boolean | undefined;
   while (p1.currentHp > 0 && p2.currentHp > 0 && turn <= MAX_TURNS) {

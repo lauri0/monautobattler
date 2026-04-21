@@ -46,6 +46,8 @@ export type FieldEffectKind =
   | 'reflect'
   | 'stealthRock';
 
+export type WeatherKind = 'sun' | 'rain' | 'sandstorm' | 'snow';
+
 export interface SideFieldState {
   tailwindTurns: number;
   lightScreenTurns: number;
@@ -55,6 +57,8 @@ export interface SideFieldState {
 
 export interface FieldState {
   trickRoomTurns: number;
+  weather?: WeatherKind;
+  weatherTurns: number; // 0 when no weather is active
   sides: [SideFieldState, SideFieldState];
 }
 
@@ -183,7 +187,10 @@ export type TurnEvent =
   | { kind: 'stealth_rock_damage'; turn: number; pokemonName: string; damage: number; hpAfter: number }
   | { kind: 'taunted'; turn: number; pokemonName: string; turns: number }
   | { kind: 'taunt_end'; turn: number; pokemonName: string }
-  | { kind: 'ability_triggered'; turn: number; pokemonName: string; ability: AbilityId };
+  | { kind: 'ability_triggered'; turn: number; pokemonName: string; ability: AbilityId }
+  | { kind: 'weather_set'; turn: number; weather: WeatherKind; turns: number; pokemonName: string }
+  | { kind: 'weather_expired'; turn: number; weather: WeatherKind }
+  | { kind: 'weather_damage'; turn: number; pokemonName: string; weather: WeatherKind; damage: number; hpAfter: number };
 
 export interface BattleResult {
   winner: BattlePokemon;

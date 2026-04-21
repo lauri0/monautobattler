@@ -42,5 +42,9 @@
     "swords-dance",
     "agility",
     "protect"
+  ],
+  "abilities": [
+    "swarm",
+    "sniper"
   ]
 }

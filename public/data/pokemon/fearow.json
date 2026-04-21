@@ -36,5 +36,9 @@
     "growl",
     "agility",
     "protect"
+  ],
+  "abilities": [
+    "keen-eye",
+    "sniper"
   ]
 }

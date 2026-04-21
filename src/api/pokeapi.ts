@@ -409,6 +409,39 @@ export async function fetchAndStoreRange(
   return { loaded, skipped };
 }
 
+export async function repairMissingAbilities(
+  ids: number[],
+  onProgress?: (msg: string, done: number, total: number) => void
+): Promise<{ repaired: number[]; skipped: number[] }> {
+  const repaired: number[] = [];
+  const skipped: number[] = [];
+
+  for (let i = 0; i < ids.length; i++) {
+    const id = ids[i];
+    onProgress?.(`Checking #${id}...`, i, ids.length);
+    try {
+      const raw = await fetchJson<RawPokemon>(`${BASE}/pokemon/${id}`);
+      const abilities = [...raw.abilities].sort((a, b) => a.slot - b.slot).map(a => a.ability.name);
+
+      const localRes = await fetch(`/data/pokemon/${raw.name}.json?t=${Date.now()}`);
+      if (!localRes.ok) { skipped.push(id); continue; }
+
+      const existing = await localRes.json() as Record<string, unknown>;
+      const existingAbilities = existing['abilities'] as string[] | undefined;
+      if (existingAbilities && existingAbilities.length > 0) { skipped.push(id); continue; }
+
+      await saveJsonFile('pokemon', raw.name, { ...existing, abilities });
+      if (abilities.length > 0) await mergeAbilityNames(abilities);
+      repaired.push(id);
+      onProgress?.(`Repaired ${raw.name}`, i + 1, ids.length);
+    } catch {
+      skipped.push(id);
+    }
+  }
+
+  return { repaired, skipped };
+}
+
 function parseStats(stats: RawStat[]): PokemonData['baseStats'] {
   const get = (name: string) => stats.find(s => s.stat.name === name)?.base_stat ?? 0;
   return {

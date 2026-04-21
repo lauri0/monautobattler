@@ -44,5 +44,10 @@
     "poison-sting",
     "growl",
     "protect"
+  ],
+  "abilities": [
+    "poison-point",
+    "rivalry",
+    "hustle"
   ]
 }
