@@ -44,6 +44,29 @@ function actionKey(a: TeamAction): string {
   return a.kind === 'move' ? `m${a.move.id}` : `s${a.targetIdx}`;
 }
 
+// Signature that splits children by the major, RNG-flippable aspects of the
+// resulting state: which pokemon is active, coarse HP bucket, status, and
+// stat-stage sum per side. Damage-roll noise within the same HP bucket still
+// averages (desirable), but KOs, status procs, and stat-boost procs fork the
+// tree into separate subtrees.
+function outcomeSignature(state: TeamBattleState): string {
+  const parts: string[] = [state.phase];
+  for (let s = 0; s < 2; s++) {
+    const t = state.teams[s];
+    const p = t.pokemon[t.activeIdx];
+    const maxHp = p.level50Stats.hp;
+    const hpBucket = maxHp > 0
+      ? Math.max(0, Math.min(8, Math.floor((p.currentHp / maxHp) * 8)))
+      : 0;
+    let sb = 0;
+    for (const v of Object.values(p.statStages)) sb += v;
+    sb = Math.max(-12, Math.min(12, sb));
+    parts.push(`${t.activeIdx}:${hpBucket}:${p.statusCondition ?? 'n'}:${sb}`);
+  }
+  parts.push(state.pendingAttack ? `p${state.pendingAttack.side}` : '-');
+  return parts.join('|');
+}
+
 function makeNode(state: TeamBattleState): MctsNode {
   const winner = battleWinner(state);
   const terminalValue = winner === null ? null : winner === 0 ? 1 : -1;
@@ -71,19 +94,19 @@ function pickByUCB(
   maximize: boolean,
 ): string | null {
   if (keys.length === 0) return null;
+  const unvisited: string[] = [];
   let bestKey = keys[0];
   let bestVal = -Infinity;
   const logP = Math.log(parentVisits + 1);
   for (const k of keys) {
     const s = stats.get(k)!;
-    let val: number;
-    if (s.visits === 0) {
-      val = Infinity;
-    } else {
-      const mean = s.totalValue / s.visits;
-      val = (maximize ? mean : -mean) + C_UCB * Math.sqrt(logP / s.visits);
-    }
+    if (s.visits === 0) { unvisited.push(k); continue; }
+    const mean = s.totalValue / s.visits;
+    const val = (maximize ? mean : -mean) + C_UCB * Math.sqrt(logP / s.visits);
     if (val > bestVal) { bestVal = val; bestKey = k; }
+  }
+  if (unvisited.length > 0) {
+    return unvisited[Math.floor(Math.random() * unvisited.length)];
   }
   return bestKey;
 }
@@ -92,6 +115,10 @@ export class MctsTeamAI implements TeamAIStrategy {
   constructor(
     private iterations: number = DEFAULT_ITERATIONS,
     private evaluator: TeamEvaluator = heuristicTeamEvaluator,
+    // 0 = argmax over visits (deterministic). Higher = softer sampling.
+    // 1 = sample proportional to visits. Small positive values keep play
+    // strong while avoiding full determinism in simultaneous-move turns.
+    private temperature: number = 0.5,
   ) {}
 
   selectAction(state: TeamBattleState, side: SideIndex): TeamAction {
@@ -109,13 +136,28 @@ export class MctsTeamAI implements TeamAIStrategy {
     const keys = side === 0 ? root.keys0 : root.keys1;
     const legal = side === 0 ? root.legal0 : root.legal1;
     const stats = side === 0 ? root.stats0 : root.stats1;
-    let bestIdx = 0;
-    let bestVisits = -1;
-    for (let i = 0; i < keys.length; i++) {
-      const v = stats.get(keys[i])!.visits;
-      if (v > bestVisits) { bestVisits = v; bestIdx = i; }
+    const visits = keys.map(k => stats.get(k)!.visits);
+
+    if (this.temperature <= 0) {
+      let bestIdx = 0;
+      let bestVisits = -1;
+      for (let i = 0; i < visits.length; i++) {
+        if (visits[i] > bestVisits) { bestVisits = visits[i]; bestIdx = i; }
+      }
+      return legal[bestIdx];
     }
-    return legal[bestIdx];
+
+    const invT = 1 / this.temperature;
+    const weights = visits.map(v => Math.pow(Math.max(v, 0), invT));
+    let total = 0;
+    for (const w of weights) total += w;
+    if (!(total > 0)) return legal[0];
+    let r = Math.random() * total;
+    for (let i = 0; i < weights.length; i++) {
+      r -= weights[i];
+      if (r <= 0) return legal[i];
+    }
+    return legal[legal.length - 1];
   }
 
   private iterate(root: MctsNode): void {
@@ -145,7 +187,7 @@ export class MctsTeamAI implements TeamAIStrategy {
       const { next } = applyActions(state, a0, a1);
 
       path.push({ node, key0, key1 });
-      const childKey = `${key0 ?? '-'}|${key1 ?? '-'}|${next.phase}`;
+      const childKey = `${key0 ?? '-'}|${key1 ?? '-'}|${outcomeSignature(next)}`;
       let child = node.children.get(childKey);
       if (!child) {
         child = { node: makeNode(next) };

@@ -18,6 +18,9 @@ export interface AbilityEffect {
     turn: number,
     events: TurnEvent[],
   ) => { opponent: BattlePokemon; field: FieldState };
+  // Applied when the bearer switches out voluntarily (not when fainting).
+  // Returns the updated bearer. May push events.
+  onSwitchOut?: (self: BattlePokemon, turn: number, events: TurnEvent[]) => BattlePokemon;
   // Multiplier applied to the bearer's outgoing damage.
   damageMultiplier?: (self: BattlePokemon, move: Move) => number;
   // When true, variable-hit moves (hitsVariable) always hit their maximum (5).
@@ -105,6 +108,18 @@ export const IMPLEMENTED_ABILITIES: Record<string, AbilityEffect> = {
   'defiant':       {},
   'sheer-force': {
     damageMultiplier: (_self, move) => sheerForceApplies(move) ? 1.3 : 1,
+  },
+  'sniper': {},
+  'thick-fat': {},
+  'regenerator': {
+    onSwitchOut: (self, turn, events) => {
+      const heal = Math.floor(self.level50Stats.hp / 3);
+      if (heal <= 0 || self.currentHp >= self.level50Stats.hp) return self;
+      const hpAfter = Math.min(self.level50Stats.hp, self.currentHp + heal);
+      events.push({ kind: 'ability_triggered', turn, pokemonName: self.data.name, ability: 'regenerator' });
+      events.push({ kind: 'heal', turn, pokemonName: self.data.name, healed: hpAfter - self.currentHp, hpAfter });
+      return { ...self, currentHp: hpAfter };
+    },
   },
   'rock-head':    {},
   'water-absorb': {},
@@ -288,6 +303,20 @@ export function getAbilityDamageMultiplier(attacker: BattlePokemon, move: Move):
   if (!ability) return 1;
   const entry = IMPLEMENTED_ABILITIES[ability];
   return entry?.damageMultiplier?.(attacker, move) ?? 1;
+}
+
+// Applies the outgoing pokemon's switch-out ability (e.g. Regenerator). Returns
+// the (possibly updated) bearer. Emits events when the ability activates.
+export function applySwitchOutAbility(
+  outgoing: BattlePokemon,
+  turn: number,
+  events: TurnEvent[],
+): BattlePokemon {
+  const ability = outgoing.ability;
+  if (!ability) return outgoing;
+  const entry = IMPLEMENTED_ABILITIES[ability];
+  if (!entry?.onSwitchOut) return outgoing;
+  return entry.onSwitchOut(outgoing, turn, events);
 }
 
 // Applies the incoming pokemon's switch-in ability against the opponent and

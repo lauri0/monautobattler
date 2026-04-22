@@ -30,10 +30,12 @@ function terrainMoveMult(
   return 1;
 }
 
-// Effective type multiplier including ability-based immunities (Levitate).
+// Effective type multiplier including ability-based immunities and reductions.
 function typeEffectiveness(move: Move, defender: BattlePokemon): number {
   if (move.type === 'ground' && defender.ability === 'levitate') return 0;
-  return getTypeEffectiveness(move.type, defender.data.types, move.effect?.superEffectiveAgainst);
+  const base = getTypeEffectiveness(move.type, defender.data.types, move.effect?.superEffectiveAgainst);
+  if (defender.ability === 'thick-fat' && (move.type === 'fire' || move.type === 'ice')) return base * 0.5;
+  return base;
 }
 
 // Weather-dependent accuracy override for moves whose hit chance is keyed to
@@ -154,7 +156,7 @@ export function calcDamage(
   D *= weatherDefenseMult(defender.data.types, move.damageClass, field?.weather);
 
   const stab = attacker.data.types.includes(move.type) ? 1.5 : 1.0;
-  const critMult = isCrit ? 1.5 : 1.0;
+  const critMult = isCrit ? (attacker.ability === 'sniper' ? 2.25 : 1.5) : 1.0;
   const screenMult = screenApplies(move, defenderScreens, isCrit) ? 0.5 : 1.0;
   const abilityMult = getAbilityDamageMultiplier(attacker, move);
   const weatherMult = weatherMoveMult(move.type, field?.weather);

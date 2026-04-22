@@ -64,6 +64,7 @@ export function getDetailedDefensiveMatchups(
   ability?: string,
 ): {
   immune: TypeName[];
+  ultraResists: TypeName[];
   stronglyResists: TypeName[];
   resists: TypeName[];
   neutral: TypeName[];
@@ -71,6 +72,7 @@ export function getDetailedDefensiveMatchups(
   veryWeakTo: TypeName[];
 } {
   const immune: TypeName[] = [];
+  const ultraResists: TypeName[] = [];
   const stronglyResists: TypeName[] = [];
   const resists: TypeName[] = [];
   const neutral: TypeName[] = [];
@@ -79,8 +81,10 @@ export function getDetailedDefensiveMatchups(
 
   for (const attackType of ALL_TYPES) {
     const baseMult = getTypeEffectiveness(attackType, pokemonTypes);
-    const mult = ability === 'levitate' && attackType === 'ground' ? 0 : baseMult;
+    let mult = ability === 'levitate' && attackType === 'ground' ? 0 : baseMult;
+    if (ability === 'thick-fat' && (attackType === 'fire' || attackType === 'ice')) mult *= 0.5;
     if (mult === 0) immune.push(attackType);
+    else if (mult <= 0.125) ultraResists.push(attackType);
     else if (mult <= 0.25) stronglyResists.push(attackType);
     else if (mult <= 0.5) resists.push(attackType);
     else if (mult >= 4) veryWeakTo.push(attackType);
@@ -88,5 +92,5 @@ export function getDetailedDefensiveMatchups(
     else neutral.push(attackType);
   }
 
-  return { immune, stronglyResists, resists, neutral, weakTo, veryWeakTo };
+  return { immune, ultraResists, stronglyResists, resists, neutral, weakTo, veryWeakTo };
 }

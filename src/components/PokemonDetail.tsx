@@ -155,6 +155,16 @@ export default function PokemonDetail({ pokemon, allPokemon, onBack, onNavigate 
                 </div>
               </div>
             )}
+            {matchups.ultraResists.length > 0 && (
+              <div className="matchup-row">
+                <span className="matchup-label">0.125x:</span>
+                <div className="matchup-badges">
+                  {matchups.ultraResists.map(type => (
+                    <span key={type} className="matchup-badge" style={{ background: getTypeColor(type) }}>{type}</span>
+                  ))}
+                </div>
+              </div>
+            )}
             {matchups.stronglyResists.length > 0 && (
               <div className="matchup-row">
                 <span className="matchup-label">0.25x:</span>

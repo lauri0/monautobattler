@@ -18,7 +18,7 @@ import type {
 import { buildBattlePokemon } from './buildBattlePokemon';
 import { applyEndOfTurnStatus, applyEndOfTurnTerrain, applyEndOfTurnWeather, applyStealthRockOnEntry, effectivePriority, makeInitialField, resolveSingleAttack, tickTaunt, usableMoves } from './battleEngine';
 import { effectiveSpeed } from './damageCalc';
-import { applySwitchInAbility } from './abilities';
+import { applySwitchInAbility, applySwitchOutAbility } from './abilities';
 
 const MAX_TURNS = 500;
 
@@ -402,7 +402,9 @@ export function applyActions(
 
     let teams = state.teams.slice() as [Team, Team];
     const team = teams[pivotSide];
-    const outgoing = onSwitchOut(team.pokemon[team.activeIdx]);
+    const inner: TurnEvent[] = [];
+    const outgoing = applySwitchOutAbility(onSwitchOut(team.pokemon[team.activeIdx]), state.turn, inner);
+    for (const ev of inner) events.push({ side: pivotSide, ...ev });
     const incoming = team.pokemon[action.targetIdx];
     teams[pivotSide] = setActive(team, action.targetIdx, outgoing);
     events.push({
@@ -476,7 +478,9 @@ export function applyActions(
     const action = side === 0 ? action0 : action1;
     if (action.kind !== 'switch') continue;
     const team = teams[side];
-    const outgoing = onSwitchOut(team.pokemon[team.activeIdx]);
+    const switchOutInner: TurnEvent[] = [];
+    const outgoing = applySwitchOutAbility(onSwitchOut(team.pokemon[team.activeIdx]), state.turn, switchOutInner);
+    for (const ev of switchOutInner) events.push({ side, ...ev });
     const incoming = team.pokemon[action.targetIdx];
     teams[side] = setActive(team, action.targetIdx, outgoing);
     events.push({
