@@ -76,7 +76,7 @@ export function effectSummary(move: Move): string {
   }
 
   if (eff.hitsExactly) {
-    parts.push(`hits ${eff.hitsExactly}×`);
+    parts.push(eff.escalatingHits ? `hits ${eff.hitsExactly}×, escalating power` : `hits ${eff.hitsExactly}×`);
   }
 
   if (eff.hitsVariable) {

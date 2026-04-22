@@ -16,7 +16,7 @@ import { heuristicTeamEvaluator } from './heuristicTeamEvaluator';
 
 const C_UCB = 1.0;
 const MAX_ROLLOUT_DEPTH = 40;
-const DEFAULT_ITERATIONS = 3000;
+const DEFAULT_ITERATIONS = 5000;
 
 interface ActionStat {
   visits: number;

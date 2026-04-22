@@ -6,5 +6,9 @@
   "accuracy": 90,
   "pp": 10,
   "damageClass": "physical",
-  "priority": 0
+  "priority": 0,
+  "effect": {
+    "hitsExactly": 3,
+    "escalatingHits": true
+  }
 }

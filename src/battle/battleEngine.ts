@@ -2,7 +2,7 @@ import type { BattlePokemon, Move, TurnEvent, BattleResult, StatStageName, StatS
 import { calcDamage, calcExpectedDamage, effectiveSpeed, type DefenderScreens } from './damageCalc';
 import { defaultAI } from '../ai/aiModule';
 import { getTypeEffectiveness } from '../utils/typeChart';
-import { abilityMaxVariableHits, applySwitchInAbility } from './abilities';
+import { abilityMaxVariableHits, applySwitchInAbility, applyStatChangeFromFoe, noGuardInEffect, sheerForceSuppresses, absorbsWater, absorbsElectric, sturdyActive, ignoresRecoil, applyContactAbility } from './abilities';
 import { isGrounded } from './damageCalc';
 
 export const TRICK_ROOM_TURNS = 5;
@@ -369,7 +369,7 @@ function applySecondaryEffects(
       const newHp = Math.min(attacker.level50Stats.hp, attacker.currentHp + healed);
       events.push({ kind: 'drain', turn, pokemonName: attacker.data.name, healed: newHp - attacker.currentHp, hpAfter: newHp });
       attacker = { ...attacker, currentHp: newHp };
-    } else {
+    } else if (!ignoresRecoil(attacker)) {
       const recoil = Math.max(1, Math.floor(damage * Math.abs(eff.drain) / 100));
       const newHp = Math.max(0, attacker.currentHp - recoil);
       events.push({ kind: 'recoil', turn, pokemonName: attacker.data.name, damage: recoil, hpAfter: newHp });
@@ -377,22 +377,27 @@ function applySecondaryEffects(
     }
   }
 
+  // Sheer Force: on qualifying moves, skip all secondary effects (stat changes,
+  // ailment, flinch, confusion) in exchange for the 1.3x damage boost applied
+  // in calcDamage. Drain and recoil above are preserved.
+  const sheerForce = sheerForceSuppresses(attacker, move);
+
   // Stat changes
-  if (eff.statChanges && eff.statChanges.length > 0) {
+  if (!sheerForce && eff.statChanges && eff.statChanges.length > 0) {
     const chance = eff.statChance ?? 0;
     if (chance === 0 || Math.random() * 100 < chance) {
       for (const sc of eff.statChanges) {
         if (sc.target === 'user') {
           attacker = applyStatChange(attacker, sc.stat, sc.change, turn, events);
         } else {
-          defender = applyStatChange(defender, sc.stat, sc.change, turn, events);
+          defender = applyStatChangeFromFoe(defender, sc.stat, sc.change, turn, events);
         }
       }
     }
   }
 
   // Primary ailment
-  if (eff.ailment && !defender.statusCondition && !isImmuneToAilment(defender, eff.ailment) && !terrainBlocksAilment(defender, eff.ailment, field)) {
+  if (!sheerForce && eff.ailment && !defender.statusCondition && !isImmuneToAilment(defender, eff.ailment) && !terrainBlocksAilment(defender, eff.ailment, field)) {
     const chance = eff.ailmentChance ?? 0;
     if (chance === 0 || Math.random() * 100 < chance) {
       events.push({ kind: 'status_applied', turn, pokemonName: defender.data.name, condition: eff.ailment });
@@ -401,12 +406,12 @@ function applySecondaryEffects(
   }
 
   // Flinch
-  if (eff.flinchChance && Math.random() * 100 < eff.flinchChance) {
+  if (!sheerForce && eff.flinchChance && Math.random() * 100 < eff.flinchChance) {
     defenderFlinched = true;
   }
 
   // Confusion on defender
-  if (eff.confuses && !defender.confused && !terrainBlocksConfusion(defender, field)) {
+  if (!sheerForce && eff.confuses && !defender.confused && !terrainBlocksConfusion(defender, field)) {
     const chance = eff.confusionChance ?? 0;
     if (chance === 0 || Math.random() * 100 < chance) {
       const turns = 2 + Math.floor(Math.random() * 4); // 2–5 turns
@@ -487,7 +492,21 @@ function applyStatChangesSilent(
     if (change.target === 'user') {
       attacker = { ...attacker, statStages: { ...attacker.statStages, [change.stat]: clampStage(attacker.statStages[change.stat] + change.change) } as StatStages };
     } else {
-      defender = { ...defender, statStages: { ...defender.statStages, [change.stat]: clampStage(defender.statStages[change.stat] + change.change) } as StatStages };
+      // Mirror big-pecks / competitive / defiant reactive abilities in the silent path
+      // so the AI tree sees the same post-change state.
+      if (change.change < 0 && change.stat === 'defense' && defender.ability === 'big-pecks') continue;
+      const before = defender.statStages[change.stat];
+      const after = clampStage(before + change.change);
+      defender = { ...defender, statStages: { ...defender.statStages, [change.stat]: after } as StatStages };
+      if (after < before) {
+        if (defender.ability === 'competitive') {
+          const spa = clampStage(defender.statStages['special-attack'] + 2);
+          defender = { ...defender, statStages: { ...defender.statStages, 'special-attack': spa } as StatStages };
+        } else if (defender.ability === 'defiant') {
+          const atk = clampStage(defender.statStages['attack'] + 2);
+          defender = { ...defender, statStages: { ...defender.statStages, attack: atk } as StatStages };
+        }
+      }
     }
   }
   return { attacker, defender };
@@ -565,8 +584,29 @@ export function simulateTurnDeterministic(
 
     if (hit) {
       const effectiveMove = effectivePowerMove(move, defender, foeHitUserThisTurn);
+
+      // Water Absorb: nullify water damage and heal 1/4 max HP.
+      if (absorbsWater(defender, effectiveMove)) {
+        const maxHp = defender.level50Stats.hp;
+        const heal = Math.max(1, Math.floor(maxHp / 4));
+        defender = { ...defender, currentHp: Math.min(maxHp, defender.currentHp + heal) };
+        return { attacker, defender, flinched: false, dealtDamage: false };
+      }
+
+      // Lightning Rod: nullify electric damage and raise Sp. Atk by 1.
+      if (absorbsElectric(defender, effectiveMove)) {
+        const spa = clampStage(defender.statStages['special-attack'] + 1);
+        defender = { ...defender, statStages: { ...defender.statStages, 'special-attack': spa } as StatStages };
+        return { attacker, defender, flinched: false, dealtDamage: false };
+      }
+
       const rawDmg = expectedDamageWithCrit(attacker, defender, effectiveMove);
-      const dmg = rawDmg > 0 ? Math.max(1, Math.floor(rawDmg * fraction)) : 0;
+      let dmg = rawDmg > 0 ? Math.max(1, Math.floor(rawDmg * fraction)) : 0;
+
+      // Sturdy: full-HP defender survives a would-be KO with 1 HP.
+      if (sturdyActive(defender) && dmg >= defender.currentHp) {
+        dmg = defender.currentHp - 1;
+      }
       dealtDamage = dmg > 0;
 
       // Drain / recoil (deterministic)
@@ -577,20 +617,22 @@ export function simulateTurnDeterministic(
         if (move.effect.drain > 0) {
           const healed = Math.max(1, Math.floor(actualDmg * move.effect.drain / 100));
           attacker = { ...attacker, currentHp: Math.min(attacker.level50Stats.hp, attacker.currentHp + healed) };
-        } else {
+        } else if (!ignoresRecoil(attacker)) {
           const recoil = Math.max(1, Math.floor(actualDmg * Math.abs(move.effect.drain) / 100));
           attacker = { ...attacker, currentHp: Math.max(0, attacker.currentHp - recoil) };
         }
       }
 
-      // Secondary effects (pre-resolved)
-      if (effects.statChange && move.effect?.statChanges) {
+      // Secondary effects (pre-resolved). Sheer Force suppresses them on
+      // qualifying moves; the 1.3x boost is already baked into rawDmg above.
+      const sheerForce = sheerForceSuppresses(attacker, move);
+      if (!sheerForce && effects.statChange && move.effect?.statChanges) {
         const result = applyStatChangesSilent(attacker, defender, move);
         attacker = result.attacker;
         // Only apply foe-targeting stat changes if the defender is still alive
         if (defender.currentHp > 0) defender = result.defender;
       }
-      if (defender.currentHp > 0) {
+      if (!sheerForce && defender.currentHp > 0) {
         if (effects.ailment && move.effect?.ailment && !defender.statusCondition && !isImmuneToAilment(defender, move.effect.ailment)) {
           defender = { ...defender, statusCondition: move.effect.ailment };
         }
@@ -729,7 +771,8 @@ function resolveStatusMove(
   }
 
   // Accuracy roll (Sleep Powder 75, Thunder Wave 90, Poison Powder 75, etc.)
-  if (move.accuracy !== null && Math.random() > move.accuracy / 100) {
+  // No Guard on either side bypasses the miss roll entirely.
+  if (move.accuracy !== null && !noGuardInEffect(attacker, defender) && Math.random() > move.accuracy / 100) {
     events.push({
       kind: 'attack', turn,
       attackerName: attacker.data.name, defenderName: defender.data.name,
@@ -815,7 +858,7 @@ function resolveStatusMove(
       if (sc.target === 'user') {
         attacker = applyStatChange(attacker, sc.stat, sc.change, turn, events);
       } else {
-        defender = applyStatChange(defender, sc.stat, sc.change, turn, events);
+        defender = applyStatChangeFromFoe(defender, sc.stat, sc.change, turn, events);
       }
     }
   }
@@ -939,11 +982,68 @@ export function resolveSingleAttack(
   let totalConnected = false;
   let lastHitDamage = 0;
 
+  // Water Absorb: nullify water damaging moves and heal the defender by 1/4 max HP.
+  // Emit an attack event (damage 0, no miss) so the log reflects the absorption.
+  if (absorbsWater(defender, effMove)) {
+    events.push({ kind: 'ability_triggered', turn: turnNumber, pokemonName: defender.data.name, ability: 'water-absorb' });
+    const maxHp = defender.level50Stats.hp;
+    const healAmount = Math.max(1, Math.floor(maxHp / 4));
+    const newHp = Math.min(maxHp, defender.currentHp + healAmount);
+    if (newHp > defender.currentHp) {
+      events.push({ kind: 'heal', turn: turnNumber, pokemonName: defender.data.name, healed: newHp - defender.currentHp, hpAfter: newHp });
+      defender = { ...defender, currentHp: newHp };
+    }
+    events.push({
+      kind: 'attack', turn: turnNumber,
+      attackerName: attacker.data.name, defenderName: defender.data.name,
+      moveName: move.name, moveType: move.type,
+      damage: 0, isCrit: false, missed: false, effectiveness: 0,
+      attackerHpAfter: attacker.currentHp, defenderHpAfter: defender.currentHp,
+    });
+    return { attacker, defender, dealtDamage: false, defenderFlinched: false, pivotTriggered: false, field };
+  }
+
+  // Lightning Rod: nullify electric damaging moves and raise Sp. Atk by 1.
+  if (absorbsElectric(defender, effMove)) {
+    events.push({ kind: 'ability_triggered', turn: turnNumber, pokemonName: defender.data.name, ability: 'lightning-rod' });
+    defender = applyStatChange(defender, 'special-attack', 1, turnNumber, events);
+    events.push({
+      kind: 'attack', turn: turnNumber,
+      attackerName: attacker.data.name, defenderName: defender.data.name,
+      moveName: move.name, moveType: move.type,
+      damage: 0, isCrit: false, missed: false, effectiveness: 0,
+      attackerHpAfter: attacker.currentHp, defenderHpAfter: defender.currentHp,
+    });
+    return { attacker, defender, dealtDamage: false, defenderFlinched: false, pivotTriggered: false, field };
+  }
+
+  const escalating = !!move.effect?.escalatingHits;
+  const skillLink = attacker.ability === 'skill-link';
+
   for (let hitIndex = 0; hitIndex < hitCount; hitIndex++) {
-    // Skip accuracy check on hits after the first
-    const hitMove = hitIndex === 0 ? effMove : { ...effMove, accuracy: null as null };
+    // Triple Axel / Triple Kick: each hit scales power by (N+1) and rolls its
+    // own accuracy (unless Skill Link, which guarantees all hits). Regular
+    // multi-hit moves skip the accuracy roll on hits after the first.
+    let hitMove: Move;
+    if (escalating) {
+      hitMove = {
+        ...effMove,
+        power: effMove.power * (hitIndex + 1),
+        accuracy: skillLink ? null : effMove.accuracy,
+      };
+    } else {
+      hitMove = hitIndex === 0 ? effMove : { ...effMove, accuracy: null as null };
+    }
     const result = calcDamage(attacker, defender, hitMove, undefined, defenderScreensFor(field, defenderSide), field);
-    const actualDamage = Math.min(result.damage, defender.currentHp);
+
+    // Sturdy: a full-HP defender survives a would-be KO with 1 HP.
+    let sturdyTriggered = false;
+    let damageThisHit = result.damage;
+    if (sturdyActive(defender) && !result.missed && damageThisHit >= defender.currentHp) {
+      damageThisHit = defender.currentHp - 1;
+      sturdyTriggered = true;
+    }
+    const actualDamage = Math.min(damageThisHit, defender.currentHp);
     const newDefHp = defender.currentHp - actualDamage;
     defender = { ...defender, currentHp: newDefHp };
 
@@ -951,16 +1051,19 @@ export function resolveSingleAttack(
       kind: 'attack', turn: turnNumber,
       attackerName: attacker.data.name, defenderName: defender.data.name,
       moveName: move.name, moveType: move.type,
-      damage: result.damage, isCrit: result.isCrit,
+      damage: damageThisHit, isCrit: result.isCrit,
       missed: result.missed, effectiveness: result.effectiveness,
       attackerHpAfter: attacker.currentHp, defenderHpAfter: newDefHp,
     });
+    if (sturdyTriggered) {
+      events.push({ kind: 'ability_triggered', turn: turnNumber, pokemonName: defender.data.name, ability: 'sturdy' });
+    }
 
     if (result.missed) break;
 
     if (!result.missed && result.effectiveness !== 0) {
       totalConnected = true;
-      if (result.damage > 0) dealtDamage = true;
+      if (damageThisHit > 0) dealtDamage = true;
       lastHitDamage = actualDamage;
     }
 
@@ -972,6 +1075,9 @@ export function resolveSingleAttack(
     attacker = eff.attacker;
     defender = eff.defender;
     defenderFlinched = eff.defenderFlinched;
+    // Contact abilities (Static, Flame Body, Poison Point, Effect Spore) roll
+    // against the attacker if the move made contact.
+    attacker = applyContactAbility(attacker, defender, move, turnNumber, events);
   }
 
   // Tick an existing forced-move lock. Skip on the turn the lock is first set.

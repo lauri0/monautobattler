@@ -1,6 +1,6 @@
 import type { BattlePokemon, FieldState, Move, TerrainKind, TypeName, WeatherKind } from '../models/types';
 import { getTypeEffectiveness } from '../utils/typeChart';
-import { getAbilityDamageMultiplier } from './abilities';
+import { getAbilityDamageMultiplier, noGuardInEffect } from './abilities';
 
 // "Grounded" = eligible to be hit by Ground-type moves and affected by terrain.
 // Flying types and Levitate users float; no other modifiers are modeled.
@@ -114,8 +114,9 @@ export function calcDamage(
   field?: FieldState,
 ): DamageResult {
   // Check accuracy (with weather-based overrides for Blizzard / Thunder / Hurricane).
+  // No Guard on either side bypasses the miss roll entirely.
   const acc = effectiveAccuracy(move, field?.weather);
-  if (acc !== null) {
+  if (acc !== null && !noGuardInEffect(attacker, defender)) {
     const hitRoll = Math.random();
     if (hitRoll > acc / 100) {
       return { damage: 0, isCrit: false, missed: true, effectiveness: 1 };
