@@ -3,6 +3,7 @@ import { calcDamage, calcExpectedDamage, effectiveSpeed, type DefenderScreens } 
 import { defaultAI } from '../ai/aiModule';
 import { getTypeEffectiveness } from '../utils/typeChart';
 import { abilityMaxVariableHits, applySwitchInAbility } from './abilities';
+import { isGrounded } from './damageCalc';
 
 export const TRICK_ROOM_TURNS = 5;
 export const TAILWIND_TURNS = 4;
@@ -14,7 +15,7 @@ function makeSide(): SideFieldState {
 }
 
 export function makeInitialField(): FieldState {
-  return { trickRoomTurns: 0, weatherTurns: 0, sides: [makeSide(), makeSide()] };
+  return { trickRoomTurns: 0, weatherTurns: 0, terrainTurns: 0, sides: [makeSide(), makeSide()] };
 }
 
 const SANDSTORM_IMMUNE_TYPES: TypeName[] = ['rock', 'ground', 'steel'];
@@ -33,6 +34,24 @@ export function applyEndOfTurnWeather(
   const damage = Math.max(1, Math.floor(p.level50Stats.hp / 16));
   const hpAfter = Math.max(0, p.currentHp - damage);
   events.push({ kind: 'weather_damage', turn, pokemonName: p.data.name, weather: 'sandstorm', damage, hpAfter });
+  return { ...p, currentHp: hpAfter };
+}
+
+// Grassy terrain heals grounded, alive pokemon for 1/16 max HP each turn.
+export function applyEndOfTurnTerrain(
+  p: BattlePokemon,
+  field: FieldState,
+  turn: number,
+  events: TurnEvent[],
+): BattlePokemon {
+  if (field.terrain !== 'grassy') return p;
+  if (p.currentHp <= 0) return p;
+  if (!isGrounded(p)) return p;
+  if (p.currentHp >= p.level50Stats.hp) return p;
+  const heal = Math.max(1, Math.floor(p.level50Stats.hp / 16));
+  const hpAfter = Math.min(p.level50Stats.hp, p.currentHp + heal);
+  const healed = hpAfter - p.currentHp;
+  events.push({ kind: 'terrain_heal', turn, pokemonName: p.data.name, healed, hpAfter });
   return { ...p, currentHp: hpAfter };
 }
 
@@ -78,6 +97,8 @@ function tickField(field: FieldState, turn: number, events: TurnEvent[]): FieldS
     trickRoomTurns: field.trickRoomTurns,
     weather: field.weather,
     weatherTurns: field.weatherTurns,
+    terrain: field.terrain,
+    terrainTurns: field.terrainTurns,
     sides: [{ ...field.sides[0] }, { ...field.sides[1] }],
   };
   if (next.trickRoomTurns > 0) {
@@ -91,6 +112,13 @@ function tickField(field: FieldState, turn: number, events: TurnEvent[]): FieldS
     if (next.weatherTurns === 0) {
       events.push({ kind: 'weather_expired', turn, weather: next.weather });
       next.weather = undefined;
+    }
+  }
+  if (next.terrainTurns > 0 && next.terrain) {
+    next.terrainTurns--;
+    if (next.terrainTurns === 0) {
+      events.push({ kind: 'terrain_expired', turn, terrain: next.terrain });
+      next.terrain = undefined;
     }
   }
   for (const s of [0, 1] as SideIndex[]) {
@@ -159,8 +187,14 @@ function effectivePowerMove(
 // Protect gets a priority boost that supersedes other priority moves. The real
 // games use +4; we use that too so Protect reliably resolves before the foe's
 // attack regardless of speed.
-export function effectivePriority(move: Move): number {
-  return move.effect?.protect ? 4 : move.priority;
+export function effectivePriority(move: Move, attacker?: BattlePokemon, field?: FieldState): number {
+  if (move.effect?.protect) return 4;
+  let pri = move.priority;
+  // Grassy Glide gains +1 priority when used by a grounded pokemon on Grassy Terrain.
+  if (move.name === 'grassy-glide' && field?.terrain === 'grassy' && attacker && isGrounded(attacker)) {
+    pri += 1;
+  }
+  return pri;
 }
 
 function targetsFoe(move: Move): boolean {
@@ -284,6 +318,24 @@ function canAct(
   return { canAct: true, updated: p };
 }
 
+// Terrain-based immunities. Electric Terrain blocks sleep on grounded pokemon;
+// Misty Terrain blocks all non-volatile status on grounded pokemon.
+function terrainBlocksAilment(
+  defender: BattlePokemon,
+  ailment: import('../models/types').StatusCondition,
+  field: FieldState,
+): boolean {
+  if (!isGrounded(defender)) return false;
+  if (field.terrain === 'misty') return true;
+  if (field.terrain === 'electric' && ailment === 'sleep') return true;
+  return false;
+}
+
+// Misty Terrain also blocks confusion on grounded pokemon.
+function terrainBlocksConfusion(defender: BattlePokemon, field: FieldState): boolean {
+  return field.terrain === 'misty' && isGrounded(defender);
+}
+
 // Type-based immunity to major ailments (approximates real Pokemon rules).
 // Sleep has no type immunity; confusion also has none.
 function isImmuneToAilment(defender: BattlePokemon, ailment: import('../models/types').StatusCondition): boolean {
@@ -303,7 +355,8 @@ function applySecondaryEffects(
   move: Move,
   damage: number,
   turn: number,
-  events: TurnEvent[]
+  events: TurnEvent[],
+  field: FieldState,
 ): { attacker: BattlePokemon; defender: BattlePokemon; defenderFlinched: boolean } {
   if (!move.effect) return { attacker, defender, defenderFlinched: false };
   const eff = move.effect;
@@ -339,7 +392,7 @@ function applySecondaryEffects(
   }
 
   // Primary ailment
-  if (eff.ailment && !defender.statusCondition && !isImmuneToAilment(defender, eff.ailment)) {
+  if (eff.ailment && !defender.statusCondition && !isImmuneToAilment(defender, eff.ailment) && !terrainBlocksAilment(defender, eff.ailment, field)) {
     const chance = eff.ailmentChance ?? 0;
     if (chance === 0 || Math.random() * 100 < chance) {
       events.push({ kind: 'status_applied', turn, pokemonName: defender.data.name, condition: eff.ailment });
@@ -353,7 +406,7 @@ function applySecondaryEffects(
   }
 
   // Confusion on defender
-  if (eff.confuses && !defender.confused) {
+  if (eff.confuses && !defender.confused && !terrainBlocksConfusion(defender, field)) {
     const chance = eff.confusionChance ?? 0;
     if (chance === 0 || Math.random() * 100 < chance) {
       const turns = 2 + Math.floor(Math.random() * 4); // 2–5 turns
@@ -773,6 +826,8 @@ function resolveStatusMove(
       events.push({ kind: 'move_failed', turn, pokemonName: attacker.data.name, moveName: move.name });
     } else if (isImmuneToAilment(defender, eff.ailment)) {
       events.push({ kind: 'move_failed', turn, pokemonName: attacker.data.name, moveName: move.name });
+    } else if (terrainBlocksAilment(defender, eff.ailment, field)) {
+      events.push({ kind: 'move_failed', turn, pokemonName: attacker.data.name, moveName: move.name });
     } else {
       defender = { ...defender, statusCondition: eff.ailment };
       events.push({ kind: 'status_applied', turn, pokemonName: defender.data.name, condition: eff.ailment });
@@ -837,6 +892,12 @@ export function resolveSingleAttack(
       events.push({ kind: 'move_failed', turn: turnNumber, pokemonName: attacker.data.name, moveName: move.name });
       return { attacker, defender, dealtDamage: false, defenderFlinched: false, pivotTriggered: false, field };
     }
+  }
+
+  // Psychic Terrain blocks priority moves aimed at a grounded defender.
+  if (field.terrain === 'psychic' && move.priority > 0 && isGrounded(defender)) {
+    events.push({ kind: 'move_failed', turn: turnNumber, pokemonName: attacker.data.name, moveName: move.name });
+    return { attacker, defender, dealtDamage: false, defenderFlinched: false, pivotTriggered: false, field };
   }
 
   // Protect blocks damaging moves from the foe.
@@ -907,7 +968,7 @@ export function resolveSingleAttack(
   }
 
   if (totalConnected) {
-    const eff = applySecondaryEffects(attacker, defender, move, lastHitDamage, turnNumber, events);
+    const eff = applySecondaryEffects(attacker, defender, move, lastHitDamage, turnNumber, events, field);
     attacker = eff.attacker;
     defender = eff.defender;
     defenderFlinched = eff.defenderFlinched;
@@ -926,7 +987,7 @@ export function resolveSingleAttack(
   }
 
   const pivotTriggered = !!(
-    move.effect?.pivotSwitch && connected && attacker.currentHp > 0
+    move.effect?.pivotSwitch && totalConnected && attacker.currentHp > 0
   );
 
   return { attacker, defender, dealtDamage, defenderFlinched, pivotTriggered, field };
@@ -974,8 +1035,8 @@ export function resolveTurnWithMoves(
   const attackers: Attacker[] = [];
   if (move1 && move2) {
     let p1First: boolean;
-    const pri1 = effectivePriority(move1);
-    const pri2 = effectivePriority(move2);
+    const pri1 = effectivePriority(move1, pokemon1, field);
+    const pri2 = effectivePriority(move2, pokemon2, field);
     if (pri1 !== pri2) {
       p1First = pri1 > pri2;
     } else {
@@ -1053,6 +1114,12 @@ export function resolveTurnWithMoves(
     p1 = applyEndOfTurnWeather(p1, field, turnNumber, events);
     p2 = applyEndOfTurnWeather(p2, field, turnNumber, events);
     if (p1.currentHp <= 0 || p2.currentHp <= 0) battleOver = true;
+  }
+
+  // End-of-turn terrain effects (grassy heal).
+  if (!battleOver) {
+    p1 = applyEndOfTurnTerrain(p1, field, turnNumber, events);
+    p2 = applyEndOfTurnTerrain(p2, field, turnNumber, events);
   }
 
   // Taunt countdown (runs regardless of KO).

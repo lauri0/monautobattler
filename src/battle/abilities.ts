@@ -1,10 +1,11 @@
-import type { AbilityId, BattlePokemon, FieldState, Move, StatStageName, TurnEvent, StatStages, WeatherKind } from '../models/types';
+import type { AbilityId, BattlePokemon, FieldState, Move, StatStageName, TurnEvent, StatStages, WeatherKind, TerrainKind } from '../models/types';
 
 // Registry of abilities whose effects are wired into the battle engine. Any
 // ability name not present here displays as "(Unimplemented)" in the UI and
 // has no in-battle effect.
 
 export const WEATHER_TURNS = 5;
+export const TERRAIN_TURNS = 5;
 
 export interface AbilityEffect {
   // Applied when the bearer switches in (including the start of a battle).
@@ -53,6 +54,19 @@ function setWeather(
   return { opponent, field: { ...field, weather, weatherTurns: WEATHER_TURNS } };
 }
 
+function setTerrain(
+  terrain: TerrainKind,
+  self: BattlePokemon,
+  opponent: BattlePokemon,
+  field: FieldState,
+  turn: number,
+  events: TurnEvent[],
+): { opponent: BattlePokemon; field: FieldState } {
+  if (field.terrain === terrain) return { opponent, field };
+  events.push({ kind: 'terrain_set', turn, terrain, turns: TERRAIN_TURNS, pokemonName: self.data.name });
+  return { opponent, field: { ...field, terrain, terrainTurns: TERRAIN_TURNS } };
+}
+
 export const IMPLEMENTED_ABILITIES: Record<string, AbilityEffect> = {
   'intimidate': {
     onSwitchIn: (_self, opponent, field, turn, events) => {
@@ -67,11 +81,16 @@ export const IMPLEMENTED_ABILITIES: Record<string, AbilityEffect> = {
       return 1;
     },
   },
-  'drought':       { onSwitchIn: (self, opp, field, turn, ev) => setWeather('sun',       self, opp, field, turn, ev) },
-  'drizzle':       { onSwitchIn: (self, opp, field, turn, ev) => setWeather('rain',      self, opp, field, turn, ev) },
-  'sand-stream':   { onSwitchIn: (self, opp, field, turn, ev) => setWeather('sandstorm', self, opp, field, turn, ev) },
-  'snow-warning':  { onSwitchIn: (self, opp, field, turn, ev) => setWeather('snow',      self, opp, field, turn, ev) },
+  'drought':        { onSwitchIn: (self, opp, field, turn, ev) => setWeather('sun',       self, opp, field, turn, ev) },
+  'drizzle':        { onSwitchIn: (self, opp, field, turn, ev) => setWeather('rain',      self, opp, field, turn, ev) },
+  'sand-stream':    { onSwitchIn: (self, opp, field, turn, ev) => setWeather('sandstorm', self, opp, field, turn, ev) },
+  'snow-warning':   { onSwitchIn: (self, opp, field, turn, ev) => setWeather('snow',      self, opp, field, turn, ev) },
+  'grassy-surge':   { onSwitchIn: (self, opp, field, turn, ev) => setTerrain('grassy',    self, opp, field, turn, ev) },
+  'electric-surge': { onSwitchIn: (self, opp, field, turn, ev) => setTerrain('electric',  self, opp, field, turn, ev) },
+  'psychic-surge':  { onSwitchIn: (self, opp, field, turn, ev) => setTerrain('psychic',   self, opp, field, turn, ev) },
+  'misty-surge':    { onSwitchIn: (self, opp, field, turn, ev) => setTerrain('misty',     self, opp, field, turn, ev) },
   'skill-link':    { maxVariableHits: true },
+  'levitate':      {},
 };
 
 export function isAbilityImplemented(name: AbilityId | undefined): boolean {

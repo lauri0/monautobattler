@@ -16,7 +16,7 @@ import type {
   StatStages,
 } from '../models/types';
 import { buildBattlePokemon } from './buildBattlePokemon';
-import { applyEndOfTurnStatus, applyEndOfTurnWeather, applyStealthRockOnEntry, effectivePriority, makeInitialField, resolveSingleAttack, tickTaunt, usableMoves } from './battleEngine';
+import { applyEndOfTurnStatus, applyEndOfTurnTerrain, applyEndOfTurnWeather, applyStealthRockOnEntry, effectivePriority, makeInitialField, resolveSingleAttack, tickTaunt, usableMoves } from './battleEngine';
 import { effectiveSpeed } from './damageCalc';
 import { applySwitchInAbility } from './abilities';
 
@@ -219,6 +219,8 @@ function completeTurn(
   let a1Ticked = applyEndOfTurnStatus(a1, turn, inner);
   a0Ticked = applyEndOfTurnWeather(a0Ticked, field, turn, inner);
   a1Ticked = applyEndOfTurnWeather(a1Ticked, field, turn, inner);
+  a0Ticked = applyEndOfTurnTerrain(a0Ticked, field, turn, inner);
+  a1Ticked = applyEndOfTurnTerrain(a1Ticked, field, turn, inner);
   a0Ticked = tickTaunt(a0Ticked, turn, inner);
   a1Ticked = tickTaunt(a1Ticked, turn, inner);
   if (a0Ticked.protectedThisTurn) a0Ticked = { ...a0Ticked, protectedThisTurn: false };
@@ -244,6 +246,8 @@ function tickFieldInTeam(
     trickRoomTurns: field.trickRoomTurns,
     weather: field.weather,
     weatherTurns: field.weatherTurns,
+    terrain: field.terrain,
+    terrainTurns: field.terrainTurns,
     sides: [{ ...field.sides[0] }, { ...field.sides[1] }],
   };
   if (next.trickRoomTurns > 0) {
@@ -257,6 +261,13 @@ function tickFieldInTeam(
     if (next.weatherTurns === 0) {
       out.push({ side: 0, kind: 'weather_expired', turn, weather: next.weather });
       next.weather = undefined;
+    }
+  }
+  if (next.terrainTurns > 0 && next.terrain) {
+    next.terrainTurns--;
+    if (next.terrainTurns === 0) {
+      out.push({ side: 0, kind: 'terrain_expired', turn, terrain: next.terrain });
+      next.terrain = undefined;
     }
   }
   for (const s of [0, 1] as SideIndex[]) {
@@ -357,8 +368,8 @@ function runOneAttack(
 
 // Figure out which side acts first. Only meaningful when both have a move.
 function speedOrder(teams: [Team, Team], m0: Move, m1: Move, field: FieldState): SideIndex {
-  const p0 = effectivePriority(m0);
-  const p1 = effectivePriority(m1);
+  const p0 = effectivePriority(m0, teams[0].pokemon[teams[0].activeIdx], field);
+  const p1 = effectivePriority(m1, teams[1].pokemon[teams[1].activeIdx], field);
   if (p0 !== p1) return p0 > p1 ? 0 : 1;
   const s0 = effectiveSpeed(teams[0].pokemon[teams[0].activeIdx], field.sides[0].tailwindTurns > 0);
   const s1 = effectiveSpeed(teams[1].pokemon[teams[1].activeIdx], field.sides[1].tailwindTurns > 0);

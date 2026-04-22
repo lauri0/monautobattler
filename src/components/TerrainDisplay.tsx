@@ -1,8 +1,22 @@
-import type { FieldState } from '../models/types';
+import type { FieldState, TerrainKind } from '../models/types';
 
-// Placeholder for a future terrain indicator. Intentionally empty so the
-// arena center column reserves matching vertical space above/below the VS
-// label. Extend by mirroring WeatherDisplay once terrains are implemented.
-export default function TerrainDisplay(_props: { field: FieldState }) {
-  return <div className="terrain-placeholder" aria-hidden />;
+const TERRAIN_META: Record<TerrainKind, { icon: string; label: string }> = {
+  grassy:   { icon: '🌿', label: 'Grassy' },
+  electric: { icon: '⚡', label: 'Electric' },
+  psychic:  { icon: '🔮', label: 'Psychic' },
+  misty:    { icon: '🌫', label: 'Misty' },
+};
+
+export default function TerrainDisplay({ field }: { field: FieldState }) {
+  if (!field.terrain || field.terrainTurns <= 0) {
+    return <div className="terrain-placeholder" aria-hidden />;
+  }
+  const meta = TERRAIN_META[field.terrain];
+  return (
+    <div className={`weather-pill weather-pill--terrain-${field.terrain}`}>
+      <span className="weather-icon">{meta.icon}</span>
+      <span className="weather-label">{meta.label}</span>
+      <span className="weather-turns">{field.terrainTurns}</span>
+    </div>
+  );
 }

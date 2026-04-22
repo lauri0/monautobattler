@@ -67,7 +67,7 @@ export default function PokemonDetail({ pokemon, allPokemon, onBack, onNavigate 
   const [saved, setSaved] = useState(false);
 
   const stats = calcLevel50Stats(pokemon.baseStats);
-  const matchups = getDetailedDefensiveMatchups(pokemon.types);
+  const matchups = getDetailedDefensiveMatchups(pokemon.types, selectedAbility);
   const moveMap = new Map<number, Move>(pokemon.availableMoves.map(m => [m.id, m]));
   const bst = Object.values(pokemon.baseStats).reduce((sum: number, v: number) => sum + v, 0);
 

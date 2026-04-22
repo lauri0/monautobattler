@@ -1,6 +1,40 @@
-import type { BattlePokemon, FieldState, Move, TypeName, WeatherKind } from '../models/types';
+import type { BattlePokemon, FieldState, Move, TerrainKind, TypeName, WeatherKind } from '../models/types';
 import { getTypeEffectiveness } from '../utils/typeChart';
 import { getAbilityDamageMultiplier } from './abilities';
+
+// "Grounded" = eligible to be hit by Ground-type moves and affected by terrain.
+// Flying types and Levitate users float; no other modifiers are modeled.
+export function isGrounded(p: BattlePokemon): boolean {
+  if (p.ability === 'levitate') return false;
+  if (p.data.types.includes('flying')) return false;
+  return true;
+}
+
+// Terrain damage multiplier. Only grounded attackers benefit from the +30% to
+// matching-type moves; misty halves incoming Dragon damage on grounded defenders.
+const GRASSY_HALVED_MOVES = new Set(['earthquake', 'bulldoze']);
+
+function terrainMoveMult(
+  attacker: BattlePokemon,
+  defender: BattlePokemon,
+  move: Move,
+  terrain: TerrainKind | undefined,
+): number {
+  if (!terrain) return 1;
+  if (terrain === 'misty' && move.type === 'dragon' && isGrounded(defender)) return 0.5;
+  if (terrain === 'grassy' && GRASSY_HALVED_MOVES.has(move.name) && isGrounded(defender)) return 0.5;
+  if (!isGrounded(attacker)) return 1;
+  if (terrain === 'electric' && move.type === 'electric') return 1.3;
+  if (terrain === 'grassy'   && move.type === 'grass')    return 1.3;
+  if (terrain === 'psychic'  && move.type === 'psychic')  return 1.3;
+  return 1;
+}
+
+// Effective type multiplier including ability-based immunities (Levitate).
+function typeEffectiveness(move: Move, defender: BattlePokemon): number {
+  if (move.type === 'ground' && defender.ability === 'levitate') return 0;
+  return getTypeEffectiveness(move.type, defender.data.types, move.effect?.superEffectiveAgainst);
+}
 
 // Weather-dependent accuracy override for moves whose hit chance is keyed to
 // the weather. Returns `null` when the move always hits under the current
@@ -88,7 +122,7 @@ export function calcDamage(
     }
   }
 
-  const effectiveness = getTypeEffectiveness(move.type, defender.data.types, move.effect?.superEffectiveAgainst);
+  const effectiveness = typeEffectiveness(move, defender);
   if (effectiveness === 0) {
     return { damage: 0, isCrit: false, missed: false, effectiveness: 0 };
   }
@@ -123,9 +157,10 @@ export function calcDamage(
   const screenMult = screenApplies(move, defenderScreens, isCrit) ? 0.5 : 1.0;
   const abilityMult = getAbilityDamageMultiplier(attacker, move);
   const weatherMult = weatherMoveMult(move.type, field?.weather);
+  const terrainMult = terrainMoveMult(attacker, defender, move, field?.terrain);
 
   const base = Math.floor(Math.floor((Math.floor(2 * 50 / 5) + 2) * move.power * A / D) / 50 + 2);
-  const damage = Math.floor(base * critMult * roll * stab * effectiveness * screenMult * abilityMult * weatherMult);
+  const damage = Math.floor(base * critMult * roll * stab * effectiveness * screenMult * abilityMult * weatherMult * terrainMult);
 
   return {
     damage: Math.max(1, damage),
@@ -142,7 +177,7 @@ export function calcMinDamage(
   defenderScreens?: DefenderScreens,
   field?: FieldState,
 ): number {
-  const effectiveness = getTypeEffectiveness(move.type, defender.data.types, move.effect?.superEffectiveAgainst);
+  const effectiveness = typeEffectiveness(move, defender);
   if (effectiveness === 0) return 0;
 
   let A: number;
@@ -168,8 +203,9 @@ export function calcMinDamage(
   const screenMult = screenApplies(move, defenderScreens, false) ? 0.5 : 1.0;
   const abilityMult = getAbilityDamageMultiplier(attacker, move);
   const weatherMult = weatherMoveMult(move.type, field?.weather);
+  const terrainMult = terrainMoveMult(attacker, defender, move, field?.terrain);
   const base = Math.floor(Math.floor((Math.floor(2 * 50 / 5) + 2) * move.power * A / D) / 50 + 2);
-  const damage = Math.floor(base * 1.0 * 0.85 * stab * effectiveness * screenMult * abilityMult * weatherMult);
+  const damage = Math.floor(base * 1.0 * 0.85 * stab * effectiveness * screenMult * abilityMult * weatherMult * terrainMult);
   return Math.max(1, damage);
 }
 
@@ -180,7 +216,7 @@ export function calcExpectedDamage(
   defenderScreens?: DefenderScreens,
   field?: FieldState,
 ): number {
-  const effectiveness = getTypeEffectiveness(move.type, defender.data.types, move.effect?.superEffectiveAgainst);
+  const effectiveness = typeEffectiveness(move, defender);
   if (effectiveness === 0) return 0;
 
   let A: number;
@@ -207,7 +243,8 @@ export function calcExpectedDamage(
   const screenMult = screenApplies(move, defenderScreens, false) ? 0.5 : 1.0;
   const abilityMult = getAbilityDamageMultiplier(attacker, move);
   const weatherMult = weatherMoveMult(move.type, field?.weather);
+  const terrainMult = terrainMoveMult(attacker, defender, move, field?.terrain);
   const base = Math.floor(Math.floor((Math.floor(2 * 50 / 5) + 2) * move.power * A / D) / 50 + 2);
-  const damage = Math.floor(base * 1.0 * roll * stab * effectiveness * screenMult * abilityMult * weatherMult);
+  const damage = Math.floor(base * 1.0 * roll * stab * effectiveness * screenMult * abilityMult * weatherMult * terrainMult);
   return Math.max(1, damage);
 }

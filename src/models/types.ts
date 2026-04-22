@@ -52,6 +52,8 @@ export type FieldEffectKind =
 
 export type WeatherKind = 'sun' | 'rain' | 'sandstorm' | 'snow';
 
+export type TerrainKind = 'grassy' | 'electric' | 'psychic' | 'misty';
+
 export interface SideFieldState {
   tailwindTurns: number;
   lightScreenTurns: number;
@@ -63,6 +65,8 @@ export interface FieldState {
   trickRoomTurns: number;
   weather?: WeatherKind;
   weatherTurns: number; // 0 when no weather is active
+  terrain?: TerrainKind;
+  terrainTurns: number; // 0 when no terrain is active
   sides: [SideFieldState, SideFieldState];
 }
 
@@ -194,7 +198,10 @@ export type TurnEvent =
   | { kind: 'ability_triggered'; turn: number; pokemonName: string; ability: AbilityId }
   | { kind: 'weather_set'; turn: number; weather: WeatherKind; turns: number; pokemonName: string }
   | { kind: 'weather_expired'; turn: number; weather: WeatherKind }
-  | { kind: 'weather_damage'; turn: number; pokemonName: string; weather: WeatherKind; damage: number; hpAfter: number };
+  | { kind: 'weather_damage'; turn: number; pokemonName: string; weather: WeatherKind; damage: number; hpAfter: number }
+  | { kind: 'terrain_set'; turn: number; terrain: TerrainKind; turns: number; pokemonName: string }
+  | { kind: 'terrain_expired'; turn: number; terrain: TerrainKind }
+  | { kind: 'terrain_heal'; turn: number; pokemonName: string; healed: number; hpAfter: number };
 
 export interface BattleResult {
   winner: BattlePokemon;
