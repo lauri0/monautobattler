@@ -18,6 +18,8 @@ export interface AbilityEffect {
   ) => { opponent: BattlePokemon; field: FieldState };
   // Multiplier applied to the bearer's outgoing damage.
   damageMultiplier?: (self: BattlePokemon, move: Move) => number;
+  // When true, variable-hit moves (hitsVariable) always hit their maximum (5).
+  maxVariableHits?: boolean;
 }
 
 function clampStage(v: number): number {
@@ -69,11 +71,17 @@ export const IMPLEMENTED_ABILITIES: Record<string, AbilityEffect> = {
   'drizzle':       { onSwitchIn: (self, opp, field, turn, ev) => setWeather('rain',      self, opp, field, turn, ev) },
   'sand-stream':   { onSwitchIn: (self, opp, field, turn, ev) => setWeather('sandstorm', self, opp, field, turn, ev) },
   'snow-warning':  { onSwitchIn: (self, opp, field, turn, ev) => setWeather('snow',      self, opp, field, turn, ev) },
+  'skill-link':    { maxVariableHits: true },
 };
 
 export function isAbilityImplemented(name: AbilityId | undefined): boolean {
   if (!name) return false;
   return name in IMPLEMENTED_ABILITIES;
+}
+
+export function abilityMaxVariableHits(attacker: BattlePokemon): boolean {
+  const entry = attacker.ability ? IMPLEMENTED_ABILITIES[attacker.ability] : undefined;
+  return entry?.maxVariableHits ?? false;
 }
 
 export function getAbilityDamageMultiplier(attacker: BattlePokemon, move: Move): number {

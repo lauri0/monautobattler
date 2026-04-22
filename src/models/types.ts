@@ -30,6 +30,9 @@ export interface MoveEffect {
   doublePowerIfTargetStatus?: boolean; // doubles base power if target has a major status condition (Hex)
   superEffectiveAgainst?: TypeName[];  // extra types this move is super effective against (Freeze-Dry vs Water)
   useFoeAttack?: boolean;  // use the defender's Attack stat for damage instead of the attacker's (Foul Play)
+  useOwnDefense?: boolean; // use the attacker's Defense stat as the attack stat (Body Press)
+  hitsExactly?: number;   // hit exactly N times, each roll independently (Dual Wingbeat, Dual Chop)
+  hitsVariable?: boolean; // hit 2–5 times with 3/8, 3/8, 1/8, 1/8 distribution (Icicle Spear, Rock Blast, …)
   confusesUser?: boolean;  // confuses the user after hitting (Outrage, Petal Dance, Thrash)
   pivotSwitch?: boolean;   // user switches out after hitting (U-turn, Volt Switch, Flip Turn)
   heal?: number;           // % of user's max HP to heal (Recover = 50)
@@ -37,6 +40,7 @@ export interface MoveEffect {
   fieldEffect?: FieldEffectKind; // marks a field/side-condition-setting status move
   taunt?: boolean;         // applies Taunt to the target (blocks status moves for N turns)
   removesScreens?: boolean; // removes Reflect and Light Screen on defender's side before the hit (Brick Break)
+  failsIfTargetNotAttacking?: boolean; // fails if the target is not using a damaging move this turn (Sucker Punch)
 }
 
 export type FieldEffectKind =

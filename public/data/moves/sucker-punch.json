@@ -6,5 +6,8 @@
   "accuracy": 100,
   "pp": 5,
   "damageClass": "physical",
-  "priority": 1
+  "priority": 1,
+  "effect": {
+    "failsIfTargetNotAttacking": true
+  }
 }

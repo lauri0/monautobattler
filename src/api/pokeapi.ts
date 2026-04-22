@@ -137,7 +137,9 @@ async function fetchMoveData(moveUrl: string): Promise<Move | null> {
       // Confusion applied to foe: ailment is confusion with a > 0 chance
       const hasConfusion = m.ailment?.name === 'confusion' && m.ailment_chance > 0;
 
-      if (hasDrain || hasAilment || hasStatChanges || hasFlinch || hasCritRate || hasConfusion) {
+      const hasVariableHits = m.min_hits === 2 && m.max_hits === 5;
+
+      if (hasDrain || hasAilment || hasStatChanges || hasFlinch || hasCritRate || hasConfusion || hasVariableHits) {
         effect = {};
 
         if (hasDrain) {
@@ -170,6 +172,10 @@ async function fetchMoveData(moveUrl: string): Promise<Move | null> {
         if (hasConfusion) {
           effect.confuses = true;
           effect.confusionChance = m.ailment_chance;
+        }
+
+        if (hasVariableHits) {
+          effect.hitsVariable = true;
         }
       }
     }
@@ -214,9 +220,29 @@ async function fetchMoveData(moveUrl: string): Promise<Move | null> {
       effect = { ...effect, pivotSwitch: true };
     }
 
-    // Brick Break: removes Reflect and Light Screen on the defender's side before hitting
-    if (data.name === 'brick-break') {
+    // Brick Break / Psychic Fangs: remove Reflect and Light Screen before hitting
+    if (data.name === 'brick-break' || data.name === 'psychic-fangs') {
       effect = { ...effect, removesScreens: true };
+    }
+
+    // Wave Crash: 33% recoil
+    if (data.name === 'wave-crash') {
+      effect = { ...effect, drain: -33 };
+    }
+
+    // Sucker Punch: fails if the target is not using a damaging move
+    if (data.name === 'sucker-punch') {
+      effect = { ...effect, failsIfTargetNotAttacking: true };
+    }
+
+    // Body Press: uses attacker's Defense as the attack stat
+    if (data.name === 'body-press') {
+      effect = { ...effect, useOwnDefense: true };
+    }
+
+    // Dual Wingbeat / Dual Chop: hit exactly twice
+    if (data.name === 'dual-wingbeat' || data.name === 'dual-chop') {
+      effect = { ...effect, hitsExactly: 2 };
     }
 
     return {
@@ -496,5 +522,7 @@ interface RawMove {
     flinch_chance: number;
     crit_rate: number;
     category: { name: string } | null;
+    min_hits: number | null;
+    max_hits: number | null;
   } | null;
 }

@@ -2,7 +2,7 @@ import type { BattlePokemon, Move, TurnEvent, BattleResult, StatStageName, StatS
 import { calcDamage, calcExpectedDamage, effectiveSpeed, type DefenderScreens } from './damageCalc';
 import { defaultAI } from '../ai/aiModule';
 import { getTypeEffectiveness } from '../utils/typeChart';
-import { applySwitchInAbility } from './abilities';
+import { abilityMaxVariableHits, applySwitchInAbility } from './abilities';
 
 export const TRICK_ROOM_TURNS = 5;
 export const TAILWIND_TURNS = 4;
@@ -171,6 +171,15 @@ function targetsFoe(move: Move): boolean {
   if (eff.flinchChance) return true;
   if (eff.statChanges?.some(s => s.target === 'foe')) return true;
   return false;
+}
+
+// 2-5 hit distribution: 3/8, 3/8, 1/8, 1/8
+function rollVariableHits(): number {
+  const r = Math.random();
+  if (r < 3 / 8) return 2;
+  if (r < 6 / 8) return 3;
+  if (r < 7 / 8) return 4;
+  return 5;
 }
 
 function clampStage(v: number): number {
@@ -621,6 +630,9 @@ export interface AttackCtx {
   foeHitUserThisTurn: boolean;
   field?: FieldState;
   attackerSide?: SideIndex;
+  // The move the defender has selected this turn. Used by Sucker Punch.
+  // undefined = unknown (move succeeds); null = defender not attacking (switch/no move).
+  defenderMove?: Move | null;
 }
 
 /**
@@ -818,6 +830,15 @@ export function resolveSingleAttack(
     return resolveStatusMove(attacker, defender, move, turnNumber, attackerSide, field, events);
   }
 
+  // Sucker Punch: fails if the target is not using a damaging move this turn.
+  if (move.effect?.failsIfTargetNotAttacking) {
+    const dm = ctx.defenderMove;
+    if (dm !== undefined && (dm === null || dm.damageClass === 'status')) {
+      events.push({ kind: 'move_failed', turn: turnNumber, pokemonName: attacker.data.name, moveName: move.name });
+      return { attacker, defender, dealtDamage: false, defenderFlinched: false, pivotTriggered: false, field };
+    }
+  }
+
   // Protect blocks damaging moves from the foe.
   if (defender.protectedThisTurn) {
     events.push({
@@ -849,26 +870,44 @@ export function resolveSingleAttack(
     }
   }
 
-  const result = calcDamage(attacker, defender, effMove, undefined, defenderScreensFor(field, defenderSide), field);
-  const actualDamage = Math.min(result.damage, defender.currentHp);
-  const newDefHp = defender.currentHp - actualDamage;
-  defender = { ...defender, currentHp: newDefHp };
-
-  events.push({
-    kind: 'attack', turn: turnNumber,
-    attackerName: attacker.data.name, defenderName: defender.data.name,
-    moveName: move.name, moveType: move.type,
-    damage: result.damage, isCrit: result.isCrit,
-    missed: result.missed, effectiveness: result.effectiveness,
-    attackerHpAfter: attacker.currentHp, defenderHpAfter: newDefHp,
-  });
-
+  const hitCount = move.effect?.hitsVariable
+    ? (abilityMaxVariableHits(attacker) ? 5 : rollVariableHits())
+    : move.effect?.hitsExactly ?? 1;
   let dealtDamage = false;
   let defenderFlinched = false;
-  const connected = !result.missed && result.effectiveness !== 0;
-  if (connected) {
-    if (result.damage > 0) dealtDamage = true;
-    const eff = applySecondaryEffects(attacker, defender, move, actualDamage, turnNumber, events);
+  let totalConnected = false;
+  let lastHitDamage = 0;
+
+  for (let hitIndex = 0; hitIndex < hitCount; hitIndex++) {
+    // Skip accuracy check on hits after the first
+    const hitMove = hitIndex === 0 ? effMove : { ...effMove, accuracy: null as null };
+    const result = calcDamage(attacker, defender, hitMove, undefined, defenderScreensFor(field, defenderSide), field);
+    const actualDamage = Math.min(result.damage, defender.currentHp);
+    const newDefHp = defender.currentHp - actualDamage;
+    defender = { ...defender, currentHp: newDefHp };
+
+    events.push({
+      kind: 'attack', turn: turnNumber,
+      attackerName: attacker.data.name, defenderName: defender.data.name,
+      moveName: move.name, moveType: move.type,
+      damage: result.damage, isCrit: result.isCrit,
+      missed: result.missed, effectiveness: result.effectiveness,
+      attackerHpAfter: attacker.currentHp, defenderHpAfter: newDefHp,
+    });
+
+    if (result.missed) break;
+
+    if (!result.missed && result.effectiveness !== 0) {
+      totalConnected = true;
+      if (result.damage > 0) dealtDamage = true;
+      lastHitDamage = actualDamage;
+    }
+
+    if (defender.currentHp <= 0) break;
+  }
+
+  if (totalConnected) {
+    const eff = applySecondaryEffects(attacker, defender, move, lastHitDamage, turnNumber, events);
     attacker = eff.attacker;
     defender = eff.defender;
     defenderFlinched = eff.defenderFlinched;
@@ -977,11 +1016,13 @@ export function resolveTurnWithMoves(
     let attacker = isP1 ? p1 : p2;
     let defender = isP1 ? p2 : p1;
 
+    const otherEntry = attackers[1 - i];
     const r = resolveSingleAttack(attacker, defender, move, turnNumber, {
       preFlinched: !isFirst && secondFlinched,
       foeHitUserThisTurn: !isFirst && firstDealtDamage,
       field,
       attackerSide: isP1 ? 0 : 1,
+      defenderMove: otherEntry ? otherEntry.move : null,
     }, events);
     attacker = r.attacker;
     defender = r.defender;

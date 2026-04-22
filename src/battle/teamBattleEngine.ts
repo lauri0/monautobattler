@@ -336,7 +336,7 @@ function runOneAttack(
   move: Move,
   turn: number,
   field: FieldState,
-  ctx: { preFlinched: boolean; foeHitUserThisTurn: boolean },
+  ctx: { preFlinched: boolean; foeHitUserThisTurn: boolean; defenderMove?: Move | null },
   events: TeamTurnEvent[],
 ): { dealtDamage: boolean; defenderFlinched: boolean; pivotTriggered: boolean; field: FieldState } {
   const defenderSide: SideIndex = attackerSide === 0 ? 1 : 0;
@@ -506,6 +506,7 @@ export function applyActions(
   const r1 = runOneAttack(teams, firstSide, firstMove!, state.turn, field, {
     preFlinched: false,
     foeHitUserThisTurn: false,
+    defenderMove: secondMove,
   }, events);
   field = r1.field;
 
@@ -524,6 +525,7 @@ export function applyActions(
       const r2 = runOneAttack(teams, secondSide, secondMove, state.turn, field, {
         preFlinched: r1.defenderFlinched,
         foeHitUserThisTurn: r1.dealtDamage,
+        defenderMove: firstMove,
       }, events);
       field = r2.field;
       if (r2.pivotTriggered && aliveBenchSlots(teams[secondSide]).length > 0) {

@@ -6,5 +6,8 @@
   "accuracy": 100,
   "pp": 15,
   "damageClass": "physical",
-  "priority": 0
+  "priority": 0,
+  "effect": {
+    "hitsVariable": true
+  }
 }

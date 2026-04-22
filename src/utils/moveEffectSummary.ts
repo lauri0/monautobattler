@@ -71,6 +71,18 @@ export function effectSummary(move: Move): string {
     parts.push('uses foe Atk');
   }
 
+  if (eff.useOwnDefense) {
+    parts.push('uses own Def');
+  }
+
+  if (eff.hitsExactly) {
+    parts.push(`hits ${eff.hitsExactly}×`);
+  }
+
+  if (eff.hitsVariable) {
+    parts.push('hits 2–5×');
+  }
+
   if (eff.confusesUser) {
     parts.push('confuse self');
   }
@@ -93,6 +105,10 @@ export function effectSummary(move: Move): string {
 
   if (eff.removesScreens) {
     parts.push('breaks screens');
+  }
+
+  if (eff.failsIfTargetNotAttacking) {
+    parts.push('fails vs status');
   }
 
   if (eff.fieldEffect) {
