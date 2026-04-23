@@ -1,6 +1,6 @@
 import { defineConfig, type Plugin } from 'vitest/config'
 import react from '@vitejs/plugin-react'
-import { existsSync, mkdirSync, readdirSync, readFileSync, writeFileSync } from 'node:fs'
+import { existsSync, mkdirSync, readdirSync, readFileSync, unlinkSync, writeFileSync } from 'node:fs'
 import { resolve, dirname } from 'node:path'
 import { fileURLToPath } from 'node:url'
 
@@ -33,11 +33,6 @@ function saveSpritePlugin(): Plugin {
         res.end(JSON.stringify({ exists }))
       })
       server.middlewares.use('/__save-sprite/', (req, res) => {
-        if (req.method !== 'POST') {
-          res.statusCode = 405
-          res.end()
-          return
-        }
         const match = req.url?.match(/^\/(\d+)$/)
         if (!match) {
           res.statusCode = 400
@@ -46,6 +41,22 @@ function saveSpritePlugin(): Plugin {
         }
         const id = Number(match[1])
         const outPath = resolve(SPRITES_DIR, `${id}.png`)
+        if (req.method === 'DELETE') {
+          try {
+            if (existsSync(outPath)) unlinkSync(outPath)
+            res.statusCode = 200
+            res.end('deleted')
+          } catch (err) {
+            res.statusCode = 500
+            res.end(String(err))
+          }
+          return
+        }
+        if (req.method !== 'POST') {
+          res.statusCode = 405
+          res.end()
+          return
+        }
         if (existsSync(outPath)) {
           res.statusCode = 200
           res.end('exists')
@@ -81,11 +92,6 @@ function saveDataPlugin(): Plugin {
     name: 'save-data',
     configureServer(server) {
       server.middlewares.use('/__save-data/', (req, res) => {
-        if (req.method !== 'POST') {
-          res.statusCode = 405
-          res.end()
-          return
-        }
         const match = req.url?.match(/^\/(pokemon|move|ability)\/([a-z0-9-]+)$/)
         if (!match) {
           res.statusCode = 400
@@ -101,6 +107,22 @@ function saveDataPlugin(): Plugin {
         }
         const subdir = resolve(DATA_DIR, DATA_KINDS[kind])
         const outPath = resolve(subdir, `${name}.json`)
+        if (req.method === 'DELETE') {
+          try {
+            if (existsSync(outPath)) unlinkSync(outPath)
+            res.statusCode = 200
+            res.end('deleted')
+          } catch (err) {
+            res.statusCode = 500
+            res.end(String(err))
+          }
+          return
+        }
+        if (req.method !== 'POST') {
+          res.statusCode = 405
+          res.end()
+          return
+        }
         const chunks: Buffer[] = []
         req.on('data', (c: Buffer) => chunks.push(c))
         req.on('end', () => {

@@ -68,6 +68,8 @@ export default function SettingsPage({ onBack, onDataLoaded }: Props) {
 
   const isLgpe = game === 'lgpe';
   const supportsAlolan = game === 'lgpe' || game === 'sv';
+  const supportsHisuian = game === 'sv';
+  const supportsPaldean = game === 'sv';
 
   const anyLearnEnabled = Object.values(learnSettings).some(Boolean);
 
@@ -279,6 +281,34 @@ export default function SettingsPage({ onBack, onDataLoaded }: Props) {
                 disabled={!supportsAlolan || loading}
               />
               Replace with Alolan forms (e.g. Meowth → Dark-type Alolan Meowth) — Let's Go or Scarlet/Violet
+            </label>
+            <label style={{
+              display: 'flex', alignItems: 'center', gap: '0.4rem',
+              cursor: (!supportsHisuian || loading) ? 'not-allowed' : 'pointer',
+              fontSize: '0.9rem',
+              opacity: supportsHisuian ? 1 : 0.4,
+            }}>
+              <input
+                type="checkbox"
+                checked={variantSettings.useHisuian}
+                onChange={() => toggleVariant('useHisuian')}
+                disabled={!supportsHisuian || loading}
+              />
+              Replace with Hisuian forms (e.g. Growlithe → Fire/Rock Hisuian Growlithe) — Scarlet/Violet
+            </label>
+            <label style={{
+              display: 'flex', alignItems: 'center', gap: '0.4rem',
+              cursor: (!supportsPaldean || loading) ? 'not-allowed' : 'pointer',
+              fontSize: '0.9rem',
+              opacity: supportsPaldean ? 1 : 0.4,
+            }}>
+              <input
+                type="checkbox"
+                checked={variantSettings.usePaldean}
+                onChange={() => toggleVariant('usePaldean')}
+                disabled={!supportsPaldean || loading}
+              />
+              Replace Tauros with Paldean Tauros (Blaze Breed, Fire/Fighting) — Scarlet/Violet
             </label>
             <label style={{
               display: 'flex', alignItems: 'center', gap: '0.4rem',

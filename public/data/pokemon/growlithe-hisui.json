@@ -1,60 +1,65 @@
 {
-  "id": 58,
-  "name": "growlithe",
+  "id": 10229,
+  "name": "growlithe-hisui",
   "types": [
-    "fire"
+    "fire",
+    "rock"
   ],
   "baseStats": {
-    "hp": 55,
-    "attack": 70,
+    "hp": 60,
+    "attack": 75,
     "defense": 45,
-    "specialAttack": 70,
+    "specialAttack": 65,
     "specialDefense": 50,
-    "speed": 60
+    "speed": 55
   },
-  "spriteUrl": "/sprites/58.png",
+  "spriteUrl": "/sprites/10229.png",
   "moves": [
+    "head-smash",
     "overheat",
     "thrash",
     "double-edge",
     "outrage",
     "close-combat",
     "flare-blitz",
-    "raging-fury",
     "fire-blast",
+    "stone-edge",
     "heat-wave",
     "take-down",
     "flamethrower",
-    "wild-charge",
-    "play-rough",
     "body-slam",
     "psychic-fangs",
     "dig",
     "crunch",
+    "power-gem",
     "tera-blast",
+    "rock-slide",
     "temper-flare",
     "facade",
     "retaliate",
+    "smart-strike",
+    "scorching-sands",
     "thunder-fang",
     "fire-fang",
     "bite",
-    "swift",
-    "thief",
     "flame-wheel",
+    "rock-tomb",
     "covet",
-    "snarl",
+    "smack-down",
     "flame-charge",
     "ember",
     "fire-spin",
     "double-kick",
+    "rock-blast",
     "leer",
     "agility",
     "protect",
-    "will-o-wisp"
+    "will-o-wisp",
+    "stealth-rock"
   ],
   "abilities": [
     "intimidate",
     "flash-fire",
-    "justified"
+    "rock-head"
   ]
 }

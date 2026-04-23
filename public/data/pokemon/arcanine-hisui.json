@@ -1,18 +1,19 @@
 {
-  "id": 59,
-  "name": "arcanine",
+  "id": 10230,
+  "name": "arcanine-hisui",
   "types": [
-    "fire"
+    "fire",
+    "rock"
   ],
   "baseStats": {
-    "hp": 90,
-    "attack": 110,
+    "hp": 95,
+    "attack": 115,
     "defense": 80,
-    "specialAttack": 100,
+    "specialAttack": 95,
     "specialDefense": 80,
-    "speed": 95
+    "speed": 90
   },
-  "spriteUrl": "/sprites/59.png",
+  "spriteUrl": "/sprites/10230.png",
   "moves": [
     "hyper-beam",
     "giga-impact",
@@ -22,45 +23,53 @@
     "outrage",
     "close-combat",
     "flare-blitz",
+    "raging-fury",
     "fire-blast",
+    "stone-edge",
     "heat-wave",
     "take-down",
     "flamethrower",
     "hyper-voice",
     "wild-charge",
-    "play-rough",
     "body-slam",
     "dragon-pulse",
     "psychic-fangs",
     "dig",
     "crunch",
     "extreme-speed",
+    "power-gem",
     "iron-head",
     "tera-blast",
+    "rock-slide",
     "temper-flare",
     "facade",
     "retaliate",
+    "smart-strike",
     "scorching-sands",
     "thunder-fang",
     "fire-fang",
     "bite",
-    "swift",
     "thief",
     "flame-wheel",
+    "rock-tomb",
     "aerial-ace",
     "bulldoze",
     "snarl",
+    "rock-throw",
+    "smack-down",
     "flame-charge",
     "ember",
     "fire-spin",
+    "rock-blast",
     "leer",
     "agility",
     "protect",
-    "will-o-wisp"
+    "will-o-wisp",
+    "stealth-rock"
   ],
   "abilities": [
     "intimidate",
     "flash-fire",
-    "justified"
+    "rock-head"
   ]
 }

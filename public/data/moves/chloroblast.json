@@ -1,0 +1,10 @@
+{
+  "id": 835,
+  "name": "chloroblast",
+  "type": "grass",
+  "power": 150,
+  "accuracy": 95,
+  "pp": 5,
+  "damageClass": "special",
+  "priority": 0
+}

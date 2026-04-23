@@ -9,11 +9,12 @@ import {
   getAutoDisableOverwrite,
   getPokemonPersisted,
   setPokemonPersisted,
+  deletePokemonPersisted,
   type MoveLearnSettings,
   type GameVersionInfo,
   type VariantSettings,
 } from '../persistence/userStorage';
-import { buildFetchIds } from './variants';
+import { buildFetchIds, computeStaleVariants } from './variants';
 import { mergeAbilityNames } from '../data/abilitiesStore';
 
 const BASE = 'https://pokeapi.co/api/v2';
@@ -411,6 +412,35 @@ async function ensureSpriteOnDisk(
   }
 }
 
+async function deletePokemonFile(name: string): Promise<void> {
+  try {
+    await fetch(`/__save-data/pokemon/${name}`, { method: 'DELETE' });
+  } catch {
+    // non-fatal
+  }
+}
+
+async function deletePokemonSprite(id: number): Promise<void> {
+  try {
+    await fetch(`/__save-sprite/${id}`, { method: 'DELETE' });
+  } catch {
+    // non-fatal
+  }
+}
+
+async function pruneStaleVariants(
+  baseIds: number[],
+  variantSettings: VariantSettings,
+): Promise<void> {
+  const stale = computeStaleVariants(baseIds, variantSettings);
+  if (stale.length === 0) return;
+  await Promise.all(stale.flatMap(({ id, name }) => [
+    deletePokemonFile(name),
+    deletePokemonSprite(id),
+  ]));
+  deletePokemonPersisted(stale.map(s => s.id));
+}
+
 export async function fetchAndStoreRange(
   from: number,
   to: number,
@@ -420,6 +450,7 @@ export async function fetchAndStoreRange(
   const game = getSelectedGameInfo();
   const variantSettings = getVariantSettings();
   const baseIds = Array.from({ length: to - from + 1 }, (_, i) => from + i);
+  await pruneStaleVariants(baseIds, variantSettings);
   const allIds = buildFetchIds(baseIds, variantSettings);
   const loaded: number[] = [];
   const skipped: number[] = [];

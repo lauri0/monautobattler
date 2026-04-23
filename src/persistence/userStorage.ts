@@ -53,6 +53,31 @@ export function setManyPokemonPersisted(updates: PokemonPersisted[]): void {
   saveAllStats(all);
 }
 
+export function deletePokemonPersisted(ids: number[]): void {
+  if (ids.length === 0) return;
+  const all = loadAllStats();
+  let changed = false;
+  for (const id of ids) {
+    if (all[id] !== undefined) {
+      delete all[id];
+      changed = true;
+    }
+  }
+  if (changed) saveAllStats(all);
+  removeFromLoadedRange(ids);
+}
+
+function removeFromLoadedRange(idsToRemove: number[]): void {
+  const current = getLoadedRange();
+  if (current.ids.length === 0) return;
+  const drop = new Set(idsToRemove);
+  const remaining = current.ids.filter(id => !drop.has(id));
+  if (remaining.length === current.ids.length) return;
+  const min = remaining.length > 0 ? remaining[0] : 0;
+  const max = remaining.length > 0 ? remaining[remaining.length - 1] : 0;
+  localStorage.setItem(LOADED_RANGE_KEY, JSON.stringify({ min, max, ids: remaining }));
+}
+
 export function resetAllStats(): void {
   const all = loadAllStats();
   for (const id of Object.keys(all)) {
@@ -255,12 +280,16 @@ const VARIANT_SETTINGS_KEY = 'variant_settings';
 
 export interface VariantSettings {
   useAlolan: boolean;
+  useHisuian: boolean;
+  usePaldean: boolean;
   includeMegas: boolean;
   swapMegaDrain: boolean;
 }
 
 const DEFAULT_VARIANT_SETTINGS: VariantSettings = {
   useAlolan: false,
+  useHisuian: false,
+  usePaldean: false,
   includeMegas: false,
   swapMegaDrain: false,
 };
