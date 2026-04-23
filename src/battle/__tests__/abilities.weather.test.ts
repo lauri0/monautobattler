@@ -4,6 +4,7 @@ import { applyEndOfTurnWeather, makeInitialField } from '../battleEngine';
 import { calcDamage } from '../damageCalc';
 import type { BattlePokemon, Team, TeamBattleState, WeatherKind } from '../../models/types';
 import { makePokemon, makeMove } from './fixtures';
+import { stubRngConst } from './rng';
 
 function mkTeam(mon: [BattlePokemon, BattlePokemon, BattlePokemon]): Team {
   return { pokemon: mon, activeIdx: 0 };
@@ -165,6 +166,7 @@ describe('Weather damage multipliers', () => {
   });
 
   it('sun boosts fire and weakens water (mirror of rain)', () => {
+    stubRngConst(0.99); // no crit for both calls
     const atk = makePokemon({ name: 'a', types: ['normal'] });
     const def = makePokemon({ name: 'd', types: ['normal'] });
     const fireMove = makeMove({ type: 'fire', damageClass: 'special', power: 80 });
@@ -185,6 +187,7 @@ describe('Weather damage multipliers', () => {
   });
 
   it('snow grants Ice types +50% Def', () => {
+    stubRngConst(0.99); // no crit for both calls
     const atk = makePokemon({ name: 'a', types: ['normal'] });
     const iceDef = makePokemon({ name: 'd', types: ['ice'] });
     const move = makeMove({ type: 'normal', damageClass: 'physical', power: 80 });

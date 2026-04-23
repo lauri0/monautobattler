@@ -2,7 +2,7 @@ import type { BattlePokemon, Move, TurnEvent, BattleResult, StatStageName, StatS
 import { calcDamage, calcExpectedDamage, effectiveSpeed, type DefenderScreens } from './damageCalc';
 import { defaultAI } from '../ai/aiModule';
 import { getTypeEffectiveness } from '../utils/typeChart';
-import { abilityMaxVariableHits, applySwitchInAbility, applyStatChangeFromFoe, noGuardInEffect, sheerForceSuppresses, absorbsWater, absorbsElectric, sturdyActive, ignoresRecoil, applyContactAbility, abilityBlocksAilment, abilityBlocksConfusion } from './abilities';
+import { abilityMaxVariableHits, applySwitchInAbility, applyStatChangeFromFoe, noGuardInEffect, sheerForceSuppresses, absorbsWater, absorbsElectric, absorbsFire, sturdyActive, ignoresRecoil, applyContactAbility, abilityBlocksAilment, abilityBlocksConfusion } from './abilities';
 import { isGrounded } from './damageCalc';
 
 export const TRICK_ROOM_TURNS = 5;
@@ -469,7 +469,7 @@ function applySecondaryEffects(
   }
 
   // Flinch
-  if (!sheerForce && eff.flinchChance && Math.random() * 100 < eff.flinchChance) {
+  if (!sheerForce && eff.flinchChance && defender.ability !== 'inner-focus' && Math.random() * 100 < eff.flinchChance) {
     defenderFlinched = true;
   }
 
@@ -539,6 +539,7 @@ function critProb(move: Move): number {
 function expectedDamageWithCrit(attacker: BattlePokemon, defender: BattlePokemon, move: Move): number {
   if (!move.power) return 0;
   const base = calcExpectedDamage(attacker, defender, move); // uses 0.925 roll, no crit
+  if (defender.ability === 'shell-armor') return base;
   const cp = critProb(move);
   return base * (1 + cp * 0.5); // crit adds 50% on top, weighted by probability
 }
@@ -555,9 +556,11 @@ function applyStatChangesSilent(
     if (change.target === 'user') {
       attacker = { ...attacker, statStages: { ...attacker.statStages, [change.stat]: clampStage(attacker.statStages[change.stat] + change.change) } as StatStages };
     } else {
-      // Mirror big-pecks / competitive / defiant reactive abilities in the silent path
-      // so the AI tree sees the same post-change state.
+      // Mirror stat-drop-blocking abilities in the silent path so the AI tree
+      // sees the same post-change state as the live battle.
       if (change.change < 0 && change.stat === 'defense' && defender.ability === 'big-pecks') continue;
+      if (change.change < 0 && defender.ability === 'clear-body') continue;
+      if (change.change < 0 && change.stat === 'attack' && (defender.ability === 'hyper-cutter' || defender.ability === 'own-tempo' || defender.ability === 'inner-focus')) continue;
       const before = defender.statStages[change.stat];
       const after = clampStage(before + change.change);
       defender = { ...defender, statStages: { ...defender.statStages, [change.stat]: after } as StatStages };
@@ -663,6 +666,12 @@ export function simulateTurnDeterministic(
         return { attacker, defender, flinched: false, dealtDamage: false };
       }
 
+      // Flash Fire: nullify fire damage and activate the 1.5× fire boost.
+      if (absorbsFire(defender, effectiveMove)) {
+        defender = { ...defender, flashFireActive: true };
+        return { attacker, defender, flinched: false, dealtDamage: false };
+      }
+
       const rawDmg = expectedDamageWithCrit(attacker, defender, effectiveMove);
       let dmg = rawDmg > 0 ? Math.max(1, Math.floor(rawDmg * fraction)) : 0;
 
@@ -699,7 +708,7 @@ export function simulateTurnDeterministic(
         if (effects.ailment && move.effect?.ailment && !defender.statusCondition && !isImmuneToAilment(defender, move.effect.ailment)) {
           defender = { ...defender, statusCondition: move.effect.ailment };
         }
-        if (effects.flinch && move.effect?.flinchChance) {
+        if (effects.flinch && move.effect?.flinchChance && defender.ability !== 'inner-focus') {
           flinched = true;
         }
         if (effects.confusion && move.effect?.confuses && !defender.confused && !abilityBlocksConfusion(defender)) {
@@ -1089,6 +1098,22 @@ export function resolveSingleAttack(
   if (absorbsElectric(defender, effMove)) {
     events.push({ kind: 'ability_triggered', turn: turnNumber, pokemonName: defender.data.name, ability: 'lightning-rod' });
     defender = applyStatChange(defender, 'special-attack', 1, turnNumber, events);
+    events.push({
+      kind: 'attack', turn: turnNumber,
+      attackerName: attacker.data.name, defenderName: defender.data.name,
+      moveName: move.name, moveType: move.type,
+      damage: 0, isCrit: false, missed: false, effectiveness: 0,
+      attackerHpAfter: attacker.currentHp, defenderHpAfter: defender.currentHp,
+    });
+    return { attacker, defender, dealtDamage: false, defenderFlinched: false, pivotTriggered: false, field };
+  }
+
+  // Flash Fire: nullify fire-type damaging moves and activate the 1.5× fire boost.
+  if (absorbsFire(defender, effMove)) {
+    events.push({ kind: 'ability_triggered', turn: turnNumber, pokemonName: defender.data.name, ability: 'flash-fire' });
+    if (!defender.flashFireActive) {
+      defender = { ...defender, flashFireActive: true };
+    }
     events.push({
       kind: 'attack', turn: turnNumber,
       attackerName: attacker.data.name, defenderName: defender.data.name,

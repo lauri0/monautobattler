@@ -130,6 +130,9 @@ export const IMPLEMENTED_ABILITIES: Record<string, AbilityEffect> = {
   'effect-spore':  {},
   'lightning-rod': {},
   'tinted-lens': {},
+  'flash-fire': {
+    damageMultiplier: (self, move) => self.flashFireActive && move.type === 'fire' ? 1.5 : 1,
+  },
   // Keen Eye would prevent foe-initiated accuracy drops and ignore the target's
   // evasion stage. This engine doesn't model accuracy or evasion stat stages
   // (see StatStageName), so the ability has no mechanical effect — it's
@@ -137,8 +140,21 @@ export const IMPLEMENTED_ABILITIES: Record<string, AbilityEffect> = {
   'keen-eye':    {},
   'own-tempo':    {},
   'vital-spirit': {},
+  'clear-body':   {},
+  'hyper-cutter': {},
+  'inner-focus':  {},
   'immunity':     {},
   'limber':       {},
+  'shell-armor':  {},
+  'iron-fist': {
+    damageMultiplier: (_self, move) => move.name.includes('punch') ? 1.2 : 1,
+  },
+  'ice-scales': {},
+  'fur-coat':   {},
+  'scrappy':    {},
+  'technician': {
+    damageMultiplier: (_self, move) => move.power > 0 && move.power <= 60 ? 1.5 : 1,
+  },
 };
 
 // Tinted Lens: not-very-effective hits (effectiveness < 1) deal double damage.
@@ -234,6 +250,14 @@ export function applyContactAbility(
   }
 }
 
+// Flash Fire: incoming fire-type damaging moves are nullified and the defender
+// gains a 1.5× boost to their own Fire-type moves (stored as flashFireActive).
+export function absorbsFire(defender: BattlePokemon, move: Move): boolean {
+  return defender.ability === 'flash-fire'
+    && move.type === 'fire'
+    && move.damageClass !== 'status';
+}
+
 // Water Absorb: incoming water-type damaging moves are nullified and the
 // defender heals 1/4 of their max HP. Status moves (damageClass 'status') are
 // unaffected — those don't deal damage and Water Absorb doesn't protect from
@@ -299,6 +323,14 @@ export function applyStatChangeFromFoe(
     events.push({ kind: 'ability_triggered', turn, pokemonName: target.data.name, ability: 'big-pecks' });
     return target;
   }
+  if (change < 0 && target.ability === 'clear-body') {
+    events.push({ kind: 'ability_triggered', turn, pokemonName: target.data.name, ability: 'clear-body' });
+    return target;
+  }
+  if (change < 0 && stat === 'attack' && (target.ability === 'hyper-cutter' || target.ability === 'own-tempo' || target.ability === 'inner-focus' || target.ability === 'scrappy')) {
+    events.push({ kind: 'ability_triggered', turn, pokemonName: target.data.name, ability: target.ability });
+    return target;
+  }
 
   const before = target.statStages[stat];
   const updated = applyStatChange(target, stat, change, turn, events);
@@ -323,43 +355,53 @@ export function noGuardInEffect(attacker: BattlePokemon, defender: BattlePokemon
 }
 
 export const ABILITY_DESCRIPTIONS: Record<string, string> = {
-  'intimidate':     'Lowers the foe\'s Attack by one stage on switch-in.',
-  'overgrow':       'Boosts Grass-type moves by 50% when HP drops below 1/3.',
-  'blaze':          'Boosts Fire-type moves by 50% when HP drops below 1/3.',
-  'torrent':        'Boosts Water-type moves by 50% when HP drops below 1/3.',
-  'swarm':          'Boosts Bug-type moves by 50% when HP drops below 1/3.',
-  'drought':        'Summons harsh sunlight for 5 turns on switch-in.',
-  'drizzle':        'Summons rain for 5 turns on switch-in.',
-  'sand-stream':    'Summons a sandstorm for 5 turns on switch-in.',
-  'snow-warning':   'Summons snow for 5 turns on switch-in.',
-  'grassy-surge':   'Sets Grassy Terrain for 5 turns on switch-in.',
-  'electric-surge': 'Sets Electric Terrain for 5 turns on switch-in.',
-  'psychic-surge':  'Sets Psychic Terrain for 5 turns on switch-in.',
-  'misty-surge':    'Sets Misty Terrain for 5 turns on switch-in.',
-  'skill-link':     'Multi-hit moves always hit the maximum number of times.',
-  'levitate':       'Immune to Ground-type moves and unaffected by terrain.',
-  'no-guard':       'This Pokémon\'s moves and moves targeting it never miss.',
-  'big-pecks':      'Prevents foes from lowering this Pokémon\'s Defense.',
-  'competitive':    'Raises Sp. Atk by 2 when a foe lowers any of this Pokémon\'s stats.',
-  'defiant':        'Raises Attack by 2 when a foe lowers any of this Pokémon\'s stats.',
-  'sheer-force':    'Removes secondary effects of moves to boost their power by 30%.',
-  'sniper':         'Boosts the power of critical hits to 2.25× instead of 1.5×.',
-  'thick-fat':      'Halves damage taken from Fire- and Ice-type moves.',
-  'regenerator':    'Heals 1/3 of max HP when switching out.',
-  'rock-head':      'Prevents recoil damage from recoil-dealing moves.',
-  'water-absorb':   'Absorbs Water-type moves, healing 1/4 of max HP instead.',
-  'sturdy':         'Survives a one-hit KO with 1 HP when at full health.',
-  'static':         '30% chance to paralyze a foe that makes contact.',
-  'flame-body':     '30% chance to burn a foe that makes contact.',
-  'poison-point':   '30% chance to poison a foe that makes contact.',
-  'effect-spore':   '30% chance to inflict paralysis, poison, or sleep on contact.',
-  'lightning-rod':  'Draws and nullifies Electric-type moves; raises Sp. Atk by 1.',
-  'tinted-lens':    'Doubles the power of not-very-effective moves.',
-  'keen-eye':       'Prevents foes from lowering this Pokémon\'s accuracy. Ignores the target\'s evasion.',
-  'own-tempo':      'Prevents this Pokémon from becoming confused.',
-  'vital-spirit':   'Prevents this Pokémon from falling asleep.',
-  'immunity':       'Prevents this Pokémon from being poisoned.',
-  'limber':         'Prevents this Pokémon from being paralyzed.',
+  'intimidate':     'Lowers the foe\'s Attack by one stage on switch-in',
+  'overgrow':       'Boosts Grass-type moves by 50% when HP drops below 1/3',
+  'blaze':          'Boosts Fire-type moves by 50% when HP drops below 1/3',
+  'torrent':        'Boosts Water-type moves by 50% when HP drops below 1/3',
+  'swarm':          'Boosts Bug-type moves by 50% when HP drops below 1/3',
+  'drought':        'Summons harsh sunlight for 5 turns on switch-in',
+  'drizzle':        'Summons rain for 5 turns on switch-in',
+  'sand-stream':    'Summons a sandstorm for 5 turns on switch-in',
+  'snow-warning':   'Summons snow for 5 turns on switch-in',
+  'grassy-surge':   'Sets Grassy Terrain for 5 turns on switch-in',
+  'electric-surge': 'Sets Electric Terrain for 5 turns on switch-in',
+  'psychic-surge':  'Sets Psychic Terrain for 5 turns on switch-in',
+  'misty-surge':    'Sets Misty Terrain for 5 turns on switch-in',
+  'skill-link':     'Multi-hit moves always hit the maximum number of times',
+  'levitate':       'Immune to Ground-type moves and unaffected by terrain',
+  'no-guard':       'This Pokémon\'s moves and moves targeting it never miss',
+  'big-pecks':      'Prevents foes from lowering this Pokémon\'s Defense',
+  'competitive':    'Raises Sp. Atk by 2 when a foe lowers any of this Pokémon\'s stats',
+  'defiant':        'Raises Attack by 2 when a foe lowers any of this Pokémon\'s stats',
+  'sheer-force':    'Removes secondary effects of moves to boost their power by 30%',
+  'sniper':         'Boosts the power of critical hits to 2.25× instead of 1.5×',
+  'thick-fat':      'Halves damage taken from Fire- and Ice-type moves',
+  'regenerator':    'Heals 1/3 of max HP when switching out',
+  'rock-head':      'Prevents recoil damage from recoil-dealing moves',
+  'water-absorb':   'Absorbs Water-type moves, healing 1/4 of max HP instead',
+  'sturdy':         'Survives a one-hit KO with 1 HP when at full health',
+  'static':         '30% chance to paralyze a foe that makes contact',
+  'flame-body':     '30% chance to burn a foe that makes contact',
+  'poison-point':   '30% chance to poison a foe that makes contact',
+  'effect-spore':   '30% chance to inflict paralysis, poison, or sleep on contact',
+  'lightning-rod':  'Draws and nullifies Electric-type moves; raises Sp. Atk by 1',
+  'flash-fire':     'Immune to Fire-type moves. The first one absorbed boosts Fire-type move power by 1.5×',
+  'tinted-lens':    'Doubles the power of not-very-effective moves',
+  'keen-eye':       'Prevents foes from lowering this Pokémon\'s accuracy. Ignores the target\'s evasion',
+  'own-tempo':      'Prevents confusion. Immune to Intimidate and other foe-initiated Attack drops',
+  'clear-body':     'Prevents other Pokémon from lowering this Pokémon\'s stats',
+  'hyper-cutter':   'Prevents other Pokémon from lowering this Pokémon\'s Attack stat',
+  'inner-focus':    'Prevents flinching. Immune to Intimidate and other foe-initiated Attack drops',
+  'vital-spirit':   'Prevents this Pokémon from falling asleep',
+  'immunity':       'Prevents this Pokémon from being poisoned',
+  'limber':         'Prevents this Pokémon from being paralyzed',
+  'shell-armor':    'Prevents the opponent from landing critical hits',
+  'iron-fist':      'Boosts the power of punching moves by 20%',
+  'ice-scales':     'Halves damage taken from special moves',
+  'fur-coat':       'Halves damage taken from physical moves',
+  'scrappy':        'Normal- and Fighting-type moves hit Ghost types. Immune to Intimidate',
+  'technician':     'Moves with 60 base power or less have their power multiplied by 1.5×',
 };
 
 export function getAbilityDescription(name: AbilityId | undefined): string | undefined {
@@ -375,6 +417,12 @@ export function isAbilityImplemented(name: AbilityId | undefined): boolean {
 export function abilityMaxVariableHits(attacker: BattlePokemon): boolean {
   const entry = attacker.ability ? IMPLEMENTED_ABILITIES[attacker.ability] : undefined;
   return entry?.maxVariableHits ?? false;
+}
+
+export function getDefenderAbilityDamageMultiplier(defender: BattlePokemon, move: Move): number {
+  if (move.damageClass === 'special' && defender.ability === 'ice-scales') return 0.5;
+  if (move.damageClass === 'physical' && defender.ability === 'fur-coat') return 0.5;
+  return 1;
 }
 
 export function getAbilityDamageMultiplier(attacker: BattlePokemon, move: Move): number {

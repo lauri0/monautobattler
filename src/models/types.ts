@@ -164,6 +164,8 @@ export interface BattlePokemon {
   // switching in). Cleared at end of turn. Fake Out uses this gate.
   justSwitchedIn?: boolean;
   ability?: AbilityId;
+  // Flash Fire: true once the pokemon has absorbed at least one Fire-type move.
+  flashFireActive?: boolean;
   statStages: StatStages;
 }
 

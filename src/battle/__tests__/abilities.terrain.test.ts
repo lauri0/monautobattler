@@ -71,6 +71,7 @@ describe('Terrain-setting abilities', () => {
 
 describe('Terrain damage multipliers', () => {
   it('electric terrain boosts electric-type moves from grounded attackers by 1.3x', () => {
+    stubRngConst(0.99); // no crit for both calls
     const atk = makePokemon({ name: 'a', types: ['normal'] });
     const def = makePokemon({ name: 'd', types: ['normal'] });
     const move = makeMove({ type: 'electric', damageClass: 'special', power: 80 });
@@ -94,6 +95,7 @@ describe('Terrain damage multipliers', () => {
   });
 
   it('misty terrain halves dragon damage to grounded defenders', () => {
+    stubRngConst(0.99); // no crit for both calls
     const atk = makePokemon({ name: 'a', types: ['normal'] });
     const def = makePokemon({ name: 'd', types: ['normal'] });
     const move = makeMove({ type: 'dragon', damageClass: 'special', power: 80 });

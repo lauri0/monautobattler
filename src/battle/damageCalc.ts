@@ -1,6 +1,6 @@
 import type { BattlePokemon, FieldState, Move, TerrainKind, TypeName, WeatherKind } from '../models/types';
 import { getTypeEffectiveness } from '../utils/typeChart';
-import { getAbilityDamageMultiplier, noGuardInEffect, tintedLensMultiplier } from './abilities';
+import { getAbilityDamageMultiplier, getDefenderAbilityDamageMultiplier, noGuardInEffect, tintedLensMultiplier } from './abilities';
 
 // "Grounded" = eligible to be hit by Ground-type moves and affected by terrain.
 // Flying types and Levitate users float; no other modifiers are modeled.
@@ -31,9 +31,13 @@ function terrainMoveMult(
 }
 
 // Effective type multiplier including ability-based immunities and reductions.
-function typeEffectiveness(move: Move, defender: BattlePokemon): number {
+function typeEffectiveness(move: Move, defender: BattlePokemon, attacker?: BattlePokemon): number {
   if (move.type === 'ground' && defender.ability === 'levitate') return 0;
-  const base = getTypeEffectiveness(move.type, defender.data.types, move.effect?.superEffectiveAgainst);
+  const scrappy = attacker?.ability === 'scrappy'
+    && (move.type === 'normal' || move.type === 'fighting')
+    && defender.data.types.includes('ghost');
+  const defenderTypes = scrappy ? defender.data.types.filter(t => t !== 'ghost') : defender.data.types;
+  const base = getTypeEffectiveness(move.type, defenderTypes, move.effect?.superEffectiveAgainst);
   if (defender.ability === 'thick-fat' && (move.type === 'fire' || move.type === 'ice')) return base * 0.5;
   return base;
 }
@@ -125,14 +129,14 @@ export function calcDamage(
     }
   }
 
-  const effectiveness = typeEffectiveness(move, defender);
+  const effectiveness = typeEffectiveness(move, defender, attacker);
   if (effectiveness === 0) {
     return { damage: 0, isCrit: false, missed: false, effectiveness: 0 };
   }
 
   const critRate = move.effect?.critRate ?? 0;
   const critProb = critRate === 0 ? 1 / 24 : critRate === 1 ? 1 / 8 : 1 / 2;
-  const isCrit = Math.random() < critProb;
+  const isCrit = defender.ability !== 'shell-armor' && Math.random() < critProb;
   const roll = randomRoll ?? (0.85 + Math.random() * 0.15);
 
   let A: number;
@@ -163,8 +167,9 @@ export function calcDamage(
   const terrainMult = terrainMoveMult(attacker, defender, move, field?.terrain);
 
   const tintedMult = tintedLensMultiplier(attacker, effectiveness);
+  const defAbilityMult = getDefenderAbilityDamageMultiplier(defender, move);
   const base = Math.floor(Math.floor((Math.floor(2 * 50 / 5) + 2) * move.power * A / D) / 50 + 2);
-  const damage = Math.floor(base * critMult * roll * stab * effectiveness * screenMult * abilityMult * weatherMult * terrainMult * tintedMult);
+  const damage = Math.floor(base * critMult * roll * stab * effectiveness * screenMult * abilityMult * weatherMult * terrainMult * tintedMult * defAbilityMult);
 
   return {
     damage: Math.max(1, damage),
@@ -181,7 +186,7 @@ export function calcMinDamage(
   defenderScreens?: DefenderScreens,
   field?: FieldState,
 ): number {
-  const effectiveness = typeEffectiveness(move, defender);
+  const effectiveness = typeEffectiveness(move, defender, attacker);
   if (effectiveness === 0) return 0;
 
   let A: number;
@@ -209,8 +214,9 @@ export function calcMinDamage(
   const weatherMult = weatherMoveMult(move.type, field?.weather);
   const terrainMult = terrainMoveMult(attacker, defender, move, field?.terrain);
   const tintedMult = tintedLensMultiplier(attacker, effectiveness);
+  const defAbilityMult = getDefenderAbilityDamageMultiplier(defender, move);
   const base = Math.floor(Math.floor((Math.floor(2 * 50 / 5) + 2) * move.power * A / D) / 50 + 2);
-  const damage = Math.floor(base * 1.0 * 0.85 * stab * effectiveness * screenMult * abilityMult * weatherMult * terrainMult * tintedMult);
+  const damage = Math.floor(base * 1.0 * 0.85 * stab * effectiveness * screenMult * abilityMult * weatherMult * terrainMult * tintedMult * defAbilityMult);
   return Math.max(1, damage);
 }
 
@@ -221,7 +227,7 @@ export function calcExpectedDamage(
   defenderScreens?: DefenderScreens,
   field?: FieldState,
 ): number {
-  const effectiveness = typeEffectiveness(move, defender);
+  const effectiveness = typeEffectiveness(move, defender, attacker);
   if (effectiveness === 0) return 0;
 
   let A: number;
@@ -250,7 +256,8 @@ export function calcExpectedDamage(
   const weatherMult = weatherMoveMult(move.type, field?.weather);
   const terrainMult = terrainMoveMult(attacker, defender, move, field?.terrain);
   const tintedMult = tintedLensMultiplier(attacker, effectiveness);
+  const defAbilityMult = getDefenderAbilityDamageMultiplier(defender, move);
   const base = Math.floor(Math.floor((Math.floor(2 * 50 / 5) + 2) * move.power * A / D) / 50 + 2);
-  const damage = Math.floor(base * 1.0 * roll * stab * effectiveness * screenMult * abilityMult * weatherMult * terrainMult * tintedMult);
+  const damage = Math.floor(base * 1.0 * roll * stab * effectiveness * screenMult * abilityMult * weatherMult * terrainMult * tintedMult * defAbilityMult);
   return Math.max(1, damage);
 }

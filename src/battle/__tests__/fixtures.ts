@@ -39,6 +39,7 @@ export interface PokemonOverrides {
   lastMoveProtected?: boolean;
   ability?: string;
   abilities?: string[];
+  flashFireActive?: boolean;
 }
 
 export function makePokemon(overrides: PokemonOverrides = {}): BattlePokemon {
@@ -87,6 +88,7 @@ export function makePokemon(overrides: PokemonOverrides = {}): BattlePokemon {
     protectedThisTurn: overrides.protectedThisTurn,
     lastMoveProtected: overrides.lastMoveProtected,
     ability: overrides.ability,
+    flashFireActive: overrides.flashFireActive,
     statStages: { ...ZERO_STAGES, ...(overrides.statStages ?? {}) },
   };
 }
