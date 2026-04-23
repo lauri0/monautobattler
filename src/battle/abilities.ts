@@ -135,6 +135,10 @@ export const IMPLEMENTED_ABILITIES: Record<string, AbilityEffect> = {
   // (see StatStageName), so the ability has no mechanical effect — it's
   // registered here so the UI doesn't flag it as "(Unimplemented)".
   'keen-eye':    {},
+  'own-tempo':    {},
+  'vital-spirit': {},
+  'immunity':     {},
+  'limber':       {},
 };
 
 // Tinted Lens: not-very-effective hits (effectiveness < 1) deal double damage.
@@ -153,9 +157,25 @@ export function absorbsElectric(defender: BattlePokemon, move: Move): boolean {
     && move.damageClass !== 'status';
 }
 
-// Type-based immunity to an incoming status. Mirrors isImmuneToAilment in
-// battleEngine.ts (duplicated here to keep abilities.ts free of engine imports).
+// Ability-based immunity to a major status ailment.
+export function abilityBlocksAilment(p: BattlePokemon, ailment: StatusCondition): boolean {
+  switch (p.ability) {
+    case 'vital-spirit': return ailment === 'sleep';
+    case 'immunity':     return ailment === 'poison';
+    case 'limber':       return ailment === 'paralysis';
+    default:             return false;
+  }
+}
+
+// Own Tempo prevents confusion.
+export function abilityBlocksConfusion(p: BattlePokemon): boolean {
+  return p.ability === 'own-tempo';
+}
+
+// Type- or ability-based immunity to an incoming status. Mirrors isImmuneToAilment
+// in battleEngine.ts (duplicated here to keep abilities.ts free of engine imports).
 function immuneToStatus(p: BattlePokemon, ailment: StatusCondition): boolean {
+  if (abilityBlocksAilment(p, ailment)) return true;
   const types = p.data.types;
   switch (ailment) {
     case 'burn':      return types.includes('fire');
@@ -336,6 +356,10 @@ export const ABILITY_DESCRIPTIONS: Record<string, string> = {
   'lightning-rod':  'Draws and nullifies Electric-type moves; raises Sp. Atk by 1.',
   'tinted-lens':    'Doubles the power of not-very-effective moves.',
   'keen-eye':       'Prevents foes from lowering this Pokémon\'s accuracy. Ignores the target\'s evasion.',
+  'own-tempo':      'Prevents this Pokémon from becoming confused.',
+  'vital-spirit':   'Prevents this Pokémon from falling asleep.',
+  'immunity':       'Prevents this Pokémon from being poisoned.',
+  'limber':         'Prevents this Pokémon from being paralyzed.',
 };
 
 export function getAbilityDescription(name: AbilityId | undefined): string | undefined {

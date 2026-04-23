@@ -2,7 +2,7 @@ import type { BattlePokemon, Move, TurnEvent, BattleResult, StatStageName, StatS
 import { calcDamage, calcExpectedDamage, effectiveSpeed, type DefenderScreens } from './damageCalc';
 import { defaultAI } from '../ai/aiModule';
 import { getTypeEffectiveness } from '../utils/typeChart';
-import { abilityMaxVariableHits, applySwitchInAbility, applyStatChangeFromFoe, noGuardInEffect, sheerForceSuppresses, absorbsWater, absorbsElectric, sturdyActive, ignoresRecoil, applyContactAbility } from './abilities';
+import { abilityMaxVariableHits, applySwitchInAbility, applyStatChangeFromFoe, noGuardInEffect, sheerForceSuppresses, absorbsWater, absorbsElectric, sturdyActive, ignoresRecoil, applyContactAbility, abilityBlocksAilment, abilityBlocksConfusion } from './abilities';
 import { isGrounded } from './damageCalc';
 
 export const TRICK_ROOM_TURNS = 5;
@@ -144,8 +144,9 @@ export function applyToxicSpikesOnEntry(
     return { pokemon: p, field: next };
   }
 
-  // Steel-types and anyone already statused are unaffected.
+  // Steel-types, Immunity holders, and anyone already statused are unaffected.
   if (p.data.types.includes('steel')) return { pokemon: p, field };
+  if (abilityBlocksAilment(p, 'poison')) return { pokemon: p, field };
   if (p.statusCondition) return { pokemon: p, field };
 
   const poisoned: BattlePokemon = { ...p, statusCondition: 'poison' };
@@ -398,9 +399,9 @@ function terrainBlocksConfusion(defender: BattlePokemon, field: FieldState): boo
   return field.terrain === 'misty' && isGrounded(defender);
 }
 
-// Type-based immunity to major ailments (approximates real Pokemon rules).
-// Sleep has no type immunity; confusion also has none.
+// Type- or ability-based immunity to major ailments.
 function isImmuneToAilment(defender: BattlePokemon, ailment: import('../models/types').StatusCondition): boolean {
+  if (abilityBlocksAilment(defender, ailment)) return true;
   const types = defender.data.types;
   switch (ailment) {
     case 'burn':      return types.includes('fire');
@@ -473,7 +474,7 @@ function applySecondaryEffects(
   }
 
   // Confusion on defender
-  if (!sheerForce && eff.confuses && !defender.confused && !terrainBlocksConfusion(defender, field)) {
+  if (!sheerForce && eff.confuses && !defender.confused && !terrainBlocksConfusion(defender, field) && !abilityBlocksConfusion(defender)) {
     const chance = eff.confusionChance ?? 0;
     if (chance === 0 || Math.random() * 100 < chance) {
       const turns = 2 + Math.floor(Math.random() * 4); // 2–5 turns
@@ -701,7 +702,7 @@ export function simulateTurnDeterministic(
         if (effects.flinch && move.effect?.flinchChance) {
           flinched = true;
         }
-        if (effects.confusion && move.effect?.confuses && !defender.confused) {
+        if (effects.confusion && move.effect?.confuses && !defender.confused && !abilityBlocksConfusion(defender)) {
           defender = { ...defender, confused: true, confusionTurnsLeft: 3 };
         }
       }
