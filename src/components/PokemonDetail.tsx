@@ -23,7 +23,7 @@ const STAT_MAX = 255;
 
 import { effectSummary } from '../utils/moveEffectSummary';
 import { formatPokemonName, formatAbilityName } from '../utils/formatName';
-import { isAbilityImplemented } from '../battle/abilities';
+import { isAbilityImplemented, getAbilityDescription } from '../battle/abilities';
 
 export default function PokemonDetail({ pokemon, allPokemon, onBack, onNavigate }: Props) {
   const sorted = [...allPokemon].sort((a, b) => a.id - b.id);
@@ -259,6 +259,11 @@ export default function PokemonDetail({ pokemon, allPokemon, onBack, onNavigate 
                   </option>
                 ))}
               </select>
+              {selectedAbility && getAbilityDescription(selectedAbility) && (
+                <p style={{ marginTop: '0.5rem', fontSize: '0.82em', color: 'var(--text-muted)', lineHeight: 1.4 }}>
+                  {getAbilityDescription(selectedAbility)}
+                </p>
+              )}
             </div>
           )}
 

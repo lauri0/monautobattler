@@ -1,6 +1,6 @@
 import type { BattlePokemon, FieldState, Move, TerrainKind, TypeName, WeatherKind } from '../models/types';
 import { getTypeEffectiveness } from '../utils/typeChart';
-import { getAbilityDamageMultiplier, noGuardInEffect } from './abilities';
+import { getAbilityDamageMultiplier, noGuardInEffect, tintedLensMultiplier } from './abilities';
 
 // "Grounded" = eligible to be hit by Ground-type moves and affected by terrain.
 // Flying types and Levitate users float; no other modifiers are modeled.
@@ -162,8 +162,9 @@ export function calcDamage(
   const weatherMult = weatherMoveMult(move.type, field?.weather);
   const terrainMult = terrainMoveMult(attacker, defender, move, field?.terrain);
 
+  const tintedMult = tintedLensMultiplier(attacker, effectiveness);
   const base = Math.floor(Math.floor((Math.floor(2 * 50 / 5) + 2) * move.power * A / D) / 50 + 2);
-  const damage = Math.floor(base * critMult * roll * stab * effectiveness * screenMult * abilityMult * weatherMult * terrainMult);
+  const damage = Math.floor(base * critMult * roll * stab * effectiveness * screenMult * abilityMult * weatherMult * terrainMult * tintedMult);
 
   return {
     damage: Math.max(1, damage),
@@ -207,8 +208,9 @@ export function calcMinDamage(
   const abilityMult = getAbilityDamageMultiplier(attacker, move);
   const weatherMult = weatherMoveMult(move.type, field?.weather);
   const terrainMult = terrainMoveMult(attacker, defender, move, field?.terrain);
+  const tintedMult = tintedLensMultiplier(attacker, effectiveness);
   const base = Math.floor(Math.floor((Math.floor(2 * 50 / 5) + 2) * move.power * A / D) / 50 + 2);
-  const damage = Math.floor(base * 1.0 * 0.85 * stab * effectiveness * screenMult * abilityMult * weatherMult * terrainMult);
+  const damage = Math.floor(base * 1.0 * 0.85 * stab * effectiveness * screenMult * abilityMult * weatherMult * terrainMult * tintedMult);
   return Math.max(1, damage);
 }
 
@@ -247,7 +249,8 @@ export function calcExpectedDamage(
   const abilityMult = getAbilityDamageMultiplier(attacker, move);
   const weatherMult = weatherMoveMult(move.type, field?.weather);
   const terrainMult = terrainMoveMult(attacker, defender, move, field?.terrain);
+  const tintedMult = tintedLensMultiplier(attacker, effectiveness);
   const base = Math.floor(Math.floor((Math.floor(2 * 50 / 5) + 2) * move.power * A / D) / 50 + 2);
-  const damage = Math.floor(base * 1.0 * roll * stab * effectiveness * screenMult * abilityMult * weatherMult * terrainMult);
+  const damage = Math.floor(base * 1.0 * roll * stab * effectiveness * screenMult * abilityMult * weatherMult * terrainMult * tintedMult);
   return Math.max(1, damage);
 }

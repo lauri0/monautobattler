@@ -129,7 +129,21 @@ export const IMPLEMENTED_ABILITIES: Record<string, AbilityEffect> = {
   'poison-point':  {},
   'effect-spore':  {},
   'lightning-rod': {},
+  'tinted-lens': {},
+  // Keen Eye would prevent foe-initiated accuracy drops and ignore the target's
+  // evasion stage. This engine doesn't model accuracy or evasion stat stages
+  // (see StatStageName), so the ability has no mechanical effect — it's
+  // registered here so the UI doesn't flag it as "(Unimplemented)".
+  'keen-eye':    {},
 };
+
+// Tinted Lens: not-very-effective hits (effectiveness < 1) deal double damage.
+// Applied after type effectiveness is computed, since the multiplier depends
+// on the resulting effectiveness rather than the move alone.
+export function tintedLensMultiplier(attacker: BattlePokemon, effectiveness: number): number {
+  if (attacker.ability !== 'tinted-lens') return 1;
+  return effectiveness > 0 && effectiveness < 1 ? 2 : 1;
+}
 
 // Lightning Rod: incoming electric-type damaging moves are nullified and the
 // defender's Special Attack rises by one stage. Mirrors Water Absorb's shape.
@@ -286,6 +300,47 @@ export function applyStatChangeFromFoe(
 // miss, and attacks targeting them never miss.
 export function noGuardInEffect(attacker: BattlePokemon, defender: BattlePokemon): boolean {
   return attacker.ability === 'no-guard' || defender.ability === 'no-guard';
+}
+
+export const ABILITY_DESCRIPTIONS: Record<string, string> = {
+  'intimidate':     'Lowers the foe\'s Attack by one stage on switch-in.',
+  'overgrow':       'Boosts Grass-type moves by 50% when HP drops below 1/3.',
+  'blaze':          'Boosts Fire-type moves by 50% when HP drops below 1/3.',
+  'torrent':        'Boosts Water-type moves by 50% when HP drops below 1/3.',
+  'swarm':          'Boosts Bug-type moves by 50% when HP drops below 1/3.',
+  'drought':        'Summons harsh sunlight for 5 turns on switch-in.',
+  'drizzle':        'Summons rain for 5 turns on switch-in.',
+  'sand-stream':    'Summons a sandstorm for 5 turns on switch-in.',
+  'snow-warning':   'Summons snow for 5 turns on switch-in.',
+  'grassy-surge':   'Sets Grassy Terrain for 5 turns on switch-in.',
+  'electric-surge': 'Sets Electric Terrain for 5 turns on switch-in.',
+  'psychic-surge':  'Sets Psychic Terrain for 5 turns on switch-in.',
+  'misty-surge':    'Sets Misty Terrain for 5 turns on switch-in.',
+  'skill-link':     'Multi-hit moves always hit the maximum number of times.',
+  'levitate':       'Immune to Ground-type moves and unaffected by terrain.',
+  'no-guard':       'This Pokémon\'s moves and moves targeting it never miss.',
+  'big-pecks':      'Prevents foes from lowering this Pokémon\'s Defense.',
+  'competitive':    'Raises Sp. Atk by 2 when a foe lowers any of this Pokémon\'s stats.',
+  'defiant':        'Raises Attack by 2 when a foe lowers any of this Pokémon\'s stats.',
+  'sheer-force':    'Removes secondary effects of moves to boost their power by 30%.',
+  'sniper':         'Boosts the power of critical hits to 2.25× instead of 1.5×.',
+  'thick-fat':      'Halves damage taken from Fire- and Ice-type moves.',
+  'regenerator':    'Heals 1/3 of max HP when switching out.',
+  'rock-head':      'Prevents recoil damage from recoil-dealing moves.',
+  'water-absorb':   'Absorbs Water-type moves, healing 1/4 of max HP instead.',
+  'sturdy':         'Survives a one-hit KO with 1 HP when at full health.',
+  'static':         '30% chance to paralyze a foe that makes contact.',
+  'flame-body':     '30% chance to burn a foe that makes contact.',
+  'poison-point':   '30% chance to poison a foe that makes contact.',
+  'effect-spore':   '30% chance to inflict paralysis, poison, or sleep on contact.',
+  'lightning-rod':  'Draws and nullifies Electric-type moves; raises Sp. Atk by 1.',
+  'tinted-lens':    'Doubles the power of not-very-effective moves.',
+  'keen-eye':       'Prevents foes from lowering this Pokémon\'s accuracy. Ignores the target\'s evasion.',
+};
+
+export function getAbilityDescription(name: AbilityId | undefined): string | undefined {
+  if (!name) return undefined;
+  return ABILITY_DESCRIPTIONS[name];
 }
 
 export function isAbilityImplemented(name: AbilityId | undefined): boolean {
