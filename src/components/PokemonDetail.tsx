@@ -84,10 +84,6 @@ export default function PokemonDetail({ pokemon, allPokemon, onBack, onNavigate 
     setTimeout(() => setSaved(false), 2000);
   }
 
-  const winPct = persisted.wins + persisted.losses > 0
-    ? ((persisted.wins / (persisted.wins + persisted.losses)) * 100).toFixed(1)
-    : '—';
-
   return (
     <div className="page">
       <div className="detail-nav">
@@ -122,26 +118,28 @@ export default function PokemonDetail({ pokemon, allPokemon, onBack, onNavigate 
             </div>
           </div>
 
-          <div className="card" style={{ marginTop: '1rem' }}>
-            <div className="detail-record-row">
-              <div className="detail-stat-box">
-                <span className="detail-stat-label">ELO</span>
-                <span className="detail-stat-val" style={{ color: '#a64dff' }}>{persisted.elo}</span>
-              </div>
-              <div className="detail-stat-box">
-                <span className="detail-stat-label">Wins</span>
-                <span className="detail-stat-val" style={{ color: '#27ae60' }}>{persisted.wins}</span>
-              </div>
-              <div className="detail-stat-box">
-                <span className="detail-stat-label">Losses</span>
-                <span className="detail-stat-val" style={{ color: '#e94560' }}>{persisted.losses}</span>
-              </div>
-              <div className="detail-stat-box">
-                <span className="detail-stat-label">Win%</span>
-                <span className="detail-stat-val">{winPct}{winPct !== '—' ? '%' : ''}</span>
-              </div>
+          {pokemon.abilities.length > 0 && (
+            <div className="card" style={{ marginTop: '1rem' }}>
+              <h3 className="section-title">Ability</h3>
+              <select
+                value={selectedAbility ?? ''}
+                onChange={e => { setSelectedAbility(e.target.value); setSaved(false); }}
+                style={{ width: '100%' }}
+              >
+                {pokemon.abilities.map(name => (
+                  <option key={name} value={name}>
+                    {formatAbilityName(name)}
+                    {!isAbilityImplemented(name) ? ' (Unimplemented)' : ''}
+                  </option>
+                ))}
+              </select>
+              {selectedAbility && getAbilityDescription(selectedAbility) && (
+                <p style={{ marginTop: '0.5rem', fontSize: '0.82em', color: 'var(--text-muted)', lineHeight: 1.4 }}>
+                  {getAbilityDescription(selectedAbility)}
+                </p>
+              )}
             </div>
-          </div>
+          )}
 
           <div className="card" style={{ marginTop: '1rem' }}>
             <h3 className="section-title">Defensive Type Matchups</h3>
@@ -243,30 +241,6 @@ export default function PokemonDetail({ pokemon, allPokemon, onBack, onNavigate 
             </div>
           </div>
 
-          {/* Ability */}
-          {pokemon.abilities.length > 0 && (
-            <div className="card" style={{ marginBottom: '1rem' }}>
-              <h3 className="section-title">Ability</h3>
-              <select
-                value={selectedAbility ?? ''}
-                onChange={e => { setSelectedAbility(e.target.value); setSaved(false); }}
-                style={{ width: '100%' }}
-              >
-                {pokemon.abilities.map(name => (
-                  <option key={name} value={name}>
-                    {formatAbilityName(name)}
-                    {!isAbilityImplemented(name) ? ' (Unimplemented)' : ''}
-                  </option>
-                ))}
-              </select>
-              {selectedAbility && getAbilityDescription(selectedAbility) && (
-                <p style={{ marginTop: '0.5rem', fontSize: '0.82em', color: 'var(--text-muted)', lineHeight: 1.4 }}>
-                  {getAbilityDescription(selectedAbility)}
-                </p>
-              )}
-            </div>
-          )}
-
           {/* Moveset */}
           <div className="card" style={{ marginBottom: '1rem' }}>
             <h3 className="section-title">Moveset</h3>
@@ -276,25 +250,27 @@ export default function PokemonDetail({ pokemon, allPokemon, onBack, onNavigate 
                 return (
                   <div key={slot} className="move-slot">
                     <span className="move-slot-num">Slot {slot + 1}</span>
-                    <select
-                      value={moveset[slot] ?? ''}
-                      onChange={e => handleMoveChange(slot, Number(e.target.value))}
-                      style={{ flex: 1 }}
-                    >
-                      {pokemon.availableMoves
-                        .filter(m => allowedIds.includes(m.id))
-                        .map(m => {
-                          const fx = effectSummary(m);
-                          return (
-                            <option key={m.id} value={m.id} style={{ background: getTypeColor(m.type), color: '#fff' }}>
-                              {`${damageClassIcon(m.damageClass)} ${m.name}  ${m.power}pw  ${m.accuracy ?? '—'}%${m.priority ? `  · pri ${m.priority > 0 ? '+' : ''}${m.priority}` : ''}${fx ? `  · ${fx}` : ''}`}
-                            </option>
-                          );
-                        })}
-                    </select>
-                    {selectedMove && (
-                      <TypeBadge type={selectedMove.type} />
-                    )}
+                    <div style={{ flex: 1, display: 'grid', gridTemplateColumns: '80% 20%', alignItems: 'center' }}>
+                      <select
+                        value={moveset[slot] ?? ''}
+                        onChange={e => handleMoveChange(slot, Number(e.target.value))}
+                        style={{ width: '100%', outline: selectedMove ? `2px solid ${getTypeColor(selectedMove.type)}` : undefined, outlineOffset: '-2px' }}
+                      >
+                        {pokemon.availableMoves
+                          .filter(m => allowedIds.includes(m.id))
+                          .map(m => {
+                            const fx = effectSummary(m);
+                            return (
+                              <option key={m.id} value={m.id} style={{ background: getTypeColor(m.type), color: '#fff' }}>
+                                {`${damageClassIcon(m.damageClass)} ${m.name}  ${m.power}pw  ${m.accuracy ?? '—'}%${m.priority ? `  · pri ${m.priority > 0 ? '+' : ''}${m.priority}` : ''}${fx ? `  · ${fx}` : ''}`}
+                              </option>
+                            );
+                          })}
+                      </select>
+                      <div style={{ display: 'flex', justifyContent: 'center' }}>
+                        {selectedMove && <TypeBadge type={selectedMove.type} />}
+                      </div>
+                    </div>
                   </div>
                 );
               })}
