@@ -42,6 +42,7 @@ export interface MoveEffect {
   taunt?: boolean;         // applies Taunt to the target (blocks status moves for N turns)
   removesScreens?: boolean; // removes Reflect and Light Screen on defender's side before the hit (Brick Break)
   failsIfTargetNotAttacking?: boolean; // fails if the target is not using a damaging move this turn (Sucker Punch)
+  clearsHazards?: boolean; // removes entry hazards (Stealth Rock) from user's side after hitting (Rapid Spin)
 }
 
 export type FieldEffectKind =
@@ -49,7 +50,9 @@ export type FieldEffectKind =
   | 'tailwind'
   | 'lightScreen'
   | 'reflect'
-  | 'stealthRock';
+  | 'stealthRock'
+  | 'spikes'
+  | 'toxicSpikes';
 
 export type WeatherKind = 'sun' | 'rain' | 'sandstorm' | 'snow';
 
@@ -60,6 +63,8 @@ export interface SideFieldState {
   lightScreenTurns: number;
   reflectTurns: number;
   stealthRock: boolean;
+  spikes: number;        // 0–3 layers
+  toxicSpikes: boolean;  // single layer (no badly-poison variant)
 }
 
 export interface FieldState {
@@ -194,6 +199,9 @@ export type TurnEvent =
   | { kind: 'field_set'; turn: number; effect: FieldEffectKind; side?: SideIndex; turns: number; pokemonName: string }
   | { kind: 'field_expired'; turn: number; effect: FieldEffectKind; side?: SideIndex }
   | { kind: 'stealth_rock_damage'; turn: number; pokemonName: string; damage: number; hpAfter: number }
+  | { kind: 'spikes_damage'; turn: number; pokemonName: string; damage: number; hpAfter: number; layers: number }
+  | { kind: 'toxic_spikes_poison'; turn: number; pokemonName: string }
+  | { kind: 'toxic_spikes_absorbed'; turn: number; pokemonName: string }
   | { kind: 'taunted'; turn: number; pokemonName: string; turns: number }
   | { kind: 'taunt_end'; turn: number; pokemonName: string }
   | { kind: 'ability_triggered'; turn: number; pokemonName: string; ability: AbilityId }

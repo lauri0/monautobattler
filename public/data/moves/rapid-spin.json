@@ -15,6 +15,7 @@
         "target": "user"
       }
     ],
-    "statChance": 100
+    "statChance": 100,
+    "clearsHazards": true
   }
 }

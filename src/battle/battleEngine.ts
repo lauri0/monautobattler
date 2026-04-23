@@ -11,7 +11,7 @@ export const SCREEN_TURNS = 5;
 export const TAUNT_TURNS = 3;
 
 function makeSide(): SideFieldState {
-  return { tailwindTurns: 0, lightScreenTurns: 0, reflectTurns: 0, stealthRock: false };
+  return { tailwindTurns: 0, lightScreenTurns: 0, reflectTurns: 0, stealthRock: false, spikes: 0, toxicSpikes: false };
 }
 
 export function makeInitialField(): FieldState {
@@ -89,6 +89,68 @@ export function applyStealthRockOnEntry(
   const hpAfter = Math.max(0, p.currentHp - damage);
   events.push({ kind: 'stealth_rock_damage', turn, pokemonName: p.data.name, damage, hpAfter });
   return { ...p, currentHp: hpAfter };
+}
+
+// Spikes chip on entry. Only hits grounded pokemon. 1/8, 1/6, 1/4 max HP for
+// 1, 2, 3 layers respectively.
+const SPIKES_FRACTION: Record<number, number> = { 1: 1 / 8, 2: 1 / 6, 3: 1 / 4 };
+
+export function applySpikesOnEntry(
+  p: BattlePokemon,
+  field: FieldState,
+  side: SideIndex,
+  turn: number,
+  events: TurnEvent[],
+): BattlePokemon {
+  const layers = field.sides[side].spikes;
+  if (layers <= 0) return p;
+  if (p.currentHp <= 0) return p;
+  if (!isGrounded(p)) return p;
+  const frac = SPIKES_FRACTION[layers] ?? 0;
+  const damage = Math.max(1, Math.floor(p.level50Stats.hp * frac));
+  const hpAfter = Math.max(0, p.currentHp - damage);
+  events.push({ kind: 'spikes_damage', turn, pokemonName: p.data.name, damage, hpAfter, layers });
+  return { ...p, currentHp: hpAfter };
+}
+
+/**
+ * Toxic Spikes on entry. Grounded Poison-types absorb the hazard (removing it
+ * from their side). Grounded pokemon without an existing major status become
+ * poisoned. Non-grounded pokemon and Steel-types are unaffected.
+ *
+ * Returns the (possibly status-applied) pokemon AND the updated field (since
+ * absorption mutates the hazard). Emits `toxic_spikes_poison` +
+ * `status_applied` on poisoning, `toxic_spikes_absorbed` + `field_expired` on
+ * absorption.
+ */
+export function applyToxicSpikesOnEntry(
+  p: BattlePokemon,
+  field: FieldState,
+  side: SideIndex,
+  turn: number,
+  events: TurnEvent[],
+): { pokemon: BattlePokemon; field: FieldState } {
+  if (!field.sides[side].toxicSpikes) return { pokemon: p, field };
+  if (p.currentHp <= 0) return { pokemon: p, field };
+  if (!isGrounded(p)) return { pokemon: p, field };
+
+  // Grounded Poison-type absorbs the hazard.
+  if (p.data.types.includes('poison')) {
+    const sides: [SideFieldState, SideFieldState] = [field.sides[0], field.sides[1]];
+    sides[side] = { ...sides[side], toxicSpikes: false };
+    const next: FieldState = { ...field, sides };
+    events.push({ kind: 'toxic_spikes_absorbed', turn, pokemonName: p.data.name });
+    events.push({ kind: 'field_expired', turn, effect: 'toxicSpikes', side });
+    return { pokemon: p, field: next };
+  }
+
+  // Steel-types and anyone already statused are unaffected.
+  if (p.data.types.includes('steel')) return { pokemon: p, field };
+  if (p.statusCondition) return { pokemon: p, field };
+
+  const poisoned: BattlePokemon = { ...p, statusCondition: 'poison' };
+  events.push({ kind: 'toxic_spikes_poison', turn, pokemonName: p.data.name });
+  return { pokemon: poisoned, field };
 }
 
 // Decrement per-turn field counters and emit expiry events.
@@ -825,6 +887,25 @@ function resolveStatusMove(
       events.push({ kind: 'field_set', turn, effect: fx, side: foeSide, turns: 0, pokemonName: attacker.data.name });
       return { attacker, defender, dealtDamage: false, defenderFlinched: false, pivotTriggered: false, field: nextField };
     }
+    if (fx === 'spikes') {
+      const foeSide = opposite(attackerSide);
+      const current = field.sides[foeSide].spikes;
+      if (current >= 3) return failed();
+      const sides: [SideFieldState, SideFieldState] = [field.sides[0], field.sides[1]];
+      sides[foeSide] = { ...sides[foeSide], spikes: current + 1 };
+      const nextField: FieldState = { ...field, sides };
+      events.push({ kind: 'field_set', turn, effect: fx, side: foeSide, turns: current + 1, pokemonName: attacker.data.name });
+      return { attacker, defender, dealtDamage: false, defenderFlinched: false, pivotTriggered: false, field: nextField };
+    }
+    if (fx === 'toxicSpikes') {
+      const foeSide = opposite(attackerSide);
+      if (field.sides[foeSide].toxicSpikes) return failed();
+      const sides: [SideFieldState, SideFieldState] = [field.sides[0], field.sides[1]];
+      sides[foeSide] = { ...sides[foeSide], toxicSpikes: true };
+      const nextField: FieldState = { ...field, sides };
+      events.push({ kind: 'field_set', turn, effect: fx, side: foeSide, turns: 0, pokemonName: attacker.data.name });
+      return { attacker, defender, dealtDamage: false, defenderFlinched: false, pivotTriggered: false, field: nextField };
+    }
   }
 
   // Taunt (applies to foe)
@@ -894,7 +975,7 @@ export function resolveSingleAttack(
   ctx: AttackCtx,
   events: TurnEvent[],
 ): SingleAttackResult {
-  const field: FieldState = ctx.field ?? makeInitialField();
+  let field: FieldState = ctx.field ?? makeInitialField();
   const attackerSide: SideIndex = ctx.attackerSide ?? 0;
   const defenderSide: SideIndex = opposite(attackerSide);
 
@@ -1078,6 +1159,22 @@ export function resolveSingleAttack(
     // Contact abilities (Static, Flame Body, Poison Point, Effect Spore) roll
     // against the attacker if the move made contact.
     attacker = applyContactAbility(attacker, defender, move, turnNumber, events);
+
+    // Rapid Spin: clear entry hazards from the user's side.
+    if (move.effect?.clearsHazards && attacker.currentHp > 0) {
+      const userSide = field.sides[attackerSide];
+      if (userSide.stealthRock || userSide.spikes > 0 || userSide.toxicSpikes) {
+        const sides: [SideFieldState, SideFieldState] = [field.sides[0], field.sides[1]];
+        const hadSr = userSide.stealthRock;
+        const hadSpikes = userSide.spikes > 0;
+        const hadToxic = userSide.toxicSpikes;
+        sides[attackerSide] = { ...userSide, stealthRock: false, spikes: 0, toxicSpikes: false };
+        field = { ...field, sides };
+        if (hadSr) events.push({ kind: 'field_expired', turn: turnNumber, effect: 'stealthRock', side: attackerSide });
+        if (hadSpikes) events.push({ kind: 'field_expired', turn: turnNumber, effect: 'spikes', side: attackerSide });
+        if (hadToxic) events.push({ kind: 'field_expired', turn: turnNumber, effect: 'toxicSpikes', side: attackerSide });
+      }
+    }
   }
 
   // Tick an existing forced-move lock. Skip on the turn the lock is first set.

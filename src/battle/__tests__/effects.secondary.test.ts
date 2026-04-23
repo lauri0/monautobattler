@@ -1,6 +1,6 @@
 import { describe, it, expect } from 'vitest';
-import { resolveSingleAttack } from '../battleEngine';
-import type { TurnEvent } from '../../models/types';
+import { makeInitialField, resolveSingleAttack } from '../battleEngine';
+import type { FieldState, TurnEvent } from '../../models/types';
 import { makePokemon, makeMove } from './fixtures';
 import { stubRng } from './rng';
 
@@ -243,5 +243,66 @@ describe('context-power multipliers', () => {
 
     if (attackEv.kind !== 'attack' || attackEv2.kind !== 'attack') throw new Error();
     expect(attackEv.damage).toBeGreaterThan(attackEv2.damage * 5);
+  });
+});
+
+describe('Rapid Spin', () => {
+  const rapidSpin = () => makeMove({
+    name: 'rapid-spin', type: 'normal', damageClass: 'physical', power: 50, accuracy: 100,
+    effect: { clearsHazards: true },
+  });
+
+  it('clears Stealth Rock from user side after hitting', () => {
+    stubRng([0, 0.99, 1.0]); // accuracy, no-crit, damage roll
+    const field: FieldState = makeInitialField();
+    field.sides[0].stealthRock = true;
+    const events: TurnEvent[] = [];
+    const r = resolveSingleAttack(
+      makePokemon({ name: 'atk' }), makePokemon({ name: 'def' }), rapidSpin(), 1,
+      { preFlinched: false, foeHitUserThisTurn: false, field, attackerSide: 0 }, events,
+    );
+    expect(r.field.sides[0].stealthRock).toBe(false);
+    expect(events.some(e => e.kind === 'field_expired' && e.effect === 'stealthRock')).toBe(true);
+  });
+
+  it('does not clear Stealth Rock on foe side', () => {
+    stubRng([0, 0.99, 1.0]);
+    const field: FieldState = makeInitialField();
+    field.sides[1].stealthRock = true;
+    const events: TurnEvent[] = [];
+    const r = resolveSingleAttack(
+      makePokemon({ name: 'atk' }), makePokemon({ name: 'def' }), rapidSpin(), 1,
+      { preFlinched: false, foeHitUserThisTurn: false, field, attackerSide: 0 }, events,
+    );
+    expect(r.field.sides[1].stealthRock).toBe(true);
+    expect(events.some(e => e.kind === 'field_expired')).toBe(false);
+  });
+
+  it('does nothing when no hazards are present', () => {
+    stubRng([0, 0.99, 1.0]);
+    const field: FieldState = makeInitialField();
+    const events: TurnEvent[] = [];
+    const r = resolveSingleAttack(
+      makePokemon({ name: 'atk' }), makePokemon({ name: 'def' }), rapidSpin(), 1,
+      { preFlinched: false, foeHitUserThisTurn: false, field, attackerSide: 0 }, events,
+    );
+    expect(r.field.sides[0].stealthRock).toBe(false);
+    expect(events.some(e => e.kind === 'field_expired')).toBe(false);
+  });
+
+  it('does not clear hazards when the move misses', () => {
+    stubRng([0.9]); // roll > 0.8 (accuracy 80) → miss
+    const field: FieldState = makeInitialField();
+    field.sides[0].stealthRock = true;
+    const events: TurnEvent[] = [];
+    const missMove = makeMove({
+      name: 'rapid-spin', type: 'normal', damageClass: 'physical', power: 50, accuracy: 80,
+      effect: { clearsHazards: true },
+    });
+    const r = resolveSingleAttack(
+      makePokemon({ name: 'atk' }), makePokemon({ name: 'def' }), missMove, 1,
+      { preFlinched: false, foeHitUserThisTurn: false, field, attackerSide: 0 }, events,
+    );
+    expect(r.field.sides[0].stealthRock).toBe(true);
   });
 });

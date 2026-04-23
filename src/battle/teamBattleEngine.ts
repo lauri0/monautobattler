@@ -16,7 +16,7 @@ import type {
   StatStages,
 } from '../models/types';
 import { buildBattlePokemon } from './buildBattlePokemon';
-import { applyEndOfTurnStatus, applyEndOfTurnTerrain, applyEndOfTurnWeather, applyStealthRockOnEntry, effectivePriority, makeInitialField, resolveSingleAttack, tickTaunt, usableMoves } from './battleEngine';
+import { applyEndOfTurnStatus, applyEndOfTurnTerrain, applyEndOfTurnWeather, applySpikesOnEntry, applyStealthRockOnEntry, applyToxicSpikesOnEntry, effectivePriority, makeInitialField, resolveSingleAttack, tickTaunt, usableMoves } from './battleEngine';
 import { effectiveSpeed } from './damageCalc';
 import { applySwitchInAbility, applySwitchOutAbility } from './abilities';
 
@@ -317,25 +317,48 @@ function applySwitchInInTeam(
   return result.field;
 }
 
-// Apply stealth rock to the active pokemon on `side` if hazards are set there.
-// Writes the (possibly damaged) pokemon back into `teams` and logs the event.
-function applySrToActive(
+// Apply all entry hazards to the active pokemon on `side`. Order: Stealth Rock
+// → Spikes → Toxic Spikes. Short-circuits when the pokemon faints so a KO'd
+// pokemon doesn't also get poisoned by toxic spikes. Returns the possibly
+// updated field (Toxic Spikes absorption by a grounded Poison-type clears the
+// hazard).
+function applyHazardsToActive(
   teams: [Team, Team],
   side: SideIndex,
   field: FieldState,
   turn: number,
   events: TeamTurnEvent[],
-): void {
-  if (!field.sides[side].stealthRock) return;
-  const active = teams[side].pokemon[teams[side].activeIdx];
-  const inner: TurnEvent[] = [];
-  const after = applyStealthRockOnEntry(active, field, side, turn, inner);
-  if (after !== active) {
-    teams[side] = writeActive(teams[side], after);
-    for (const ev of inner) {
-      events.push({ side, ...ev });
-    }
+): FieldState {
+  const hasAny = field.sides[side].stealthRock || field.sides[side].spikes > 0 || field.sides[side].toxicSpikes;
+  if (!hasAny) return field;
+  let active = teams[side].pokemon[teams[side].activeIdx];
+
+  const srInner: TurnEvent[] = [];
+  const afterSr = applyStealthRockOnEntry(active, field, side, turn, srInner);
+  if (afterSr !== active) {
+    active = afterSr;
+    teams[side] = writeActive(teams[side], active);
+    for (const ev of srInner) events.push({ side, ...ev });
   }
+  if (active.currentHp <= 0) return field;
+
+  const spInner: TurnEvent[] = [];
+  const afterSp = applySpikesOnEntry(active, field, side, turn, spInner);
+  if (afterSp !== active) {
+    active = afterSp;
+    teams[side] = writeActive(teams[side], active);
+    for (const ev of spInner) events.push({ side, ...ev });
+  }
+  if (active.currentHp <= 0) return field;
+
+  const txInner: TurnEvent[] = [];
+  const res = applyToxicSpikesOnEntry(active, field, side, turn, txInner);
+  if (res.pokemon !== active || res.field !== field) {
+    if (res.pokemon !== active) teams[side] = writeActive(teams[side], res.pokemon);
+    for (const ev of txInner) events.push({ side, ...ev });
+    return res.field;
+  }
+  return field;
 }
 
 // Resolve a single attack against the current active on `defenderSide`. Writes
@@ -411,10 +434,10 @@ export function applyActions(
       kind: 'switch', turn: state.turn, side: pivotSide,
       outName: outgoing.data.name, inName: incoming.data.name,
     });
-    applySrToActive(teams, pivotSide, field, state.turn, events);
+    field = applyHazardsToActive(teams, pivotSide, field, state.turn, events);
     field = applySwitchInInTeam(teams, pivotSide, field, state.turn, events);
 
-    // If SR KO'd the incoming pokemon, skip the pending attack and let the
+    // If hazards KO'd the incoming pokemon, skip the pending attack and let the
     // normal phase logic surface a replace request.
     const incomingAlive = teams[pivotSide].pokemon[teams[pivotSide].activeIdx].currentHp > 0;
 
@@ -458,7 +481,7 @@ export function applyActions(
         kind: 'switch', turn: state.turn, side,
         outName: outgoing.data.name, inName: incoming.data.name,
       });
-      applySrToActive(teams, side, field, state.turn, events);
+      field = applyHazardsToActive(teams, side, field, state.turn, events);
       field = applySwitchInInTeam(teams, side, field, state.turn, events);
     }
 
@@ -487,7 +510,7 @@ export function applyActions(
       kind: 'switch', turn: state.turn, side,
       outName: outgoing.data.name, inName: incoming.data.name,
     });
-    applySrToActive(teams, side, field, state.turn, events);
+    field = applyHazardsToActive(teams, side, field, state.turn, events);
     field = applySwitchInInTeam(teams, side, field, state.turn, events);
   }
 

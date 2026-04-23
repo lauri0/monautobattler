@@ -107,6 +107,10 @@ export function effectSummary(move: Move): string {
     parts.push('breaks screens');
   }
 
+  if (eff.clearsHazards) {
+    parts.push('clears hazards');
+  }
+
   if (eff.failsIfTargetNotAttacking) {
     parts.push('fails vs status');
   }
@@ -118,6 +122,8 @@ export function effectSummary(move: Move): string {
       lightScreen: 'light screen 5t',
       reflect: 'reflect 5t',
       stealthRock: 'stealth rock',
+      spikes: 'spikes',
+      toxicSpikes: 'toxic spikes',
     };
     parts.push(labels[eff.fieldEffect] ?? eff.fieldEffect);
   }

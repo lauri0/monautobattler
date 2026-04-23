@@ -77,6 +77,8 @@ const STATUS_MOVE_EFFECTS: Record<string, MoveEffect> = {
   'light-screen': { fieldEffect: 'lightScreen' },
   'reflect':      { fieldEffect: 'reflect' },
   'stealth-rock': { fieldEffect: 'stealthRock' },
+  'spikes':       { fieldEffect: 'spikes' },
+  'toxic-spikes': { fieldEffect: 'toxicSpikes' },
   'taunt':        { taunt: true },
   'will-o-wisp':  { ailment: 'burn', ailmentChance: 0 },
   'nasty-plot':   { statChanges: [{ stat: 'special-attack', change: 2, target: 'user' }], statChance: 0 },
@@ -95,6 +97,11 @@ const STATUS_MOVE_EFFECTS: Record<string, MoveEffect> = {
     { stat: 'attack', change: -1, target: 'foe' },
     { stat: 'special-attack', change: -1, target: 'foe' },
   ], statChance: 0, pivotSwitch: true },
+  'quiver-dance': { statChanges: [
+    { stat: 'special-attack', change: 1, target: 'user' },
+    { stat: 'special-defense', change: 1, target: 'user' },
+    { stat: 'speed', change: 1, target: 'user' },
+  ], statChance: 0 },
 };
 
 async function fetchMoveData(moveUrl: string): Promise<Move | null> {
@@ -223,6 +230,11 @@ async function fetchMoveData(moveUrl: string): Promise<Move | null> {
     // Brick Break / Psychic Fangs: remove Reflect and Light Screen before hitting
     if (data.name === 'brick-break' || data.name === 'psychic-fangs') {
       effect = { ...effect, removesScreens: true };
+    }
+
+    // Rapid Spin: clears entry hazards from user's side after hitting
+    if (data.name === 'rapid-spin') {
+      effect = { ...effect, clearsHazards: true };
     }
 
     // Wave Crash: 33% recoil

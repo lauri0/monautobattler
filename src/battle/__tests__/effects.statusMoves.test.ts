@@ -507,4 +507,19 @@ describe('Stat-boosting status moves', () => {
     const r = runStatus(makePokemon(), makePokemon(), move);
     expect(r.attacker.statStages.defense).toBe(2);
   });
+
+  it('Quiver Dance raises SpAtk, SpDef, and Speed by 1', () => {
+    const move = makeMove({ name: 'quiver-dance', damageClass: 'status', power: 0, accuracy: null,
+      effect: { statChanges: [
+        { stat: 'special-attack', change: 1, target: 'user' },
+        { stat: 'special-defense', change: 1, target: 'user' },
+        { stat: 'speed', change: 1, target: 'user' },
+      ], statChance: 0 } });
+    const r = runStatus(makePokemon(), makePokemon(), move);
+    expect(r.attacker.statStages['special-attack']).toBe(1);
+    expect(r.attacker.statStages['special-defense']).toBe(1);
+    expect(r.attacker.statStages.speed).toBe(1);
+    const statEvents = r.events.filter(e => e.kind === 'stat_change');
+    expect(statEvents).toHaveLength(3);
+  });
 });

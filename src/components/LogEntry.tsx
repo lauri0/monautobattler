@@ -213,6 +213,7 @@ export default function LogEntry({ ev }: { ev: TurnEvent }) {
     const names: Record<string, string> = {
       trickRoom: 'Trick Room', tailwind: 'Tailwind',
       lightScreen: 'Light Screen', reflect: 'Reflect', stealthRock: 'Stealth Rock',
+      spikes: 'Spikes', toxicSpikes: 'Toxic Spikes',
     };
     return (
       <div className="log-entry log-entry--status">
@@ -227,6 +228,7 @@ export default function LogEntry({ ev }: { ev: TurnEvent }) {
     const names: Record<string, string> = {
       trickRoom: 'Trick Room', tailwind: 'Tailwind',
       lightScreen: 'Light Screen', reflect: 'Reflect', stealthRock: 'Stealth Rock',
+      spikes: 'Spikes', toxicSpikes: 'Toxic Spikes',
     };
     return (
       <div className="log-entry log-entry--status">
@@ -242,6 +244,36 @@ export default function LogEntry({ ev }: { ev: TurnEvent }) {
         <span className="log-turn">T{ev.turn}</span>
         <span className="log-attacker">{ev.pokemonName}</span>
         <span> was hurt by Stealth Rock! (-{ev.damage} HP)</span>
+      </div>
+    );
+  }
+
+  if (ev.kind === 'spikes_damage') {
+    return (
+      <div className="log-entry log-entry--status">
+        <span className="log-turn">T{ev.turn}</span>
+        <span className="log-attacker">{ev.pokemonName}</span>
+        <span> was hurt by the Spikes! (-{ev.damage} HP)</span>
+      </div>
+    );
+  }
+
+  if (ev.kind === 'toxic_spikes_poison') {
+    return (
+      <div className="log-entry log-entry--status">
+        <span className="log-turn">T{ev.turn}</span>
+        <span className="log-attacker">{ev.pokemonName}</span>
+        <span> was poisoned by the Toxic Spikes!</span>
+      </div>
+    );
+  }
+
+  if (ev.kind === 'toxic_spikes_absorbed') {
+    return (
+      <div className="log-entry log-entry--effect">
+        <span className="log-turn">T{ev.turn}</span>
+        <span className="log-attacker">{ev.pokemonName}</span>
+        <span> absorbed the Toxic Spikes!</span>
       </div>
     );
   }

@@ -95,9 +95,11 @@ export const heuristicTeamEvaluator: TeamEvaluator = {
 
     const offensiveDiff = offensiveScore(ours, theirActive) - offensiveScore(theirs, ourActive);
 
-    const hazardDiff =
-      (state.field.sides[flip].stealthRock ? 1 : 0) -
-      (state.field.sides[side].stealthRock ? 1 : 0);
+    const hazardScore = (s: SideIndex) => {
+      const f = state.field.sides[s];
+      return (f.stealthRock ? 1 : 0) + f.spikes + (f.toxicSpikes ? 1 : 0);
+    };
+    const hazardDiff = hazardScore(flip) - hazardScore(side);
 
     const screenDiff = sideScreenScore(state, side) - sideScreenScore(state, flip);
 
