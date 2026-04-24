@@ -307,6 +307,9 @@ function applySwitchInInTeam(
   if (result.opponent !== opponent) {
     teams[opponentSide] = writeActive(teams[opponentSide], result.opponent);
   }
+  if (result.self && result.self !== incoming) {
+    teams[incomingSide] = writeActive(teams[incomingSide], result.self);
+  }
   // Events emitted by a switch-in ability describe the incoming pokemon's
   // effect on the opposing side (stat drops, weather changes broadcast by the
   // active). Tag with the opponent side for wording consistency with the

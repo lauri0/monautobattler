@@ -10,14 +10,14 @@ export const TERRAIN_TURNS = 5;
 
 export interface AbilityEffect {
   // Applied when the bearer switches in (including the start of a battle).
-  // Returns the updated opponent and field. May push events.
+  // Returns the updated self (optional), opponent, and field. May push events.
   onSwitchIn?: (
     self: BattlePokemon,
     opponent: BattlePokemon,
     field: FieldState,
     turn: number,
     events: TurnEvent[],
-  ) => { opponent: BattlePokemon; field: FieldState };
+  ) => { self?: BattlePokemon; opponent: BattlePokemon; field: FieldState };
   // Applied when the bearer switches out voluntarily (not when fainting).
   // Returns the updated bearer. May push events.
   onSwitchOut?: (self: BattlePokemon, turn: number, events: TurnEvent[]) => BattlePokemon;
@@ -123,6 +123,7 @@ export const IMPLEMENTED_ABILITIES: Record<string, AbilityEffect> = {
   },
   'rock-head':    {},
   'water-absorb': {},
+  'volt-absorb':  {},
   'sturdy':       {},
   'static':        {},
   'flame-body':    {},
@@ -155,6 +156,40 @@ export const IMPLEMENTED_ABILITIES: Record<string, AbilityEffect> = {
   'technician': {
     damageMultiplier: (_self, move) => move.power > 0 && move.power <= 60 ? 1.5 : 1,
   },
+  'merciless':    {},
+  'quick-feet':   {},
+  'rattled':      {},
+  'natural-cure': {
+    onSwitchOut: (self, turn, events) => {
+      if (!self.statusCondition) return self;
+      events.push({ kind: 'ability_triggered', turn, pokemonName: self.data.name, ability: 'natural-cure' });
+      events.push({ kind: 'status_cured', turn, pokemonName: self.data.name, condition: self.statusCondition });
+      return { ...self, statusCondition: undefined };
+    },
+  },
+  'guts': {
+    damageMultiplier: (self, move) => {
+      if (move.damageClass !== 'physical') return 1;
+      return self.statusCondition ? 1.5 : 1;
+    },
+  },
+  'tough-claws': {
+    damageMultiplier: (_self, move) => makesContact(move) ? 1.3 : 1,
+  },
+  'magic-guard':   {},
+  'marvel-scale':  {},
+  'download': {
+    onSwitchIn: (self, opponent, field, turn, events) => {
+      if (opponent.currentHp <= 0) return { opponent, field };
+      const raiseSpa = opponent.level50Stats.specialDefense < opponent.level50Stats.defense;
+      const stat: StatStageName = raiseSpa ? 'special-attack' : 'attack';
+      const boostedSelf = applyStatChange(self, stat, 1, turn, events);
+      return { self: boostedSelf, opponent, field };
+    },
+  },
+  'shed-skin':     {},
+  'moxie':         {},
+  'adaptability':  {},
 };
 
 // Tinted Lens: not-very-effective hits (effectiveness < 1) deal double damage.
@@ -169,6 +204,14 @@ export function tintedLensMultiplier(attacker: BattlePokemon, effectiveness: num
 // defender's Special Attack rises by one stage. Mirrors Water Absorb's shape.
 export function absorbsElectric(defender: BattlePokemon, move: Move): boolean {
   return defender.ability === 'lightning-rod'
+    && move.type === 'electric'
+    && move.damageClass !== 'status';
+}
+
+// Volt Absorb: incoming electric-type damaging moves are nullified and the
+// defender heals 1/4 of their max HP. Mirrors Water Absorb.
+export function absorbsVoltAbsorb(defender: BattlePokemon, move: Move): boolean {
+  return defender.ability === 'volt-absorb'
     && move.type === 'electric'
     && move.damageClass !== 'status';
 }
@@ -250,6 +293,21 @@ export function applyContactAbility(
   }
 }
 
+// Rattled: when the defender is hit by a Bug-, Ghost-, or Dark-type damaging move,
+// raise its Speed by one stage.
+export function applyRattledByMove(
+  defender: BattlePokemon,
+  move: Move,
+  turn: number,
+  events: TurnEvent[],
+): BattlePokemon {
+  if (defender.ability !== 'rattled') return defender;
+  if (defender.currentHp <= 0) return defender;
+  if (move.type !== 'bug' && move.type !== 'ghost' && move.type !== 'dark') return defender;
+  events.push({ kind: 'ability_triggered', turn, pokemonName: defender.data.name, ability: 'rattled' });
+  return applyStatChange(defender, 'speed', 1, turn, events);
+}
+
 // Flash Fire: incoming fire-type damaging moves are nullified and the defender
 // gains a 1.5× boost to their own Fire-type moves (stored as flashFireActive).
 export function absorbsFire(defender: BattlePokemon, move: Move): boolean {
@@ -274,10 +332,40 @@ export function sturdyActive(defender: BattlePokemon): boolean {
   return defender.ability === 'sturdy' && defender.currentHp === defender.level50Stats.hp;
 }
 
-// Rock Head: the bearer takes no recoil from recoil moves (Double-Edge, etc.).
-// Does not affect crash damage from self-missing moves (not modeled here).
+// Rock Head / Magic Guard: no recoil from recoil moves.
 export function ignoresRecoil(attacker: BattlePokemon): boolean {
-  return attacker.ability === 'rock-head';
+  return attacker.ability === 'rock-head' || attacker.ability === 'magic-guard';
+}
+
+// Magic Guard: bearer takes no indirect damage (status ticks, weather, hazards).
+export function hasMagicGuard(p: BattlePokemon): boolean {
+  return p.ability === 'magic-guard';
+}
+
+// Shed Skin: 33% chance each end-of-turn to cure the bearer's major status.
+export function applyShedSkin(
+  p: BattlePokemon,
+  turn: number,
+  events: TurnEvent[],
+): BattlePokemon {
+  if (p.ability !== 'shed-skin') return p;
+  if (!p.statusCondition) return p;
+  if (p.currentHp <= 0) return p;
+  if (Math.random() >= 1 / 3) return p;
+  events.push({ kind: 'ability_triggered', turn, pokemonName: p.data.name, ability: 'shed-skin' });
+  events.push({ kind: 'status_cured', turn, pokemonName: p.data.name, condition: p.statusCondition });
+  return { ...p, statusCondition: undefined };
+}
+
+// Moxie: raise Attack by 1 stage when the bearer KOs a foe with a direct attack.
+export function applyMoxie(
+  attacker: BattlePokemon,
+  turn: number,
+  events: TurnEvent[],
+): BattlePokemon {
+  if (attacker.ability !== 'moxie') return attacker;
+  events.push({ kind: 'ability_triggered', turn, pokemonName: attacker.data.name, ability: 'moxie' });
+  return applyStatChange(attacker, 'attack', 1, turn, events);
 }
 
 // A move qualifies for Sheer Force iff it's a damaging move with at least one
@@ -345,6 +433,10 @@ export function applyStatChangeFromFoe(
     events.push({ kind: 'ability_triggered', turn, pokemonName: target.data.name, ability: 'defiant' });
     return applyStatChange(updated, 'attack', 2, turn, events);
   }
+  if (target.ability === 'rattled' && stat === 'attack') {
+    events.push({ kind: 'ability_triggered', turn, pokemonName: target.data.name, ability: 'rattled' });
+    return applyStatChange(updated, 'speed', 1, turn, events);
+  }
   return updated;
 }
 
@@ -380,15 +472,16 @@ export const ABILITY_DESCRIPTIONS: Record<string, string> = {
   'regenerator':    'Heals 1/3 of max HP when switching out',
   'rock-head':      'Prevents recoil damage from recoil-dealing moves',
   'water-absorb':   'Absorbs Water-type moves, healing 1/4 of max HP instead',
+  'volt-absorb':    'Absorbs Electric-type moves, healing 1/4 of max HP instead',
   'sturdy':         'Survives a one-hit KO with 1 HP when at full health',
   'static':         '30% chance to paralyze a foe that makes contact',
   'flame-body':     '30% chance to burn a foe that makes contact',
   'poison-point':   '30% chance to poison a foe that makes contact',
   'effect-spore':   '30% chance to inflict paralysis, poison, or sleep on contact',
   'lightning-rod':  'Draws and nullifies Electric-type moves; raises Sp. Atk by 1',
-  'flash-fire':     'Immune to Fire-type moves. The first one absorbed boosts Fire-type move power by 1.5×',
+  'flash-fire':     'Immune to Fire-type moves and the first one absorbed boosts Fire-type move power by 1.5×',
   'tinted-lens':    'Doubles the power of not-very-effective moves',
-  'keen-eye':       'Prevents foes from lowering this Pokémon\'s accuracy. Ignores the target\'s evasion',
+  'keen-eye':       'Prevents foes from lowering this Pokémon\'s accuracy and ignores the target\'s evasion',
   'own-tempo':      'Prevents confusion. Immune to Intimidate and other foe-initiated Attack drops',
   'clear-body':     'Prevents other Pokémon from lowering this Pokémon\'s stats',
   'hyper-cutter':   'Prevents other Pokémon from lowering this Pokémon\'s Attack stat',
@@ -400,8 +493,20 @@ export const ABILITY_DESCRIPTIONS: Record<string, string> = {
   'iron-fist':      'Boosts the power of punching moves by 20%',
   'ice-scales':     'Halves damage taken from special moves',
   'fur-coat':       'Halves damage taken from physical moves',
-  'scrappy':        'Normal- and Fighting-type moves hit Ghost types. Immune to Intimidate',
+  'scrappy':        'Normal- and Fighting-type moves hit Ghost types and immunity to Intimidate',
   'technician':     'Moves with 60 base power or less have their power multiplied by 1.5×',
+  'merciless':      'Attacks always result in a critical hit if the target is poisoned. Bypasses Shell Armor.',
+  'quick-feet':     'Raises Speed by 50% when the bearer has a major status ailment. Paralysis speed penalty is ignored.',
+  'rattled':        'Raises Speed by one stage when hit by a Bug-, Ghost-, or Dark-type move, or when Intimidated.',
+  'natural-cure':   'Cures any major status condition when this Pokémon switches out',
+  'guts':           'Raises Attack by 50% when the bearer has a major status ailment; burn\'s Attack penalty is suppressed',
+  'tough-claws':    'Boosts the power of moves that make direct contact by 30%',
+  'magic-guard':    'This Pokémon can only be damaged by direct attacks; ignores all indirect damage',
+  'marvel-scale':   'Halves damage from physical moves when the bearer has a major status ailment',
+  'download':       'Raises Attack or Sp. Atk by one stage on switch-in based on which of the foe\'s defenses is lower',
+  'shed-skin':      '33% chance each turn to cure the bearer\'s major status condition',
+  'moxie':          'Raises Attack by one stage each time the bearer knocks out an opposing Pokémon',
+  'adaptability':   'Raises the bonus from Same-Type Attack Bonus from 1.5× to 2×',
 };
 
 export function getAbilityDescription(name: AbilityId | undefined): string | undefined {
@@ -422,6 +527,7 @@ export function abilityMaxVariableHits(attacker: BattlePokemon): boolean {
 export function getDefenderAbilityDamageMultiplier(defender: BattlePokemon, move: Move): number {
   if (move.damageClass === 'special' && defender.ability === 'ice-scales') return 0.5;
   if (move.damageClass === 'physical' && defender.ability === 'fur-coat') return 0.5;
+  if (move.damageClass === 'physical' && defender.ability === 'marvel-scale' && defender.statusCondition) return 0.5;
   return 1;
 }
 
@@ -455,7 +561,7 @@ export function applySwitchInAbility(
   field: FieldState,
   turn: number,
   events: TurnEvent[],
-): { opponent: BattlePokemon; field: FieldState } {
+): { self?: BattlePokemon; opponent: BattlePokemon; field: FieldState } {
   const ability = incoming.ability;
   if (!ability) return { opponent, field };
   const entry = IMPLEMENTED_ABILITIES[ability];

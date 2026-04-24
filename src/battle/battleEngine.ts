@@ -2,7 +2,7 @@ import type { BattlePokemon, Move, TurnEvent, BattleResult, StatStageName, StatS
 import { calcDamage, calcExpectedDamage, effectiveSpeed, type DefenderScreens } from './damageCalc';
 import { defaultAI } from '../ai/aiModule';
 import { getTypeEffectiveness } from '../utils/typeChart';
-import { abilityMaxVariableHits, applySwitchInAbility, applyStatChangeFromFoe, noGuardInEffect, sheerForceSuppresses, absorbsWater, absorbsElectric, absorbsFire, sturdyActive, ignoresRecoil, applyContactAbility, abilityBlocksAilment, abilityBlocksConfusion } from './abilities';
+import { abilityMaxVariableHits, applySwitchInAbility, applyStatChangeFromFoe, noGuardInEffect, sheerForceSuppresses, absorbsWater, absorbsElectric, absorbsVoltAbsorb, absorbsFire, sturdyActive, ignoresRecoil, applyContactAbility, applyRattledByMove, abilityBlocksAilment, abilityBlocksConfusion, hasMagicGuard, applyShedSkin, applyMoxie } from './abilities';
 import { isGrounded } from './damageCalc';
 
 export const TRICK_ROOM_TURNS = 5;
@@ -31,6 +31,7 @@ export function applyEndOfTurnWeather(
   if (field.weather !== 'sandstorm') return p;
   if (p.currentHp <= 0) return p;
   if (p.data.types.some(t => SANDSTORM_IMMUNE_TYPES.includes(t))) return p;
+  if (hasMagicGuard(p)) return p;
   const damage = Math.max(1, Math.floor(p.level50Stats.hp / 16));
   const hpAfter = Math.max(0, p.currentHp - damage);
   events.push({ kind: 'weather_damage', turn, pokemonName: p.data.name, weather: 'sandstorm', damage, hpAfter });
@@ -83,6 +84,7 @@ export function applyStealthRockOnEntry(
 ): BattlePokemon {
   if (!field.sides[side].stealthRock) return p;
   if (p.currentHp <= 0) return p;
+  if (hasMagicGuard(p)) return p;
   const eff = getTypeEffectiveness('rock', p.data.types);
   if (eff === 0) return p;
   const damage = Math.max(1, Math.floor(p.level50Stats.hp * 0.125 * eff));
@@ -106,6 +108,7 @@ export function applySpikesOnEntry(
   if (layers <= 0) return p;
   if (p.currentHp <= 0) return p;
   if (!isGrounded(p)) return p;
+  if (hasMagicGuard(p)) return p;
   const frac = SPIKES_FRACTION[layers] ?? 0;
   const damage = Math.max(1, Math.floor(p.level50Stats.hp * frac));
   const hpAfter = Math.max(0, p.currentHp - damage);
@@ -501,6 +504,7 @@ export function applyEndOfTurnStatus(
 ): BattlePokemon {
   if (p.statusCondition !== 'burn' && p.statusCondition !== 'poison') return p;
   if (p.currentHp <= 0) return p;
+  if (hasMagicGuard(p)) return p;
   const divisor = p.statusCondition === 'burn' ? 16 : 8;
   const tick = Math.max(1, Math.floor(p.level50Stats.hp / divisor));
   const newHp = Math.max(0, p.currentHp - tick);
@@ -666,6 +670,14 @@ export function simulateTurnDeterministic(
         return { attacker, defender, flinched: false, dealtDamage: false };
       }
 
+      // Volt Absorb: nullify electric damage and heal 1/4 max HP.
+      if (absorbsVoltAbsorb(defender, effectiveMove)) {
+        const maxHp = defender.level50Stats.hp;
+        const heal = Math.max(1, Math.floor(maxHp / 4));
+        defender = { ...defender, currentHp: Math.min(maxHp, defender.currentHp + heal) };
+        return { attacker, defender, flinched: false, dealtDamage: false };
+      }
+
       // Flash Fire: nullify fire damage and activate the 1.5× fire boost.
       if (absorbsFire(defender, effectiveMove)) {
         defender = { ...defender, flashFireActive: true };
@@ -685,6 +697,10 @@ export function simulateTurnDeterministic(
       const actualDmg = Math.min(dmg, defender.currentHp);
       let defHp = defender.currentHp - actualDmg;
       defender = { ...defender, currentHp: defHp };
+      if (defHp <= 0 && dealtDamage && attacker.ability === 'moxie') {
+        const atkStage = clampStage(attacker.statStages.attack + 1);
+        attacker = { ...attacker, statStages: { ...attacker.statStages, attack: atkStage } as StatStages };
+      }
       if (move.effect?.drain) {
         if (move.effect.drain > 0) {
           const healed = Math.max(1, Math.floor(actualDmg * move.effect.drain / 100));
@@ -768,6 +784,7 @@ export function simulateTurnDeterministic(
   if (!battleOver) {
     function tickStatus(p: BattlePokemon): BattlePokemon {
       if (p.statusCondition !== 'burn' && p.statusCondition !== 'poison') return p;
+      if (p.ability === 'magic-guard') return p;
       const divisor = p.statusCondition === 'burn' ? 16 : 8;
       const tick = Math.max(1, Math.floor(p.level50Stats.hp / divisor));
       return { ...p, currentHp: Math.max(0, p.currentHp - tick) };
@@ -1108,6 +1125,26 @@ export function resolveSingleAttack(
     return { attacker, defender, dealtDamage: false, defenderFlinched: false, pivotTriggered: false, field };
   }
 
+  // Volt Absorb: nullify electric damaging moves and heal the defender by 1/4 max HP.
+  if (absorbsVoltAbsorb(defender, effMove)) {
+    events.push({ kind: 'ability_triggered', turn: turnNumber, pokemonName: defender.data.name, ability: 'volt-absorb' });
+    const maxHp = defender.level50Stats.hp;
+    const healAmount = Math.max(1, Math.floor(maxHp / 4));
+    const newHp = Math.min(maxHp, defender.currentHp + healAmount);
+    if (newHp > defender.currentHp) {
+      events.push({ kind: 'heal', turn: turnNumber, pokemonName: defender.data.name, healed: newHp - defender.currentHp, hpAfter: newHp });
+      defender = { ...defender, currentHp: newHp };
+    }
+    events.push({
+      kind: 'attack', turn: turnNumber,
+      attackerName: attacker.data.name, defenderName: defender.data.name,
+      moveName: move.name, moveType: move.type,
+      damage: 0, isCrit: false, missed: false, effectiveness: 0,
+      attackerHpAfter: attacker.currentHp, defenderHpAfter: defender.currentHp,
+    });
+    return { attacker, defender, dealtDamage: false, defenderFlinched: false, pivotTriggered: false, field };
+  }
+
   // Flash Fire: nullify fire-type damaging moves and activate the 1.5× fire boost.
   if (absorbsFire(defender, effMove)) {
     events.push({ kind: 'ability_triggered', turn: turnNumber, pokemonName: defender.data.name, ability: 'flash-fire' });
@@ -1185,6 +1222,11 @@ export function resolveSingleAttack(
     // Contact abilities (Static, Flame Body, Poison Point, Effect Spore) roll
     // against the attacker if the move made contact.
     attacker = applyContactAbility(attacker, defender, move, turnNumber, events);
+    defender = applyRattledByMove(defender, move, turnNumber, events);
+    // Moxie: raise Attack by 1 when the bearer scores a KO.
+    if (defender.currentHp <= 0 && dealtDamage) {
+      attacker = applyMoxie(attacker, turnNumber, events);
+    }
 
     // Rapid Spin: clear entry hazards from the user's side.
     if (move.effect?.clearsHazards && attacker.currentHp > 0) {
@@ -1338,6 +1380,12 @@ export function resolveTurnWithMoves(
     if (p1.currentHp <= 0 || p2.currentHp <= 0) battleOver = true;
   }
 
+  // Shed Skin: 33% chance to cure status after status damage resolves.
+  if (!battleOver) {
+    p1 = applyShedSkin(p1, turnNumber, events);
+    p2 = applyShedSkin(p2, turnNumber, events);
+  }
+
   // End-of-turn weather chip damage (sandstorm only).
   if (!battleOver) {
     p1 = applyEndOfTurnWeather(p1, field, turnNumber, events);
@@ -1381,8 +1429,10 @@ export function applyInitialSwitchIns(
   let p1 = pokemon1;
   let p2 = pokemon2;
   let field = initialField;
-  ({ opponent: p2, field } = applySwitchInAbility(p1, p2, field, 1, events));
-  ({ opponent: p1, field } = applySwitchInAbility(p2, p1, field, 1, events));
+  let r1 = applySwitchInAbility(p1, p2, field, 1, events);
+  p2 = r1.opponent; field = r1.field; if (r1.self) p1 = r1.self;
+  let r2 = applySwitchInAbility(p2, p1, field, 1, events);
+  p1 = r2.opponent; field = r2.field; if (r2.self) p2 = r2.self;
   return { p1, p2, events, field };
 }
 

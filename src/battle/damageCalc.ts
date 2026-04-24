@@ -98,7 +98,11 @@ function statStageMult(stage: number): number {
 
 export function effectiveSpeed(p: BattlePokemon, tailwind = false): number {
   let spd = p.level50Stats.speed * statStageMult(p.statStages.speed);
-  if (p.statusCondition === 'paralysis') spd *= 0.5;
+  if (p.ability === 'quick-feet' && p.statusCondition) {
+    spd *= 1.5;
+  } else if (p.statusCondition === 'paralysis') {
+    spd *= 0.5;
+  }
   if (tailwind) spd *= 2;
   return spd;
 }
@@ -136,7 +140,8 @@ export function calcDamage(
 
   const critRate = move.effect?.critRate ?? 0;
   const critProb = critRate === 0 ? 1 / 24 : critRate === 1 ? 1 / 8 : 1 / 2;
-  const isCrit = defender.ability !== 'shell-armor' && Math.random() < critProb;
+  const mercilessCrit = attacker.ability === 'merciless' && defender.statusCondition === 'poison';
+  const isCrit = mercilessCrit || (defender.ability !== 'shell-armor' && Math.random() < critProb);
   const roll = randomRoll ?? (0.85 + Math.random() * 0.15);
 
   let A: number;
@@ -149,7 +154,7 @@ export function calcDamage(
       A = attacker.level50Stats.defense * statStageMult(attacker.statStages.defense);
     } else {
       A = attacker.level50Stats.attack * statStageMult(attacker.statStages.attack);
-      if (attacker.statusCondition === 'burn') A *= 0.5;
+      if (attacker.statusCondition === 'burn' && attacker.ability !== 'guts') A *= 0.5;
     }
     D = defender.level50Stats.defense * statStageMult(defender.statStages.defense);
   } else {
@@ -159,7 +164,7 @@ export function calcDamage(
 
   D *= weatherDefenseMult(defender.data.types, move.damageClass, field?.weather);
 
-  const stab = attacker.data.types.includes(move.type) ? 1.5 : 1.0;
+  const stab = attacker.data.types.includes(move.type) ? (attacker.ability === 'adaptability' ? 2.0 : 1.5) : 1.0;
   const critMult = isCrit ? (attacker.ability === 'sniper' ? 2.25 : 1.5) : 1.0;
   const screenMult = screenApplies(move, defenderScreens, isCrit) ? 0.5 : 1.0;
   const abilityMult = getAbilityDamageMultiplier(attacker, move);
@@ -208,7 +213,7 @@ export function calcMinDamage(
 
   D *= weatherDefenseMult(defender.data.types, move.damageClass, field?.weather);
 
-  const stab = attacker.data.types.includes(move.type) ? 1.5 : 1.0;
+  const stab = attacker.data.types.includes(move.type) ? (attacker.ability === 'adaptability' ? 2.0 : 1.5) : 1.0;
   const screenMult = screenApplies(move, defenderScreens, false) ? 0.5 : 1.0;
   const abilityMult = getAbilityDamageMultiplier(attacker, move);
   const weatherMult = weatherMoveMult(move.type, field?.weather);
@@ -249,7 +254,7 @@ export function calcExpectedDamage(
 
   D *= weatherDefenseMult(defender.data.types, move.damageClass, field?.weather);
 
-  const stab = attacker.data.types.includes(move.type) ? 1.5 : 1.0;
+  const stab = attacker.data.types.includes(move.type) ? (attacker.ability === 'adaptability' ? 2.0 : 1.5) : 1.0;
   const roll = 0.925; // average of 0.85–1.00
   const screenMult = screenApplies(move, defenderScreens, false) ? 0.5 : 1.0;
   const abilityMult = getAbilityDamageMultiplier(attacker, move);
