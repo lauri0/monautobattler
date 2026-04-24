@@ -592,7 +592,7 @@ export function simulateTurnDeterministic(
   p2: BattlePokemon,
   move1: Move,
   move2: Move,
-  turnNumber: number,
+  _turnNumber: number,
   outcome: ChanceOutcome,
 ): { p1After: BattlePokemon; p2After: BattlePokemon; battleOver: boolean; lastAttackerIsP1?: boolean } {
   // Filter firstTurnOnly moves for pokemon that are not fresh on the field.

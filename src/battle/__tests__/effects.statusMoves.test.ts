@@ -1,6 +1,6 @@
 import { describe, it, expect } from 'vitest';
 import { makeInitialField, resolveSingleAttack, resolveTurnWithMoves } from '../battleEngine';
-import type { FieldState, TurnEvent } from '../../models/types';
+import type { BattlePokemon, FieldState, TurnEvent } from '../../models/types';
 import { makePokemon, makeMove } from './fixtures';
 import { stubRng, stubRngConst } from './rng';
 
@@ -233,8 +233,6 @@ const tailwind = () => makeMove({ name: 'tailwind', damageClass: 'status', power
   accuracy: null, priority: 0, effect: { fieldEffect: 'tailwind' } });
 const lightScreen = () => makeMove({ name: 'light-screen', damageClass: 'status', power: 0,
   accuracy: null, priority: 0, effect: { fieldEffect: 'lightScreen' } });
-const reflect = () => makeMove({ name: 'reflect', damageClass: 'status', power: 0,
-  accuracy: null, priority: 0, effect: { fieldEffect: 'reflect' } });
 const stealthRock = () => makeMove({ name: 'stealth-rock', damageClass: 'status', power: 0,
   accuracy: null, priority: 0, effect: { fieldEffect: 'stealthRock' } });
 
@@ -430,7 +428,7 @@ describe('Taunt', () => {
   it('decrements and expires after 3 turns via resolveTurnWithMoves', () => {
     stubRngConst(0);
     const tackle = makeMove({ name: 'tackle', power: 1, damageClass: 'physical' });
-    let p1 = { ...makePokemon({ name: 'a' }), tauntTurns: 3 };
+    let p1: BattlePokemon = { ...makePokemon({ name: 'a' }), tauntTurns: 3 };
     let p2 = makePokemon({ name: 'b' });
     let field = makeInitialField();
     for (let t = 1; t <= 3; t++) {

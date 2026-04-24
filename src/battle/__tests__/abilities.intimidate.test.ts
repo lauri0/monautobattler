@@ -5,8 +5,10 @@ import type { BattlePokemon, Team, TeamBattleState } from '../../models/types';
 import { makeInitialField } from '../battleEngine';
 import { makePokemon, makeMove } from './fixtures';
 
-function mkTeam(mon: [BattlePokemon, BattlePokemon, BattlePokemon]): Team {
-  return { pokemon: mon, activeIdx: 0 };
+function mkTeam(mons: BattlePokemon[]): Team {
+  const filler = makePokemon({ currentHp: 0 });
+  while (mons.length < 4) mons = [...mons, filler];
+  return { pokemon: mons, activeIdx: 0 };
 }
 
 describe('Intimidate', () => {

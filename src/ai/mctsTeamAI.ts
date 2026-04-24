@@ -112,14 +112,22 @@ function pickByUCB(
 }
 
 export class MctsTeamAI implements TeamAIStrategy {
+  private iterations: number;
+  private evaluator: TeamEvaluator;
+  // 0 = argmax over visits (deterministic). Higher = softer sampling.
+  // 1 = sample proportional to visits. Small positive values keep play
+  // strong while avoiding full determinism in simultaneous-move turns.
+  private temperature: number;
+
   constructor(
-    private iterations: number = DEFAULT_ITERATIONS,
-    private evaluator: TeamEvaluator = heuristicTeamEvaluator,
-    // 0 = argmax over visits (deterministic). Higher = softer sampling.
-    // 1 = sample proportional to visits. Small positive values keep play
-    // strong while avoiding full determinism in simultaneous-move turns.
-    private temperature: number = 0.5,
-  ) {}
+    iterations: number = DEFAULT_ITERATIONS,
+    evaluator: TeamEvaluator = heuristicTeamEvaluator,
+    temperature: number = 0.5,
+  ) {
+    this.iterations = iterations;
+    this.evaluator = evaluator;
+    this.temperature = temperature;
+  }
 
   selectAction(state: TeamBattleState, side: SideIndex): TeamAction {
     const myLegal = legalActions(state, side);

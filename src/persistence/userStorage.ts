@@ -126,8 +126,8 @@ export function setBattleSelection(idA: number, idB: number): void {
 const TEAM_3V3_SELECTION_KEY = 'team3v3_selection';
 
 export interface Team3v3Selection {
-  team0: [number, number, number];
-  team1: [number, number, number];
+  team0: [number, number, number, number];
+  team1: [number, number, number, number];
 }
 
 export function getTeam3v3Selection(): Team3v3Selection | null {
@@ -136,7 +136,7 @@ export function getTeam3v3Selection(): Team3v3Selection | null {
     if (!raw) return null;
     const parsed = JSON.parse(raw);
     if (!Array.isArray(parsed.team0) || !Array.isArray(parsed.team1)) return null;
-    if (parsed.team0.length !== 3 || parsed.team1.length !== 3) return null;
+    if (parsed.team0.length !== 4 || parsed.team1.length !== 4) return null;
     return parsed as Team3v3Selection;
   } catch {
     return null;

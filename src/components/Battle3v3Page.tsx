@@ -26,20 +26,20 @@ interface Props {
 
 type Phase = 'select' | 'battle';
 
-type TeamIds = [number, number, number];
+type TeamIds = [number, number, number, number];
 
 function pickDefault(enabled: PokemonData[], offset: number): TeamIds {
   const ids: number[] = [];
-  for (let i = 0; i < 3; i++) {
+  for (let i = 0; i < 4; i++) {
     const p = enabled[(offset + i) % Math.max(1, enabled.length)];
     ids.push(p?.id ?? 0);
   }
-  return [ids[0], ids[1], ids[2]];
+  return [ids[0], ids[1], ids[2], ids[3]];
 }
 
 function teamIsValid(ids: TeamIds, enabled: PokemonData[]): boolean {
   if (ids.some(id => !enabled.some(p => p.id === id))) return false;
-  return new Set(ids).size === 3;
+  return new Set(ids).size === 4;
 }
 
 export default function Battle3v3Page({ allPokemon, onBack }: Props) {
@@ -56,7 +56,7 @@ export default function Battle3v3Page({ allPokemon, onBack }: Props) {
   const [team1Ids, setTeam1Ids] = useState<TeamIds>(() => {
     const saved = getTeam3v3Selection();
     if (saved && teamIsValid(saved.team1, enabled)) return saved.team1;
-    return pickDefault(enabled, 3);
+    return pickDefault(enabled, 4);
   });
 
   const [phase, setPhase] = useState<Phase>('select');
@@ -87,7 +87,7 @@ export default function Battle3v3Page({ allPokemon, onBack }: Props) {
 
   const team0Valid = teamIsValid(team0Ids, enabled);
   const team1Valid = teamIsValid(team1Ids, enabled);
-  const canStart = team0Valid && team1Valid && enabled.length >= 3;
+  const canStart = team0Valid && team1Valid && enabled.length >= 4;
 
   function startBattle(newMode: 'spectate' | 'play') {
     if (!canStart) return;
@@ -105,13 +105,13 @@ export default function Battle3v3Page({ allPokemon, onBack }: Props) {
   }
 
   function randomizeTeam(side: SideIndex) {
-    if (enabled.length < 3) return;
+    if (enabled.length < 4) return;
     const shuffled = [...enabled];
     for (let i = shuffled.length - 1; i > 0; i--) {
       const j = Math.floor(Math.random() * (i + 1));
       [shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]];
     }
-    const ids: TeamIds = [shuffled[0].id, shuffled[1].id, shuffled[2].id];
+    const ids: TeamIds = [shuffled[0].id, shuffled[1].id, shuffled[2].id, shuffled[3].id];
     (side === 0 ? setTeam0Ids : setTeam1Ids)(ids);
   }
 
@@ -155,8 +155,8 @@ export default function Battle3v3Page({ allPokemon, onBack }: Props) {
             Spectate Battle
           </button>
         </div>
-        {!canStart && enabled.length < 3 && (
-          <p style={{ color: '#f44336', marginTop: '0.75rem', textAlign: 'center' }}>Need at least 3 enabled Pokemon.</p>
+        {!canStart && enabled.length < 4 && (
+          <p style={{ color: '#f44336', marginTop: '0.75rem', textAlign: 'center' }}>Need at least 4 enabled Pokemon.</p>
         )}
       </div>
     );
@@ -236,11 +236,11 @@ function TeamBuilder({ label, ids, enabled, allPokemon, valid, onChange, onRando
     <div className="team-builder card">
       <div className="team-builder-header">
         <h3 className="section-title">{label}</h3>
-        <button className="btn-secondary btn-small" onClick={onRandomize} disabled={enabled.length < 3}>
+        <button className="btn-secondary btn-small" onClick={onRandomize} disabled={enabled.length < 4}>
           🎲 Randomize
         </button>
       </div>
-      {[0, 1, 2].map(slot => {
+      {[0, 1, 2, 3].map(slot => {
         const id = ids[slot];
         const data = allPokemon.find(p => p.id === id);
         const dup = ids.filter(x => x === id).length > 1;
@@ -270,7 +270,7 @@ function TeamBuilder({ label, ids, enabled, allPokemon, valid, onChange, onRando
       })}
       {!valid && (
         <p style={{ color: '#f44336', fontSize: '0.8rem', marginTop: '0.5rem' }}>
-          Pick 3 different Pokemon.
+          Pick 4 different Pokemon.
         </p>
       )}
     </div>

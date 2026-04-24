@@ -241,11 +241,11 @@ export interface AIStrategy {
 
 // ── 3v3 Team Battle Types ──
 
-export type TeamSlotIndex = 0 | 1 | 2;
+export type TeamSlotIndex = 0 | 1 | 2 | 3;
 export type SideIndex = 0 | 1;
 
 export interface Team {
-  pokemon: BattlePokemon[];      // length 3
+  pokemon: BattlePokemon[];      // length 4
   activeIdx: TeamSlotIndex;
 }
 

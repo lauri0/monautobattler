@@ -1,14 +1,14 @@
 import { describe, it, expect } from 'vitest';
 import { effectiveSpeed } from '../damageCalc';
-import { makePokemon } from './fixtures';
+import { makePokemon, type PokemonOverrides } from './fixtures';
 
 const BASE_SPEED = 100;
 
-function makeQF(status?: Parameters<typeof makePokemon>[0]['statusCondition']) {
+function makeQF(status?: PokemonOverrides['statusCondition']) {
   return makePokemon({ name: 'qf', ability: 'quick-feet', stats: { speed: BASE_SPEED }, statusCondition: status });
 }
 
-function makePlain(status?: Parameters<typeof makePokemon>[0]['statusCondition']) {
+function makePlain(status?: PokemonOverrides['statusCondition']) {
   return makePokemon({ name: 'plain', stats: { speed: BASE_SPEED }, statusCondition: status });
 }
 

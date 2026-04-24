@@ -4,7 +4,9 @@ import type { BattlePokemon, Team, TeamBattleState } from '../../models/types';
 import { makePokemon, makeMove } from './fixtures';
 import { stubRng } from './rng';
 
-function mkTeam(mons: [BattlePokemon, BattlePokemon, BattlePokemon]): Team {
+function mkTeam(mons: BattlePokemon[]): Team {
+  const filler = makePokemon({ currentHp: 0 });
+  while (mons.length < 4) mons = [...mons, filler];
   return { pokemon: mons, activeIdx: 0 };
 }
 

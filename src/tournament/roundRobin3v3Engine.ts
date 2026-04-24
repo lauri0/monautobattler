@@ -14,8 +14,8 @@ export interface RR3v3Pairing {
 
 export interface RR3v3MatchResult {
   winner: 0 | 1; // 0 = team A, 1 = team B
-  rosterA: [number, number, number]; // pokemon ids brought by team A
-  rosterB: [number, number, number]; // pokemon ids brought by team B
+  rosterA: [number, number, number, number]; // pokemon ids brought by team A
+  rosterB: [number, number, number, number]; // pokemon ids brought by team B
   pokemonSurvivedA: number; // alive pokemon on team A at match end
   pokemonSurvivedB: number;
 }
@@ -53,7 +53,7 @@ export interface RR3v3Standing {
 
 export const RR_TEAM_COUNT = 10;
 export const RR_ROSTER_SIZE = 4;
-export const RR_MATCH_SIZE = 3;
+export const RR_MATCH_SIZE = 4;
 export const RR_DRAFT_ROUNDS = 4;
 export const RR_DRAFT_OFFER_SIZE = 3;
 // Play mode: player is offered RR_DRAFT_OFFER_SIZE * RR_DRAFT_ROUNDS = 12 unique.

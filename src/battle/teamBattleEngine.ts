@@ -29,20 +29,24 @@ const ZERO_STAGES: StatStages = {
 // ── Construction ──────────────────────────────────────────────────────────────
 
 export function buildTeamBattleState(
-  team0Ids: [number, number, number],
-  team1Ids: [number, number, number],
+  team0Ids: [number, number, number, number],
+  team1Ids: [number, number, number, number],
   allPokemon: PokemonData[],
+  opts?: { activeIdx0?: TeamSlotIndex; activeIdx1?: TeamSlotIndex },
 ): TeamBattleState {
   const byId = new Map(allPokemon.map(p => [p.id, p]));
-  const mkTeam = (ids: [number, number, number]): Team => ({
+  const mkTeam = (ids: [number, number, number, number], activeIdx: TeamSlotIndex): Team => ({
     pokemon: ids.map(id => {
       const data = byId.get(id);
       if (!data) throw new Error(`Pokemon id ${id} not found`);
       return buildBattlePokemon(data);
     }),
-    activeIdx: 0,
+    activeIdx,
   });
-  const teams: [Team, Team] = [mkTeam(team0Ids), mkTeam(team1Ids)];
+  const teams: [Team, Team] = [
+    mkTeam(team0Ids, opts?.activeIdx0 ?? 0),
+    mkTeam(team1Ids, opts?.activeIdx1 ?? 0),
+  ];
   return { teams, turn: 1, phase: 'choose', field: makeInitialField() };
 }
 
@@ -69,7 +73,7 @@ export function getActive(state: TeamBattleState, side: SideIndex): BattlePokemo
 
 export function aliveBenchSlots(team: Team): TeamSlotIndex[] {
   const out: TeamSlotIndex[] = [];
-  for (let i = 0; i < 3; i++) {
+  for (let i = 0; i < 4; i++) {
     if (i !== team.activeIdx && team.pokemon[i].currentHp > 0) out.push(i as TeamSlotIndex);
   }
   return out;
@@ -274,15 +278,15 @@ function tickFieldInTeam(
     const side = next.sides[s];
     if (side.tailwindTurns > 0) {
       side.tailwindTurns--;
-      if (side.tailwindTurns === 0) out.push({ side: s, kind: 'field_expired', turn, effect: 'tailwind', side: s });
+      if (side.tailwindTurns === 0) out.push({ side: s, kind: 'field_expired', turn, effect: 'tailwind' });
     }
     if (side.lightScreenTurns > 0) {
       side.lightScreenTurns--;
-      if (side.lightScreenTurns === 0) out.push({ side: s, kind: 'field_expired', turn, effect: 'lightScreen', side: s });
+      if (side.lightScreenTurns === 0) out.push({ side: s, kind: 'field_expired', turn, effect: 'lightScreen' });
     }
     if (side.reflectTurns > 0) {
       side.reflectTurns--;
-      if (side.reflectTurns === 0) out.push({ side: s, kind: 'field_expired', turn, effect: 'reflect', side: s });
+      if (side.reflectTurns === 0) out.push({ side: s, kind: 'field_expired', turn, effect: 'reflect' });
     }
   }
   return next;

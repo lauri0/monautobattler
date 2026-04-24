@@ -1,15 +1,18 @@
 import { describe, it, expect } from 'vitest';
 import { applyActions } from '../teamBattleEngine';
+import { makeInitialField } from '../battleEngine';
 import type { BattlePokemon, Team, TeamBattleState } from '../../models/types';
 import { makePokemon, makeMove } from './fixtures';
 import { stubRng } from './rng';
 
-function mkTeam(mons: [BattlePokemon, BattlePokemon, BattlePokemon]): Team {
+function mkTeam(mons: BattlePokemon[]): Team {
+  const filler = makePokemon({ currentHp: 0 });
+  while (mons.length < 4) mons = [...mons, filler];
   return { pokemon: mons, activeIdx: 0 };
 }
 
 function mkState(side0: Team, side1: Team): TeamBattleState {
-  return { teams: [side0, side1], turn: 1, phase: 'choose' };
+  return { teams: [side0, side1], turn: 1, phase: 'choose', field: makeInitialField() };
 }
 
 describe('pivot switches (U-turn / Volt Switch)', () => {

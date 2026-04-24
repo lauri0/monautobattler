@@ -112,7 +112,7 @@ export const heuristicTeamEvaluator: TeamEvaluator = {
 
     const raw =
       0.6 * (ourHpFrac - theirHpFrac) +
-      0.4 * (aliveDiff / 3) +
+      0.4 * (aliveDiff / 4) +
       0.05 * stageDiff +
       statusDiff +
       0.15 * offensiveDiff +

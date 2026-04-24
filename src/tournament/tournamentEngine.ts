@@ -3,7 +3,6 @@ import type {
   TournamentPokemon,
   TournamentGroup,
   GroupMatch,
-  GroupStanding,
   KnockoutMatch,
   TournamentState,
 } from '../models/types';

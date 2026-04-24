@@ -1,7 +1,7 @@
 import { describe, it, expect } from 'vitest';
 import { calcDamage } from '../damageCalc';
 import { makePokemon, makeMove } from './fixtures';
-import { stubRng, stubRngConst } from './rng';
+import { stubRng } from './rng';
 
 const attacker          = makePokemon({ name: 'a',    types: ['normal'], ability: 'merciless', stats: { specialAttack: 100 } });
 const plainAttacker     = makePokemon({ name: 'plain', types: ['normal'],                      stats: { specialAttack: 100 } });
