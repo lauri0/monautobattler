@@ -7,8 +7,8 @@ import type {
 import { buildTeamBattleState, applyInitialSwitchInsTeam } from '../battle/teamBattleEngine';
 import {
   getPokemonPersisted,
-  getTeam3v3Selection,
-  setTeam3v3Selection,
+  getTeam4v4Selection,
+  setTeam4v4Selection,
 } from '../persistence/userStorage';
 import TeamView from './TeamView';
 import WeatherDisplay from './WeatherDisplay';
@@ -17,7 +17,7 @@ import PlayerActionBar from './PlayerActionBar';
 import { renderTeamEvent } from './TeamEventLog';
 import { useTeamBattleController } from './useTeamBattleController';
 import { formatPokemonName } from '../utils/formatName';
-import './Battle3v3Page.css';
+import './Battle4v4Page.css';
 
 interface Props {
   allPokemon: PokemonData[];
@@ -42,19 +42,19 @@ function teamIsValid(ids: TeamIds, enabled: PokemonData[]): boolean {
   return new Set(ids).size === 4;
 }
 
-export default function Battle3v3Page({ allPokemon, onBack }: Props) {
+export default function Battle4v4Page({ allPokemon, onBack }: Props) {
   const enabled = useMemo(
     () => allPokemon.filter(p => !getPokemonPersisted(p.id).disabled),
     [allPokemon],
   );
 
   const [team0Ids, setTeam0Ids] = useState<TeamIds>(() => {
-    const saved = getTeam3v3Selection();
+    const saved = getTeam4v4Selection();
     if (saved && teamIsValid(saved.team0, enabled)) return saved.team0;
     return pickDefault(enabled, 0);
   });
   const [team1Ids, setTeam1Ids] = useState<TeamIds>(() => {
-    const saved = getTeam3v3Selection();
+    const saved = getTeam4v4Selection();
     if (saved && teamIsValid(saved.team1, enabled)) return saved.team1;
     return pickDefault(enabled, 4);
   });
@@ -64,7 +64,7 @@ export default function Battle3v3Page({ allPokemon, onBack }: Props) {
   const logRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
-    setTeam3v3Selection({ team0: team0Ids, team1: team1Ids });
+    setTeam4v4Selection({ team0: team0Ids, team1: team1Ids });
   }, [team0Ids, team1Ids]);
 
   const [initialState, setInitialState] = useState(() =>
@@ -123,7 +123,7 @@ export default function Battle3v3Page({ allPokemon, onBack }: Props) {
     return (
       <div className="page">
         <button className="back-btn" onClick={onBack}>← Back</button>
-        <h1 className="page-title">3v3 Battle</h1>
+        <h1 className="page-title">4v4 Battle</h1>
         <div className="team-builders">
           <TeamBuilder
             label="Team 1"
@@ -165,7 +165,7 @@ export default function Battle3v3Page({ allPokemon, onBack }: Props) {
   return (
     <div className="page">
       <button className="back-btn" onClick={onBack}>← Back</button>
-      <h1 className="page-title">3v3 Battle</h1>
+      <h1 className="page-title">4v4 Battle</h1>
 
       <div className="team-arena">
         <TeamView

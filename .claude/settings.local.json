@@ -19,7 +19,8 @@
       "Bash(npm test *)",
       "Bash(git stash *)",
       "Bash(npx vitest *)",
-      "Bash(xargs -I {} sh -c 'echo \"=== {} ===\"; cat {}')"
+      "Bash(xargs -I {} sh -c 'echo \"=== {} ===\"; cat {}')",
+      "Bash(git mv *)"
     ]
   }
 }

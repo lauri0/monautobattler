@@ -181,17 +181,20 @@
 }
 .draft-offerings {
   display: grid;
-  grid-template-columns: repeat(3, 1fr);
+  grid-template-columns: repeat(2, 1fr);
   gap: 0.75rem;
 }
 .draft-card {
   text-align: center;
   padding: 0.75rem;
+  display: flex;
+  flex-direction: column;
 }
 .draft-card-sprite {
-  width: 96px;
-  height: 96px;
+  width: 128px;
+  height: 128px;
   image-rendering: pixelated;
+  align-self: center;
 }
 .draft-card-name {
   font-weight: 600;
@@ -223,6 +226,7 @@
 }
 .draft-pick-btn {
   width: 100%;
+  margin-top: auto;
 }
 .draft-roster-slots {
   display: flex;

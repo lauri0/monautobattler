@@ -123,28 +123,28 @@ export function setBattleSelection(idA: number, idB: number): void {
   localStorage.setItem(BATTLE_SELECTION_KEY, JSON.stringify({ idA, idB }));
 }
 
-const TEAM_3V3_SELECTION_KEY = 'team3v3_selection';
+const TEAM_4V4_SELECTION_KEY = 'team4v4_selection';
 
-export interface Team3v3Selection {
+export interface Team4v4Selection {
   team0: [number, number, number, number];
   team1: [number, number, number, number];
 }
 
-export function getTeam3v3Selection(): Team3v3Selection | null {
+export function getTeam4v4Selection(): Team4v4Selection | null {
   try {
-    const raw = localStorage.getItem(TEAM_3V3_SELECTION_KEY);
+    const raw = localStorage.getItem(TEAM_4V4_SELECTION_KEY);
     if (!raw) return null;
     const parsed = JSON.parse(raw);
     if (!Array.isArray(parsed.team0) || !Array.isArray(parsed.team1)) return null;
     if (parsed.team0.length !== 4 || parsed.team1.length !== 4) return null;
-    return parsed as Team3v3Selection;
+    return parsed as Team4v4Selection;
   } catch {
     return null;
   }
 }
 
-export function setTeam3v3Selection(sel: Team3v3Selection): void {
-  localStorage.setItem(TEAM_3V3_SELECTION_KEY, JSON.stringify(sel));
+export function setTeam4v4Selection(sel: Team4v4Selection): void {
+  localStorage.setItem(TEAM_4V4_SELECTION_KEY, JSON.stringify(sel));
 }
 
 const MOVE_LEARN_SETTINGS_KEY = 'move_learn_settings';

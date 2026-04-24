@@ -26,7 +26,7 @@ describe('Intimidate', () => {
     }
   });
 
-  it('drops foe Attack on mid-battle switch-in (3v3)', () => {
+  it('drops foe Attack on mid-battle switch-in (4v4)', () => {
     const move = makeMove({ power: 40 });
     const leader = makePokemon({ id: 2, name: 'leader', moves: [move] });
     const gyarados = makePokemon({ id: 1, name: 'gyarados', ability: 'intimidate', moves: [move] });

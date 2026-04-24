@@ -239,7 +239,7 @@ export interface AIStrategy {
   ): Move;
 }
 
-// ── 3v3 Team Battle Types ──
+// ── 4v4 Team Battle Types ──
 
 export type TeamSlotIndex = 0 | 1 | 2 | 3;
 export type SideIndex = 0 | 1;

@@ -1289,7 +1289,7 @@ export function resolveTurn(
 
 /**
  * Resolves a single 1v1 turn with pre-selected moves. A `null` move means that
- * side skips its attack this turn (used by the 3v3 engine when a side switches
+ * side skips its attack this turn (used by the 4v4 engine when a side switches
  * while the other attacks). End-of-turn status ticks still apply to both sides.
  */
 export function resolveTurnWithMoves(

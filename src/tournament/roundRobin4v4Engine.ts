@@ -1,18 +1,18 @@
 import type { PokemonData } from '../models/types';
 import { getPokemonPersisted } from '../persistence/userStorage';
 
-export interface RR3v3Team {
+export interface RR4v4Team {
   name: string;
   roster: number[]; // 4 pokemon ids
   isPlayer: boolean;
 }
 
-export interface RR3v3Pairing {
+export interface RR4v4Pairing {
   a: number; // team index
   b: number;
 }
 
-export interface RR3v3MatchResult {
+export interface RR4v4MatchResult {
   winner: 0 | 1; // 0 = team A, 1 = team B
   rosterA: [number, number, number, number]; // pokemon ids brought by team A
   rosterB: [number, number, number, number]; // pokemon ids brought by team B
@@ -20,8 +20,8 @@ export interface RR3v3MatchResult {
   pokemonSurvivedB: number;
 }
 
-export type RR3v3Phase = 'draft' | 'overview' | 'match' | 'finished';
-export type RR3v3Mode = 'play' | 'spectate';
+export type RR4v4Phase = 'draft' | 'overview' | 'match' | 'finished';
+export type RR4v4Mode = 'play' | 'spectate';
 
 export interface DraftState {
   reservedForPlayer: number[]; // the 12 ids reserved for player's draft offers
@@ -30,17 +30,17 @@ export interface DraftState {
   round: number;               // 0..3, which round (0 = first pick)
 }
 
-export interface RR3v3State {
-  teams: RR3v3Team[];
-  schedule: RR3v3Pairing[];
-  results: (RR3v3MatchResult | null)[];
+export interface RR4v4State {
+  teams: RR4v4Team[];
+  schedule: RR4v4Pairing[];
+  results: (RR4v4MatchResult | null)[];
   currentMatchIdx: number;
-  mode: RR3v3Mode;
-  phase: RR3v3Phase;
+  mode: RR4v4Mode;
+  phase: RR4v4Phase;
   draft: DraftState | null;
 }
 
-export interface RR3v3Standing {
+export interface RR4v4Standing {
   teamIdx: number;
   played: number;
   wins: number;
@@ -55,9 +55,9 @@ export const RR_TEAM_COUNT = 10;
 export const RR_ROSTER_SIZE = 4;
 export const RR_MATCH_SIZE = 4;
 export const RR_DRAFT_ROUNDS = 4;
-export const RR_DRAFT_OFFER_SIZE = 3;
-// Play mode: player is offered RR_DRAFT_OFFER_SIZE * RR_DRAFT_ROUNDS = 12 unique.
-// AI teams (9) × 4 = 36. Min enabled = 48.
+export const RR_DRAFT_OFFER_SIZE = 2;
+// Play mode: player is offered RR_DRAFT_OFFER_SIZE * RR_DRAFT_ROUNDS = 8 unique.
+// AI teams (9) × 4 = 36. Min enabled = 44.
 export const RR_MIN_POOL_PLAY = RR_DRAFT_OFFER_SIZE * RR_DRAFT_ROUNDS + (RR_TEAM_COUNT - 1) * RR_ROSTER_SIZE;
 // Spectate mode: 10 × 4 = 40.
 export const RR_MIN_POOL_SPECTATE = RR_TEAM_COUNT * RR_ROSTER_SIZE;
@@ -86,12 +86,12 @@ function enabledPoolIds(allPokemon: PokemonData[]): number[] {
 // Round-robin circle method for even n. Produces C(n,2) pairings, n-1 rounds of n/2 each.
 // We fix team 0 and rotate the rest. Pairings are emitted round by round so the
 // schedule is interleaved (each team plays about once every 5 matches).
-export function generateSchedule(n: number): RR3v3Pairing[] {
+export function generateSchedule(n: number): RR4v4Pairing[] {
   if (n % 2 !== 0) throw new Error(`generateSchedule requires even n, got ${n}`);
   const arr: number[] = Array.from({ length: n }, (_, i) => i);
-  const rounds: RR3v3Pairing[][] = [];
+  const rounds: RR4v4Pairing[][] = [];
   for (let r = 0; r < n - 1; r++) {
-    const pairs: RR3v3Pairing[] = [];
+    const pairs: RR4v4Pairing[] = [];
     for (let i = 0; i < n / 2; i++) {
       pairs.push({ a: arr[i], b: arr[n - 1 - i] });
     }
@@ -106,13 +106,13 @@ export function generateSchedule(n: number): RR3v3Pairing[] {
 
 // ── Tournament creation ──────────────────────────────────────────────────────
 
-export function createSpectateTournament(allPokemon: PokemonData[]): RR3v3State {
+export function createSpectateTournament(allPokemon: PokemonData[]): RR4v4State {
   const pool = enabledPoolIds(allPokemon);
   if (pool.length < RR_MIN_POOL_SPECTATE) {
     throw new Error(`Need at least ${RR_MIN_POOL_SPECTATE} enabled Pokemon, have ${pool.length}.`);
   }
   const shuffled = shuffle(pool);
-  const teams: RR3v3Team[] = [];
+  const teams: RR4v4Team[] = [];
   for (let i = 0; i < RR_TEAM_COUNT; i++) {
     const roster = shuffled.slice(i * RR_ROSTER_SIZE, i * RR_ROSTER_SIZE + RR_ROSTER_SIZE);
     teams.push({ name: `AI Team ${i + 1}`, roster, isPlayer: false });
@@ -129,7 +129,7 @@ export function createSpectateTournament(allPokemon: PokemonData[]): RR3v3State 
   };
 }
 
-export function createPlayTournament(allPokemon: PokemonData[]): RR3v3State {
+export function createPlayTournament(allPokemon: PokemonData[]): RR4v4State {
   const pool = enabledPoolIds(allPokemon);
   if (pool.length < RR_MIN_POOL_PLAY) {
     throw new Error(`Need at least ${RR_MIN_POOL_PLAY} enabled Pokemon for draft, have ${pool.length}.`);
@@ -140,14 +140,14 @@ export function createPlayTournament(allPokemon: PokemonData[]): RR3v3State {
   // Remaining pool for AI teams.
   const aiPool = shuffled.slice(RR_DRAFT_ROUNDS * RR_DRAFT_OFFER_SIZE);
 
-  const aiTeams: RR3v3Team[] = [];
+  const aiTeams: RR4v4Team[] = [];
   for (let i = 0; i < RR_TEAM_COUNT - 1; i++) {
     const roster = aiPool.slice(i * RR_ROSTER_SIZE, i * RR_ROSTER_SIZE + RR_ROSTER_SIZE);
     aiTeams.push({ name: `AI Team ${i + 1}`, roster, isPlayer: false });
   }
 
   // Player team starts empty; roster fills during draft.
-  const playerTeam: RR3v3Team = { name: 'Your Team', roster: [], isPlayer: true };
+  const playerTeam: RR4v4Team = { name: 'Your Team', roster: [], isPlayer: true };
 
   // Randomize team slot order so player isn't always team 0 (but keep isPlayer marker).
   const allTeams = shuffle([playerTeam, ...aiTeams]);
@@ -175,7 +175,7 @@ export function createPlayTournament(allPokemon: PokemonData[]): RR3v3State {
 
 // ── Draft progression ────────────────────────────────────────────────────────
 
-export function applyDraftPick(state: RR3v3State, pickedId: number): RR3v3State {
+export function applyDraftPick(state: RR4v4State, pickedId: number): RR4v4State {
   if (state.phase !== 'draft' || !state.draft) return state;
   if (!state.draft.offered.includes(pickedId)) return state;
 
@@ -213,7 +213,7 @@ export function applyDraftPick(state: RR3v3State, pickedId: number): RR3v3State 
 
 // ── Match result application ─────────────────────────────────────────────────
 
-export function applyMatchResult(state: RR3v3State, result: RR3v3MatchResult): RR3v3State {
+export function applyMatchResult(state: RR4v4State, result: RR4v4MatchResult): RR4v4State {
   if (state.phase !== 'overview' && state.phase !== 'match') return state;
   if (state.currentMatchIdx >= state.schedule.length) return state;
 
@@ -232,8 +232,8 @@ export function applyMatchResult(state: RR3v3State, result: RR3v3MatchResult): R
 
 // ── Standings ────────────────────────────────────────────────────────────────
 
-export function computeStandings(state: RR3v3State): RR3v3Standing[] {
-  const standings: RR3v3Standing[] = state.teams.map((_, i) => ({
+export function computeStandings(state: RR4v4State): RR4v4Standing[] {
+  const standings: RR4v4Standing[] = state.teams.map((_, i) => ({
     teamIdx: i,
     played: 0, wins: 0, losses: 0, points: 0, koDiff: 0,
   }));
@@ -278,7 +278,7 @@ export function computeStandings(state: RR3v3State): RR3v3Standing[] {
 }
 
 // Convenience: find the next pairing involving the player (used for fast-forward).
-export function findNextPlayerMatchIdx(state: RR3v3State): number | null {
+export function findNextPlayerMatchIdx(state: RR4v4State): number | null {
   for (let i = state.currentMatchIdx; i < state.schedule.length; i++) {
     const { a, b } = state.schedule[i];
     if (state.teams[a].isPlayer || state.teams[b].isPlayer) return i;
@@ -286,7 +286,7 @@ export function findNextPlayerMatchIdx(state: RR3v3State): number | null {
   return null;
 }
 
-export function isPlayerPairing(state: RR3v3State, matchIdx: number): boolean {
+export function isPlayerPairing(state: RR4v4State, matchIdx: number): boolean {
   const p = state.schedule[matchIdx];
   if (!p) return false;
   return state.teams[p.a].isPlayer || state.teams[p.b].isPlayer;

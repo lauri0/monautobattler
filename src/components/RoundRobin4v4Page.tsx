@@ -10,13 +10,13 @@ import {
   RR_MIN_POOL_PLAY,
   RR_MIN_POOL_SPECTATE,
   RR_TOTAL_MATCHES,
-} from '../tournament/roundRobin3v3Engine';
-import type { RR3v3State, RR3v3MatchResult } from '../tournament/roundRobin3v3Engine';
+} from '../tournament/roundRobin4v4Engine';
+import type { RR4v4State, RR4v4MatchResult } from '../tournament/roundRobin4v4Engine';
 import {
-  saveRoundRobin3v3,
-  loadRoundRobin3v3,
-  clearRoundRobin3v3,
-} from '../persistence/roundRobin3v3Storage';
+  saveRoundRobin4v4,
+  loadRoundRobin4v4,
+  clearRoundRobin4v4,
+} from '../persistence/roundRobin4v4Storage';
 import { pickStartingIndex } from '../tournament/rosterPicker';
 import {
   buildTeamBattleState,
@@ -32,8 +32,10 @@ import { renderTeamEvent } from './TeamEventLog';
 import { useTeamBattleController } from './useTeamBattleController';
 import DraftPhase from './DraftPhase';
 import RoundRobinStandingsView from './RoundRobinStandingsView';
+import WeatherDisplay from './WeatherDisplay';
+import TerrainDisplay from './TerrainDisplay';
 import { formatPokemonName } from '../utils/formatName';
-import './RoundRobin3v3Page.css';
+import './RoundRobin4v4Page.css';
 
 interface Props {
   allPokemon: PokemonData[];
@@ -54,16 +56,16 @@ interface PendingMatch {
   swapped: boolean;
 }
 
-export default function RoundRobin3v3Page({ allPokemon, onBack }: Props) {
+export default function RoundRobin4v4Page({ allPokemon, onBack }: Props) {
   const byId = useMemo(() => new Map(allPokemon.map(p => [p.id, p])), [allPokemon]);
   const enabledCount = useMemo(
     () => allPokemon.filter(p => !getPokemonPersisted(p.id).disabled && p.availableMoves.length > 0).length,
     [allPokemon],
   );
 
-  const [state, setState] = useState<RR3v3State | null>(() => loadRoundRobin3v3());
+  const [state, setState] = useState<RR4v4State | null>(() => loadRoundRobin4v4());
   const [localPhase, setLocalPhase] = useState<LocalPhase>(() => {
-    const loaded = loadRoundRobin3v3();
+    const loaded = loadRoundRobin4v4();
     if (!loaded) return 'setup';
     if (loaded.phase === 'draft') return 'draft';
     if (loaded.phase === 'finished') return 'finished';
@@ -72,7 +74,7 @@ export default function RoundRobin3v3Page({ allPokemon, onBack }: Props) {
   const [pending, setPending] = useState<PendingMatch | null>(null);
 
   useEffect(() => {
-    if (state) saveRoundRobin3v3(state);
+    if (state) saveRoundRobin4v4(state);
   }, [state]);
 
   function startPlay() {
@@ -97,7 +99,7 @@ export default function RoundRobin3v3Page({ allPokemon, onBack }: Props) {
 
   function abandonTournament() {
     if (!confirm('Abandon the current tournament? Progress will be lost.')) return;
-    clearRoundRobin3v3();
+    clearRoundRobin4v4();
     setState(null);
     setPending(null);
     setLocalPhase('setup');
@@ -150,7 +152,7 @@ export default function RoundRobin3v3Page({ allPokemon, onBack }: Props) {
     setLocalPhase('match');
   }
 
-  function onMatchEnd(result: RR3v3MatchResult) {
+  function onMatchEnd(result: RR4v4MatchResult) {
     if (!state) return;
     const next = applyMatchResult(state, result);
     setState(next);
@@ -197,7 +199,7 @@ export default function RoundRobin3v3Page({ allPokemon, onBack }: Props) {
     return (
       <div className="page">
         <button className="back-btn" onClick={onBack}>← Back</button>
-        <h1 className="page-title">3v3 Round Robin</h1>
+        <h1 className="page-title">4v4 Round Robin</h1>
         <div className="rr-setup card">
           <p>
             Ten teams of four Pokemon compete in a full round-robin ({RR_TOTAL_MATCHES} matches).
@@ -229,7 +231,7 @@ export default function RoundRobin3v3Page({ allPokemon, onBack }: Props) {
     return (
       <div className="page">
         <button className="back-btn" onClick={abandonTournament}>← Abandon</button>
-        <h1 className="page-title">3v3 Round Robin — Draft</h1>
+        <h1 className="page-title">4v4 Round Robin — Draft</h1>
         <DraftPhase
           allPokemon={allPokemon}
           offeredIds={state.draft.offered}
@@ -290,7 +292,7 @@ export default function RoundRobin3v3Page({ allPokemon, onBack }: Props) {
   return (
     <div className="page">
       <button className="back-btn" onClick={onBack}>← Back</button>
-      <h1 className="page-title">3v3 Round Robin</h1>
+      <h1 className="page-title">4v4 Round Robin</h1>
 
       <div className="rr-progress card">
         <div>Progress: <strong>{state.currentMatchIdx} / {state.schedule.length}</strong> matches played</div>
@@ -335,7 +337,7 @@ export default function RoundRobin3v3Page({ allPokemon, onBack }: Props) {
 
 // ── Sub-views ────────────────────────────────────────────────────────────────
 
-function TeamRosterMini({ team, byId }: { team: RR3v3State['teams'][number]; byId: Map<number, PokemonData> }) {
+function TeamRosterMini({ team, byId }: { team: RR4v4State['teams'][number]; byId: Map<number, PokemonData> }) {
   return (
     <div className="rr-team-mini">
       <div className="rr-team-mini-name">{team.name}</div>
@@ -357,7 +359,7 @@ function TeamRosterMini({ team, byId }: { team: RR3v3State['teams'][number]; byI
 }
 
 function PreMatchView(props: {
-  state: RR3v3State;
+  state: RR4v4State;
   byId: Map<number, PokemonData>;
   onSelect: (startIdx: TeamSlotIndex) => void;
   onCancel: () => void;
@@ -431,9 +433,9 @@ function PreMatchView(props: {
 }
 
 function MatchView(props: {
-  tournamentState: RR3v3State;
+  tournamentState: RR4v4State;
   pending: PendingMatch;
-  onEnd: (result: RR3v3MatchResult) => void;
+  onEnd: (result: RR4v4MatchResult) => void;
   onBack: () => void;
 }) {
   const { tournamentState, pending, onEnd, onBack } = props;
@@ -489,7 +491,11 @@ function MatchView(props: {
             ? (slot) => submitPlayerAction({ kind: 'switch', targetIdx: slot })
             : undefined}
         />
-        <div className="arena-vs">VS</div>
+        <div className="arena-center">
+          <WeatherDisplay field={state.field} />
+          <div className="arena-vs">VS</div>
+          <TerrainDisplay field={state.field} />
+        </div>
         <TeamView state={state} side={1} />
       </div>
 
@@ -534,7 +540,7 @@ function MatchView(props: {
 }
 
 function FinishedView(props: {
-  state: RR3v3State;
+  state: RR4v4State;
   allPokemon: PokemonData[];
   onBack: () => void;
   onReset: () => void;

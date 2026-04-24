@@ -1,10 +1,10 @@
 import type { PokemonData } from '../models/types';
-import type { RR3v3State } from '../tournament/roundRobin3v3Engine';
-import { computeStandings } from '../tournament/roundRobin3v3Engine';
+import type { RR4v4State } from '../tournament/roundRobin4v4Engine';
+import { computeStandings } from '../tournament/roundRobin4v4Engine';
 import { formatPokemonName } from '../utils/formatName';
 
 interface Props {
-  state: RR3v3State;
+  state: RR4v4State;
   allPokemon: PokemonData[];
 }
 

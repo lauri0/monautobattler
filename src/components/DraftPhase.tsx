@@ -2,8 +2,8 @@ import type { PokemonData } from '../models/types';
 import TypeBadge from './TypeBadge';
 import { formatPokemonName } from '../utils/formatName';
 import { getTypeColor } from '../utils/typeColors';
-import { RR_DRAFT_ROUNDS } from '../tournament/roundRobin3v3Engine';
-import { getPokemonPersisted } from '../persistence/userStorage';
+import { RR_DRAFT_ROUNDS } from '../tournament/roundRobin4v4Engine';
+import { getPokemonPersisted, getAllowedMoveIds } from '../persistence/userStorage';
 
 interface Props {
   allPokemon: PokemonData[];
@@ -19,10 +19,22 @@ function bst(p: PokemonData): number {
 }
 
 function DraftCard({ data, onPick }: { data: PokemonData; onPick: () => void }) {
-  const moveset = getPokemonPersisted(data.id).moveset;
-  const selectedMoves = moveset
-    .map(id => data.availableMoves.find(m => m.id === id))
-    .filter((m): m is PokemonData['availableMoves'][number] => !!m);
+  const persisted = getPokemonPersisted(data.id);
+  const allowedIds = getAllowedMoveIds();
+  const moveMap = new Map(data.availableMoves.map(m => [m.id, m]));
+  const selectedMoves: PokemonData['availableMoves'] = persisted.moveset
+    .map(id => moveMap.get(id))
+    .filter((m): m is PokemonData['availableMoves'][number] => !!m && allowedIds.includes(m.id));
+  if (selectedMoves.length < 4) {
+    const used = new Set(selectedMoves.map(m => m.id));
+    const sorted = [...data.availableMoves]
+      .filter(m => allowedIds.includes(m.id))
+      .sort((a, b) => b.power - a.power);
+    for (const m of sorted) {
+      if (selectedMoves.length >= 4) break;
+      if (!used.has(m.id)) selectedMoves.push(m);
+    }
+  }
   return (
     <div className="draft-card card">
       <img src={data.spriteUrl} alt={data.name} className="draft-card-sprite" />
@@ -56,7 +68,7 @@ export default function DraftPhase({
     <div className="draft-phase">
       <div className="draft-header">
         <h2 className="section-title">Draft — Pick {round + 1} of {RR_DRAFT_ROUNDS}</h2>
-        <p className="draft-help">Choose one of the three Pokemon below to add to your 4-Pokemon roster.</p>
+        <p className="draft-help">Choose one of the two Pokemon below to add to your 4-Pokemon roster.</p>
       </div>
 
       <div className="draft-layout">

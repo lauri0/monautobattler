@@ -9,7 +9,7 @@ import { applyActions, battleWinner, legalActions } from '../battle/teamBattleEn
 import { mctsTeamAI } from '../ai/mctsTeamAI';
 
 /**
- * Shared controller for a live, interactive 3v3 team battle.
+ * Shared controller for a live, interactive 4v4 team battle.
  * Handles both spectate (both sides AI-driven, advances one turn per click)
  * and play mode (side 0 is the human; AI auto-advances any turns where
  * only the opponent needs to act — e.g. replace phases for side 1 only).
