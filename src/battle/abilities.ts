@@ -190,6 +190,7 @@ export const IMPLEMENTED_ABILITIES: Record<string, AbilityEffect> = {
   'shed-skin':     {},
   'moxie':         {},
   'adaptability':  {},
+  'weak-armor':    {},
 };
 
 // Tinted Lens: not-very-effective hits (effectiveness < 1) deal double damage.
@@ -306,6 +307,23 @@ export function applyRattledByMove(
   if (move.type !== 'bug' && move.type !== 'ghost' && move.type !== 'dark') return defender;
   events.push({ kind: 'ability_triggered', turn, pokemonName: defender.data.name, ability: 'rattled' });
   return applyStatChange(defender, 'speed', 1, turn, events);
+}
+
+// Weak Armor: when the bearer is hit by a physical move, its Defense drops by
+// one stage and its Speed rises by two stages.
+export function applyWeakArmor(
+  defender: BattlePokemon,
+  move: Move,
+  turn: number,
+  events: TurnEvent[],
+): BattlePokemon {
+  if (defender.ability !== 'weak-armor') return defender;
+  if (defender.currentHp <= 0) return defender;
+  if (move.damageClass !== 'physical') return defender;
+  events.push({ kind: 'ability_triggered', turn, pokemonName: defender.data.name, ability: 'weak-armor' });
+  let p = applyStatChange(defender, 'defense', -1, turn, events);
+  p = applyStatChange(p, 'speed', 2, turn, events);
+  return p;
 }
 
 // Flash Fire: incoming fire-type damaging moves are nullified and the defender
@@ -507,6 +525,7 @@ export const ABILITY_DESCRIPTIONS: Record<string, string> = {
   'shed-skin':      '33% chance each turn to cure the bearer\'s major status condition',
   'moxie':          'Raises Attack by one stage each time the bearer knocks out an opposing Pokémon',
   'adaptability':   'Raises the bonus from Same-Type Attack Bonus from 1.5× to 2×',
+  'weak-armor':     'Physical hits lower Defense by one stage but sharply raise Speed by two stages',
 };
 
 export function getAbilityDescription(name: AbilityId | undefined): string | undefined {

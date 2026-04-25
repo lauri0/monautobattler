@@ -2,7 +2,7 @@ import type { BattlePokemon, Move, TurnEvent, BattleResult, StatStageName, StatS
 import { calcDamage, calcExpectedDamage, effectiveSpeed, type DefenderScreens } from './damageCalc';
 import { defaultAI } from '../ai/aiModule';
 import { getTypeEffectiveness } from '../utils/typeChart';
-import { abilityMaxVariableHits, applySwitchInAbility, applyStatChangeFromFoe, noGuardInEffect, sheerForceSuppresses, absorbsWater, absorbsElectric, absorbsVoltAbsorb, absorbsFire, sturdyActive, ignoresRecoil, applyContactAbility, applyRattledByMove, abilityBlocksAilment, abilityBlocksConfusion, hasMagicGuard, applyShedSkin, applyMoxie } from './abilities';
+import { abilityMaxVariableHits, applySwitchInAbility, applyStatChangeFromFoe, noGuardInEffect, sheerForceSuppresses, absorbsWater, absorbsElectric, absorbsVoltAbsorb, absorbsFire, sturdyActive, ignoresRecoil, applyContactAbility, applyRattledByMove, applyWeakArmor, abilityBlocksAilment, abilityBlocksConfusion, hasMagicGuard, applyShedSkin, applyMoxie } from './abilities';
 import { isGrounded } from './damageCalc';
 
 export const TRICK_ROOM_TURNS = 5;
@@ -1223,6 +1223,7 @@ export function resolveSingleAttack(
     // against the attacker if the move made contact.
     attacker = applyContactAbility(attacker, defender, move, turnNumber, events);
     defender = applyRattledByMove(defender, move, turnNumber, events);
+    defender = applyWeakArmor(defender, move, turnNumber, events);
     // Moxie: raise Attack by 1 when the bearer scores a KO.
     if (defender.currentHp <= 0 && dealtDamage) {
       attacker = applyMoxie(attacker, turnNumber, events);
