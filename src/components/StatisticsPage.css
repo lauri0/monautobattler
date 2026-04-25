@@ -136,8 +136,8 @@
   border: 1px solid rgba(166, 77, 255, 0.35);
   border-radius: 4px;
   padding: 1px 7px;
-  color: #c97fff;
-  cursor: default;
+  color: var(--accent, #a64dff);
+  cursor: help;
 }
 
 .move-poke-tooltip {
@@ -152,6 +152,8 @@
   padding: 8px 10px;
   box-shadow: 0 8px 24px rgba(0, 0, 0, 0.5);
   min-width: 150px;
+  max-height: 240px;
+  overflow-y: auto;
 }
 
 .move-poke-wrap:hover .move-poke-tooltip {
