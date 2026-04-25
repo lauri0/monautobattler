@@ -68,7 +68,13 @@ export default function StatisticsPage({ allPokemon, onBack }: Props) {
     return ALL_TYPES
       .map(type => ({
         type,
-        count: nonDisabled.filter(p => getTypeEffectiveness(type, p.types) > 1).length,
+        count: nonDisabled.filter(p => {
+          const ability = getPokemonPersisted(p.id).selectedAbility ?? p.abilities[0];
+          let eff = getTypeEffectiveness(type, p.types);
+          if (ability === 'levitate' && type === 'ground') eff = 0;
+          if (ability === 'thick-fat' && (type === 'fire' || type === 'ice')) eff *= 0.5;
+          return eff > 1;
+        }).length,
       }))
       .sort((a, b) => b.count - a.count);
   }, [nonDisabled]);
