@@ -22,6 +22,7 @@ function formatMoveName(name: string): string {
 
 export default function StatisticsPage({ allPokemon, onBack }: Props) {
   const [tab, setTab] = useState<Tab>('moves');
+  const [hoveredMove, setHoveredMove] = useState<{ idx: number; x: number; y: number; maxH: number } | null>(null);
 
   const nonDisabled = useMemo(
     () => allPokemon.filter(p => !getPokemonPersisted(p.id).disabled),
@@ -132,16 +133,15 @@ export default function StatisticsPage({ allPokemon, onBack }: Props) {
                       {m.effectText}
                     </td>
                     <td className="stats-count">
-                      <span className="move-poke-wrap">
-                        <span className="move-poke-count" title={m.pokemon.map(p => formatPokemonName(p.name)).join(', ')}>{m.pokemon.length}</span>
-                        <div className="move-poke-tooltip">
-                          {m.pokemon.map(p => (
-                            <div key={p.name} className="move-poke-row">
-                              <img src={p.spriteUrl} alt={p.name} className="move-poke-sprite" />
-                              <span>{formatPokemonName(p.name)}</span>
-                            </div>
-                          ))}
-                        </div>
+                      <span
+                        className="move-poke-count"
+                        onMouseEnter={e => {
+                          const rect = e.currentTarget.getBoundingClientRect();
+                          setHoveredMove({ idx: i, x: rect.left, y: rect.bottom + 6, maxH: window.innerHeight - rect.bottom - 26 });
+                        }}
+                        onMouseLeave={() => setHoveredMove(null)}
+                      >
+                        {m.pokemon.length}
                       </span>
                     </td>
                   </tr>
@@ -234,6 +234,20 @@ export default function StatisticsPage({ allPokemon, onBack }: Props) {
               </tbody>
             </table>
           </div>
+        </div>
+      )}
+
+      {hoveredMove !== null && (
+        <div
+          className="move-poke-tooltip"
+          style={{ position: 'fixed', left: hoveredMove.x, top: hoveredMove.y, maxHeight: hoveredMove.maxH }}
+        >
+          {(moveRankings[hoveredMove.idx]?.pokemon ?? []).map(p => (
+            <div key={p.name} className="move-poke-row">
+              <img src={p.spriteUrl} alt={p.name} className="move-poke-sprite" />
+              <span>{formatPokemonName(p.name)}</span>
+            </div>
+          ))}
         </div>
       )}
     </div>
