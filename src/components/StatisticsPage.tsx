@@ -133,7 +133,7 @@ export default function StatisticsPage({ allPokemon, onBack }: Props) {
                     </td>
                     <td className="stats-count">
                       <span className="move-poke-wrap">
-                        <span className="move-poke-count">{m.pokemon.length}</span>
+                        <span className="move-poke-count" title={m.pokemon.map(p => formatPokemonName(p.name)).join(', ')}>{m.pokemon.length}</span>
                         <div className="move-poke-tooltip">
                           {m.pokemon.map(p => (
                             <div key={p.name} className="move-poke-row">
