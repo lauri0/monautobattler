@@ -1,0 +1,54 @@
+{
+  "id": 124,
+  "name": "jynx",
+  "types": [
+    "ice",
+    "psychic"
+  ],
+  "baseStats": {
+    "hp": 65,
+    "attack": 50,
+    "defense": 35,
+    "specialAttack": 115,
+    "specialDefense": 95,
+    "speed": 95
+  },
+  "spriteUrl": "/sprites/124.png",
+  "moves": [
+    "hyper-beam",
+    "focus-punch",
+    "giga-impact",
+    "focus-blast",
+    "blizzard",
+    "dream-eater",
+    "ice-beam",
+    "psychic",
+    "energy-ball",
+    "shadow-ball",
+    "ice-punch",
+    "brick-break",
+    "drain-punch",
+    "facade",
+    "thief",
+    "covet",
+    "water-pulse",
+    "avalanche",
+    "confusion",
+    "payback",
+    "pound",
+    "powder-snow",
+    "lick",
+    "light-screen",
+    "reflect",
+    "protect",
+    "taunt",
+    "calm-mind",
+    "nasty-plot",
+    "trick-room"
+  ],
+  "abilities": [
+    "oblivious",
+    "magic-guard",
+    "dry-skin"
+  ]
+}
