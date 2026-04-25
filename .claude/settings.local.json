@@ -20,7 +20,10 @@
       "Bash(git stash *)",
       "Bash(npx vitest *)",
       "Bash(xargs -I {} sh -c 'echo \"=== {} ===\"; cat {}')",
-      "Bash(git mv *)"
+      "Bash(git mv *)",
+      "Bash(C:/Users/lauri/.claude/plugins/cache/claude-plugins-official/superpowers/5.0.7/skills/brainstorming/scripts/start-server.sh *)",
+      "Bash(git add *)",
+      "Bash(git commit *)"
     ]
   }
 }

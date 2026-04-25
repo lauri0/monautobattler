@@ -1,0 +1,323 @@
+<h2>Move Rankings — Pokemon Hover Tooltip</h2>
+<p class="subtitle">Where should the tooltip appear, and how should the count look?</p>
+
+<style>
+  .demo-table-wrap {
+    overflow-x: auto;
+    margin: 0 auto 2rem;
+    max-width: 720px;
+  }
+  .demo-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 0.9rem;
+    background: #1e1e2e;
+    border-radius: 8px;
+    overflow: hidden;
+  }
+  .demo-table th {
+    text-align: left;
+    padding: 0.5rem 0.75rem;
+    font-size: 0.75rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    color: #888;
+    border-bottom: 1px solid #333;
+  }
+  .demo-table td {
+    padding: 0.6rem 0.75rem;
+    border-bottom: 1px solid #2a2a3e;
+    vertical-align: middle;
+    color: #e0e0f0;
+  }
+  .demo-table tr:last-child td { border-bottom: none; }
+  .type-badge {
+    display: inline-block;
+    padding: 2px 8px;
+    border-radius: 4px;
+    font-size: 0.72rem;
+    font-weight: 700;
+    color: #fff;
+    text-transform: capitalize;
+  }
+  .type-water { background: #4d90d5; }
+  .type-fire { background: #e8a030; }
+  .type-normal { background: #919aa2; }
+  .type-ice { background: #74cec0; }
+  .move-class { color: #888; font-size: 1rem; text-align: center; }
+  .num { text-align: right; color: #888; }
+  .option-label {
+    font-size: 0.75rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    color: #a64dff;
+    margin: 2rem 0 0.5rem;
+    text-align: center;
+  }
+
+  /* ── Tooltip shared ── */
+  .poke-tooltip {
+    position: absolute;
+    z-index: 100;
+    background: #1a1a2e;
+    border: 1px solid #444;
+    border-radius: 8px;
+    padding: 8px 10px;
+    box-shadow: 0 8px 24px rgba(0,0,0,0.5);
+    min-width: 150px;
+    pointer-events: none;
+    display: none;
+  }
+  .poke-tooltip .poke-row {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 4px 0;
+    border-bottom: 1px solid #2a2a3e;
+    color: #e0e0f0;
+    font-size: 0.82rem;
+    font-weight: 600;
+    white-space: nowrap;
+  }
+  .poke-tooltip .poke-row:last-child { border-bottom: none; }
+  .poke-tooltip img {
+    width: 28px;
+    height: 28px;
+    image-rendering: pixelated;
+  }
+
+  /* ── Option A: tooltip above, dashed underline count ── */
+  .count-a {
+    font-weight: 700;
+    cursor: default;
+    border-bottom: 2px dashed #a64dff;
+    display: inline-block;
+    position: relative;
+  }
+  .count-a:hover .poke-tooltip {
+    display: block;
+    bottom: calc(100% + 8px);
+    right: 0;
+  }
+
+  /* ── Option B: tooltip to the left, underline count ── */
+  .count-b {
+    font-weight: 700;
+    cursor: default;
+    text-decoration: underline dotted #a64dff;
+    text-underline-offset: 3px;
+    display: inline-block;
+    position: relative;
+  }
+  .count-b:hover .poke-tooltip {
+    display: block;
+    top: 50%;
+    transform: translateY(-50%);
+    right: calc(100% + 8px);
+  }
+
+  /* ── Option C: tooltip below, count gets a pill background ── */
+  .count-c-wrap {
+    position: relative;
+    display: inline-block;
+  }
+  .count-c {
+    font-weight: 700;
+    cursor: default;
+    background: rgba(166,77,255,0.15);
+    border: 1px solid rgba(166,77,255,0.35);
+    border-radius: 4px;
+    padding: 1px 7px;
+    color: #c97fff;
+    display: inline-block;
+  }
+  .count-c-wrap:hover .poke-tooltip {
+    display: block;
+    top: calc(100% + 6px);
+    right: 0;
+  }
+
+  .options { margin-top: 1.5rem; }
+</style>
+
+<!-- ── OPTION A ── -->
+<div class="option-label">Option A — Tooltip above, dashed underline</div>
+<div class="demo-table-wrap">
+  <table class="demo-table">
+    <thead><tr>
+      <th>Rank</th><th></th><th>Move</th><th>Type</th>
+      <th style="text-align:right">Power</th><th style="text-align:right">Acc</th>
+      <th>Effects</th><th>Pokemon</th>
+    </tr></thead>
+    <tbody>
+      <tr>
+        <td>#1</td>
+        <td class="move-class">💧</td>
+        <td><strong>Surf</strong></td>
+        <td><span class="type-badge type-water">Water</span></td>
+        <td class="num">90</td><td class="num">100%</td>
+        <td style="font-size:0.8rem;color:#888">hits all adjacent</td>
+        <td>
+          <span class="count-a">6
+            <div class="poke-tooltip">
+              <div class="poke-row"><img src="https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/131.png" alt="">Lapras</div>
+              <div class="poke-row"><img src="https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/134.png" alt="">Vaporeon</div>
+              <div class="poke-row"><img src="https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/7.png" alt="">Squirtle</div>
+              <div class="poke-row"><img src="https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/54.png" alt="">Psyduck</div>
+              <div class="poke-row"><img src="https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/60.png" alt="">Poliwag</div>
+              <div class="poke-row"><img src="https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/143.png" alt="">Snorlax</div>
+            </div>
+          </span>
+        </td>
+      </tr>
+      <tr>
+        <td>#2</td>
+        <td class="move-class">🔥</td>
+        <td><strong>Flamethrower</strong></td>
+        <td><span class="type-badge type-fire">Fire</span></td>
+        <td class="num">90</td><td class="num">100%</td>
+        <td style="font-size:0.8rem;color:#888">10% burn</td>
+        <td><span class="count-a">4
+            <div class="poke-tooltip">
+              <div class="poke-row"><img src="https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/136.png" alt="">Flareon</div>
+              <div class="poke-row"><img src="https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/6.png" alt="">Charizard</div>
+              <div class="poke-row"><img src="https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/59.png" alt="">Arcanine</div>
+              <div class="poke-row"><img src="https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/78.png" alt="">Rapidash</div>
+            </div>
+          </span>
+        </td>
+      </tr>
+    </tbody>
+  </table>
+</div>
+
+<!-- ── OPTION B ── -->
+<div class="option-label">Option B — Tooltip to the left, dotted underline</div>
+<div class="demo-table-wrap">
+  <table class="demo-table">
+    <thead><tr>
+      <th>Rank</th><th></th><th>Move</th><th>Type</th>
+      <th style="text-align:right">Power</th><th style="text-align:right">Acc</th>
+      <th>Effects</th><th>Pokemon</th>
+    </tr></thead>
+    <tbody>
+      <tr>
+        <td>#1</td>
+        <td class="move-class">💧</td>
+        <td><strong>Surf</strong></td>
+        <td><span class="type-badge type-water">Water</span></td>
+        <td class="num">90</td><td class="num">100%</td>
+        <td style="font-size:0.8rem;color:#888">hits all adjacent</td>
+        <td>
+          <span class="count-b">6
+            <div class="poke-tooltip">
+              <div class="poke-row"><img src="https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/131.png" alt="">Lapras</div>
+              <div class="poke-row"><img src="https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/134.png" alt="">Vaporeon</div>
+              <div class="poke-row"><img src="https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/7.png" alt="">Squirtle</div>
+              <div class="poke-row"><img src="https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/54.png" alt="">Psyduck</div>
+              <div class="poke-row"><img src="https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/60.png" alt="">Poliwag</div>
+              <div class="poke-row"><img src="https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/143.png" alt="">Snorlax</div>
+            </div>
+          </span>
+        </td>
+      </tr>
+      <tr>
+        <td>#2</td>
+        <td class="move-class">🔥</td>
+        <td><strong>Flamethrower</strong></td>
+        <td><span class="type-badge type-fire">Fire</span></td>
+        <td class="num">90</td><td class="num">100%</td>
+        <td style="font-size:0.8rem;color:#888">10% burn</td>
+        <td><span class="count-b">4
+            <div class="poke-tooltip">
+              <div class="poke-row"><img src="https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/136.png" alt="">Flareon</div>
+              <div class="poke-row"><img src="https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/6.png" alt="">Charizard</div>
+              <div class="poke-row"><img src="https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/59.png" alt="">Arcanine</div>
+              <div class="poke-row"><img src="https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/78.png" alt="">Rapidash</div>
+            </div>
+          </span>
+        </td>
+      </tr>
+    </tbody>
+  </table>
+</div>
+
+<!-- ── OPTION C ── -->
+<div class="option-label">Option C — Tooltip below, purple pill badge</div>
+<div class="demo-table-wrap">
+  <table class="demo-table">
+    <thead><tr>
+      <th>Rank</th><th></th><th>Move</th><th>Type</th>
+      <th style="text-align:right">Power</th><th style="text-align:right">Acc</th>
+      <th>Effects</th><th>Pokemon</th>
+    </tr></thead>
+    <tbody>
+      <tr>
+        <td>#1</td>
+        <td class="move-class">💧</td>
+        <td><strong>Surf</strong></td>
+        <td><span class="type-badge type-water">Water</span></td>
+        <td class="num">90</td><td class="num">100%</td>
+        <td style="font-size:0.8rem;color:#888">hits all adjacent</td>
+        <td>
+          <span class="count-c-wrap">
+            <span class="count-c">6</span>
+            <div class="poke-tooltip">
+              <div class="poke-row"><img src="https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/131.png" alt="">Lapras</div>
+              <div class="poke-row"><img src="https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/134.png" alt="">Vaporeon</div>
+              <div class="poke-row"><img src="https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/7.png" alt="">Squirtle</div>
+              <div class="poke-row"><img src="https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/54.png" alt="">Psyduck</div>
+              <div class="poke-row"><img src="https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/60.png" alt="">Poliwag</div>
+              <div class="poke-row"><img src="https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/143.png" alt="">Snorlax</div>
+            </div>
+          </span>
+        </td>
+      </tr>
+      <tr>
+        <td>#2</td>
+        <td class="move-class">🔥</td>
+        <td><strong>Flamethrower</strong></td>
+        <td><span class="type-badge type-fire">Fire</span></td>
+        <td class="num">90</td><td class="num">100%</td>
+        <td style="font-size:0.8rem;color:#888">10% burn</td>
+        <td>
+          <span class="count-c-wrap">
+            <span class="count-c">4</span>
+            <div class="poke-tooltip">
+              <div class="poke-row"><img src="https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/136.png" alt="">Flareon</div>
+              <div class="poke-row"><img src="https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/6.png" alt="">Charizard</div>
+              <div class="poke-row"><img src="https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/59.png" alt="">Arcanine</div>
+              <div class="poke-row"><img src="https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/78.png" alt="">Rapidash</div>
+            </div>
+          </span>
+        </td>
+      </tr>
+    </tbody>
+  </table>
+</div>
+
+<div class="options">
+  <div class="option" data-choice="a" onclick="toggleSelect(this)">
+    <div class="letter">A</div>
+    <div class="content">
+      <h3>Above, dashed underline</h3>
+      <p>Tooltip floats above the count. Dashed purple underline signals interactivity.</p>
+    </div>
+  </div>
+  <div class="option" data-choice="b" onclick="toggleSelect(this)">
+    <div class="letter">B</div>
+    <div class="content">
+      <h3>Left, dotted underline</h3>
+      <p>Tooltip slides out to the left. Dotted underline is a familiar "abbr" hint style.</p>
+    </div>
+  </div>
+  <div class="option" data-choice="c" onclick="toggleSelect(this)">
+    <div class="letter">C</div>
+    <div class="content">
+      <h3>Below, purple pill badge</h3>
+      <p>Tooltip drops below. Count styled as a purple pill — stands out from plain numbers.</p>
+    </div>
+  </div>
+</div>
