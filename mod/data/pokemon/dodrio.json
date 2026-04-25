@@ -1,0 +1,62 @@
+{
+  "id": 85,
+  "name": "dodrio",
+  "types": [
+    "normal",
+    "flying"
+  ],
+  "baseStats": {
+    "hp": 60,
+    "attack": 110,
+    "defense": 70,
+    "specialAttack": 60,
+    "specialDefense": 60,
+    "speed": 110
+  },
+  "spriteUrl": "/sprites/85.png",
+  "moves": [
+    "hyper-beam",
+    "giga-impact",
+    "sky-attack",
+    "thrash",
+    "double-edge",
+    "brave-bird",
+    "fly",
+    "take-down",
+    "uproar",
+    "body-slam",
+    "drill-peck",
+    "tri-attack",
+    "drill-run",
+    "throat-chop",
+    "lunge",
+    "tera-blast",
+    "stomping-tantrum",
+    "facade",
+    "knock-off",
+    "swift",
+    "thief",
+    "aerial-ace",
+    "pluck",
+    "assurance",
+    "acrobatics",
+    "pounce",
+    "trailblaze",
+    "quick-attack",
+    "peck",
+    "double-hit",
+    "mud-slap",
+    "fury-attack",
+    "swords-dance",
+    "growl",
+    "agility",
+    "protect",
+    "taunt",
+    "tailwind"
+  ],
+  "abilities": [
+    "run-away",
+    "moxie",
+    "tangled-feet"
+  ]
+}

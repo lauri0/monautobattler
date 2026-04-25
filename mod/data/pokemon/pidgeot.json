@@ -1,0 +1,43 @@
+{
+  "id": 18,
+  "name": "pidgeot",
+  "types": [
+    "normal",
+    "flying"
+  ],
+  "baseStats": {
+    "hp": 83,
+    "attack": 80,
+    "defense": 75,
+    "specialAttack": 70,
+    "specialDefense": 70,
+    "speed": 101
+  },
+  "spriteUrl": "/sprites/18.png",
+  "moves": [
+    "hyper-beam",
+    "giga-impact",
+    "hurricane",
+    "fly",
+    "air-slash",
+    "steel-wing",
+    "facade",
+    "u-turn",
+    "wing-attack",
+    "thief",
+    "aerial-ace",
+    "pluck",
+    "gust",
+    "tackle",
+    "quick-attack",
+    "twister",
+    "agility",
+    "protect",
+    "tailwind"
+  ],
+  "abilities": [
+    "keen-eye",
+    "no-guard",
+    "big-pecks"
+  ]
+}
