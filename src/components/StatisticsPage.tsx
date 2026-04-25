@@ -37,7 +37,7 @@ export default function StatisticsPage({ allPokemon, onBack }: Props) {
       accuracy: number | null;
       priority: number;
       effectText: string;
-      count: number;
+      pokemon: { name: string; spriteUrl: string }[];
     }>();
     for (const pokemon of nonDisabled) {
       const persisted = getPokemonPersisted(pokemon.id);
@@ -54,13 +54,13 @@ export default function StatisticsPage({ allPokemon, onBack }: Props) {
             accuracy: move.accuracy,
             priority: move.priority,
             effectText: effectSummary(move),
-            count: 0,
+            pokemon: [],
           });
         }
-        moveCount.get(moveId)!.count++;
+        moveCount.get(moveId)!.pokemon.push({ name: pokemon.name, spriteUrl: pokemon.spriteUrl });
       }
     }
-    return [...moveCount.values()].sort((a, b) => b.count - a.count);
+    return [...moveCount.values()].sort((a, b) => b.pokemon.length - a.pokemon.length);
   }, [nonDisabled]);
 
   const coverageRankings = useMemo(() => {
@@ -131,7 +131,19 @@ export default function StatisticsPage({ allPokemon, onBack }: Props) {
                       {m.priority !== 0 && <span className="stats-priority">pri {m.priority > 0 ? '+' : ''}{m.priority}</span>}
                       {m.effectText}
                     </td>
-                    <td className="stats-count">{m.count}</td>
+                    <td className="stats-count">
+                      <span className="move-poke-wrap">
+                        <span className="move-poke-count">{m.pokemon.length}</span>
+                        <div className="move-poke-tooltip">
+                          {m.pokemon.map(p => (
+                            <div key={p.name} className="move-poke-row">
+                              <img src={p.spriteUrl} alt={p.name} className="move-poke-sprite" />
+                              <span>{formatPokemonName(p.name)}</span>
+                            </div>
+                          ))}
+                        </div>
+                      </span>
+                    </td>
                   </tr>
                 ))}
               </tbody>

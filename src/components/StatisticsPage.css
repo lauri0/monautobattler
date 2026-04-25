@@ -123,3 +123,59 @@
   color: var(--text-muted);
   padding: 2rem 0.75rem;
 }
+
+.move-poke-wrap {
+  position: relative;
+  display: inline-block;
+}
+
+.move-poke-count {
+  display: inline-block;
+  font-weight: 700;
+  background: rgba(166, 77, 255, 0.15);
+  border: 1px solid rgba(166, 77, 255, 0.35);
+  border-radius: 4px;
+  padding: 1px 7px;
+  color: #c97fff;
+  cursor: default;
+}
+
+.move-poke-tooltip {
+  display: none;
+  position: absolute;
+  top: calc(100% + 6px);
+  right: 0;
+  z-index: 100;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 8px 10px;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.5);
+  min-width: 150px;
+}
+
+.move-poke-wrap:hover .move-poke-tooltip {
+  display: block;
+}
+
+.move-poke-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 4px 0;
+  border-bottom: 1px solid var(--border);
+  font-size: 0.82rem;
+  font-weight: 600;
+  white-space: nowrap;
+  color: var(--text);
+}
+
+.move-poke-row:last-child {
+  border-bottom: none;
+}
+
+.move-poke-sprite {
+  width: 28px;
+  height: 28px;
+  image-rendering: pixelated;
+}
