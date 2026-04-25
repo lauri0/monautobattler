@@ -81,9 +81,14 @@ export default function RoundRobinStandingsView({ state, allPokemon }: Props) {
           <thead>
             <tr>
               <th></th>
-              {state.teams.map((_, i) => (
-                <th key={i} title={state.teams[i].name}>{rank.get(i)}</th>
-              ))}
+              {state.teams.map((team, i) => {
+                const label = team.isPlayer ? '★' : team.name.replace(/^AI Team /, '');
+                return (
+                  <th key={i} title={team.name} className={team.isPlayer ? 'rr-col-player' : ''}>
+                    {label}
+                  </th>
+                );
+              })}
             </tr>
           </thead>
           <tbody>

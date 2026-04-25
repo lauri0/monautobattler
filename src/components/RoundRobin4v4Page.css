@@ -128,6 +128,9 @@
 .rr-row-player th {
   color: #f1c40f;
 }
+.rr-col-player {
+  color: #f1c40f;
+}
 .rr-diff-pos { color: #27ae60; }
 .rr-diff-neg { color: #e74c3c; }
 
