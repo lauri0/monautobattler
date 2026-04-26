@@ -1,6 +1,5 @@
 import { useState } from 'react';
-import type { PokemonData } from '../models/types';
-import type { DamageStat } from '../models/types';
+import type { PokemonData, DamageStat } from '../models/types';
 import type { RR4v4State } from '../tournament/roundRobin4v4Engine';
 import { computeStandings } from '../tournament/roundRobin4v4Engine';
 import { formatPokemonName } from '../utils/formatName';
@@ -28,9 +27,6 @@ export default function RoundRobinStandingsView({ state, allPokemon }: Props) {
     matrix[pair.a][pair.b] = aWon ? 'W' : 'L';
     matrix[pair.b][pair.a] = aWon ? 'L' : 'W';
   });
-
-  const rank = new Map<number, number>();
-  standings.forEach((s, i) => rank.set(s.teamIdx, i + 1));
 
   return (
     <div className="rr-standings">
