@@ -1,4 +1,4 @@
-import type { PokemonData } from '../models/types';
+import type { PokemonData, MatchDamageSummary } from '../models/types';
 import { getPokemonPersisted } from '../persistence/userStorage';
 
 export interface RR4v4Team {
@@ -18,6 +18,7 @@ export interface RR4v4MatchResult {
   rosterB: [number, number, number, number]; // pokemon ids brought by team B
   pokemonSurvivedA: number; // alive pokemon on team A at match end
   pokemonSurvivedB: number;
+  damageSummary?: MatchDamageSummary;
 }
 
 export type RR4v4Phase = 'draft' | 'overview' | 'match' | 'finished';

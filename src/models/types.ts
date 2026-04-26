@@ -221,6 +221,16 @@ export interface BattleResult {
   log: TurnEvent[];
 }
 
+export interface DamageStat {
+  physical: number;  // damage dealt to enemies via physical moves
+  special: number;   // damage dealt to enemies via special moves
+  other: number;     // status/weather/hazard/confusion damage dealt to enemies
+  recoil: number;    // self-damage from recoil
+  heal: number;      // all HP recovered (drain, Recover/Roost, Grassy Terrain)
+}
+
+export type MatchDamageSummary = Array<{ pokemonId: number } & DamageStat>;
+
 export interface EloChange {
   pokemonId: number;
   oldElo: number;
