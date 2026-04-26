@@ -50,7 +50,7 @@ export function parseDamageSummary(
       if (!ev.missed && ev.damage > 0) {
         const stat = get(ev.attackerName);
         if (ev.damageClass === 'physical') stat.physical += ev.damage;
-        else stat.special += ev.damage;
+        else if (ev.damageClass === 'special') stat.special += ev.damage;
       }
       lastReceivedAttack.set(ev.defenderName, { attacker: ev.attackerName, turn: ev.turn });
 
