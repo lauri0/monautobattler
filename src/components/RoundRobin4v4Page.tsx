@@ -24,6 +24,7 @@ import {
   applyInitialSwitchInsTeam,
 } from '../battle/teamBattleEngine';
 import { mctsTeamAI } from '../ai/mctsTeamAI';
+import { parseDamageSummary, buildNameToIdMap } from '../battle/damageSummary';
 import { getPokemonPersisted } from '../persistence/userStorage';
 import TeamView from './TeamView';
 import PlayerActionBar from './PlayerActionBar';
@@ -181,12 +182,15 @@ export default function RoundRobin4v4Page({ allPokemon, onBack }: Props) {
       const battle = runFullTeamBattle(initial, mctsTeamAI, mctsTeamAI);
       const survivedA = battle.finalState.teams[0].pokemon.filter(p => p.currentHp > 0).length;
       const survivedB = battle.finalState.teams[1].pokemon.filter(p => p.currentHp > 0).length;
+      const nameToId = buildNameToIdMap(initial);
+      const damageSummary = parseDamageSummary(battle.log, nameToId);
       current = applyMatchResult(current, {
         winner: battle.winner === 0 ? 0 : 1,
         rosterA: aIds,
         rosterB: bIds,
         pokemonSurvivedA: survivedA,
         pokemonSurvivedB: survivedB,
+        damageSummary,
       });
     }
     setState(current);
@@ -263,6 +267,7 @@ export default function RoundRobin4v4Page({ allPokemon, onBack }: Props) {
       <MatchView
         tournamentState={state}
         pending={pending}
+        allPokemon={allPokemon}
         onEnd={onMatchEnd}
         onBack={onBack}
       />
@@ -440,13 +445,19 @@ function PreMatchView(props: {
 function MatchView(props: {
   tournamentState: RR4v4State;
   pending: PendingMatch;
+  allPokemon: PokemonData[];
   onEnd: (result: RR4v4MatchResult) => void;
   onBack: () => void;
 }) {
-  const { tournamentState, pending, onEnd, onBack } = props;
+  const { tournamentState, pending, allPokemon: _allPokemon, onEnd, onBack } = props;
   const startup = useMemo(() => applyInitialSwitchInsTeam(pending.initial), [pending.initial]);
   const { state, log, thinking, winner, done, nextTurn, submitPlayerAction } =
     useTeamBattleController(startup.state, startup.events);
+  const damageSummary = useMemo(() => {
+    if (!done) return null;
+    const nameToId = buildNameToIdMap(pending.initial);
+    return parseDamageSummary(log, nameToId);
+  }, [done]); // eslint-disable-line react-hooks/exhaustive-deps
   const logRef = useRef<HTMLDivElement>(null);
 
   const teamA = tournamentState.teams[pending.pairing.a];
@@ -472,6 +483,7 @@ function MatchView(props: {
       rosterB: pending.rosterB,
       pokemonSurvivedA: survivedA,
       pokemonSurvivedB: survivedB,
+      damageSummary: damageSummary ?? undefined,
     });
   }
 
