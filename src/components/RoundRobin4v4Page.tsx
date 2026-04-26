@@ -319,6 +319,11 @@ export default function RoundRobin4v4Page({ allPokemon, onBack }: Props) {
                 Simulate {aiMatchesUntilPlayer} AI match{aiMatchesUntilPlayer === 1 ? '' : 'es'} until mine
               </button>
             )}
+            {state.mode === 'play' && !nextIsPlayer && nextPlayerIdx === null && (
+              <button className="btn-primary" onClick={() => simulateUntilPlayer(true)}>
+                Simulate remaining {state.schedule.length - state.currentMatchIdx} match{state.schedule.length - state.currentMatchIdx === 1 ? '' : 'es'}
+              </button>
+            )}
             {state.mode === 'spectate' && (
               <button className="btn-primary" onClick={() => simulateUntilPlayer(true)}>
                 Simulate remaining matches

@@ -268,9 +268,9 @@ export function computeStandings(state: RR4v4State): RR4v4Standing[] {
 
   standings.sort((x, y) => {
     if (y.points !== x.points) return y.points - x.points;
+    if (y.koDiff !== x.koDiff) return y.koDiff - x.koDiff;
     const h2h = headToHead(y.teamIdx, x.teamIdx);
     if (h2h !== 0) return h2h;
-    if (y.koDiff !== x.koDiff) return y.koDiff - x.koDiff;
     return 0;
   });
 
