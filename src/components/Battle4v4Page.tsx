@@ -79,7 +79,7 @@ export default function Battle4v4Page({ allPokemon, onBack }: Props) {
     if (!done) return null;
     const nameToId = buildNameToIdMap(initialState.state);
     return parseDamageSummary(log, nameToId);
-  }, [done]); // eslint-disable-line react-hooks/exhaustive-deps
+  }, [done, log, initialState.state]);
 
   useEffect(() => {
     if (logRef.current) logRef.current.scrollTop = logRef.current.scrollHeight;

@@ -458,7 +458,7 @@ function MatchView(props: {
     if (!done) return null;
     const nameToId = buildNameToIdMap(pending.initial);
     return parseDamageSummary(log, nameToId);
-  }, [done]); // eslint-disable-line react-hooks/exhaustive-deps
+  }, [done, log, pending.initial]);
   const logRef = useRef<HTMLDivElement>(null);
 
   const teamA = tournamentState.teams[pending.pairing.a];
