@@ -78,7 +78,7 @@ export function parseDamageSummary(
         statusSources.set(target, abilityHolderThisStep);
       } else {
         const last = lastReceivedAttack.get(target);
-        if (last) statusSources.set(target, last.attacker);
+        if (last && last.turn === ev.turn) statusSources.set(target, last.attacker);
       }
 
     } else if (ev.kind === 'toxic_spikes_poison') {

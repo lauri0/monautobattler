@@ -114,10 +114,12 @@ describe('parseDamageSummary', () => {
            attackerHpAfter: 100, defenderHpAfter: 60 }),
       ev({ side: 1, kind: 'ability_triggered', turn: 1, pokemonName: 'defender', ability: 'static' }),
       ev({ side: 0, kind: 'status_applied', turn: 1, pokemonName: 'attacker', condition: 'paralysis' }),
+      // paralysis chip damage attributed to defender (the ability holder that caused it)
+      ev({ side: 0, kind: 'status_damage', turn: 2, pokemonName: 'attacker', condition: 'paralysis', damage: 15, hpAfter: 85 }),
     ];
     const result = parseDamageSummary(log, nameToId);
-    expect(result.find(e => e.pokemonId === 1)?.physical).toBe(40);
-    expect(result.find(e => e.pokemonId === 2)).toBeUndefined();
+    expect(result.find(e => e.pokemonId === 1)?.physical).toBe(40);  // attacker's tackle
+    expect(result.find(e => e.pokemonId === 2)?.other).toBe(15);     // defender's Static-caused damage
   });
 
   it('credits confusion_hit to the pokemon that caused the confusion', () => {
