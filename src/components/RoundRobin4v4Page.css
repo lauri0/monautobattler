@@ -271,6 +271,97 @@
   margin-left: 0.5rem;
 }
 
+/* ── Standings / Damage tabs ── */
+.rr-tabs {
+  display: flex;
+  gap: 0.5rem;
+  margin-bottom: 1.5rem;
+  flex-wrap: wrap;
+}
+
+.rr-tab {
+  padding: 0.5rem 1.25rem;
+  border: 1px solid var(--border);
+  background: var(--surface);
+  color: var(--text-muted);
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 0.9rem;
+  font-weight: 600;
+  transition: color 0.15s, border-color 0.15s, background 0.15s;
+}
+
+.rr-tab:hover {
+  color: var(--text);
+  border-color: var(--text-muted);
+}
+
+.rr-tab--active {
+  background: var(--accent);
+  color: #fff;
+  border-color: var(--accent);
+}
+
+/* ── Damage tab table ── */
+.rr-damage-tab {
+  overflow-x: auto;
+}
+
+.rr-damage-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.88rem;
+}
+
+.rr-damage-table th {
+  padding: 0.5rem 0.75rem;
+  font-size: 0.78rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--text-muted);
+  border-bottom: 1px solid var(--border);
+  text-align: right;
+  white-space: nowrap;
+}
+
+.rr-damage-table th:nth-child(2),
+.rr-damage-table th:nth-child(3) {
+  text-align: left;
+}
+
+.rr-damage-table td {
+  padding: 0.6rem 0.75rem;
+  border-bottom: 1px solid var(--border);
+  vertical-align: middle;
+  text-align: right;
+  font-variant-numeric: tabular-nums;
+}
+
+.rr-damage-table td:nth-child(2),
+.rr-damage-table td:nth-child(3) {
+  text-align: left;
+  font-variant-numeric: normal;
+}
+
+.rr-damage-table tr:last-child td { border-bottom: none; }
+.rr-damage-table tr:hover td { background: var(--surface2); }
+
+.rr-damage-table td:nth-child(7) { font-weight: 700; }
+
+.rr-pokemon-cell {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  white-space: nowrap;
+}
+
+.rr-pokemon-cell img {
+  width: 32px;
+  height: 32px;
+  image-rendering: pixelated;
+}
+
 /* ── Pre-match 3-of-4 picker ── */
 .rr-prematch-opp, .rr-prematch-own {
   margin-bottom: 1rem;
