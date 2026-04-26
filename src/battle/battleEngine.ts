@@ -1204,7 +1204,7 @@ export function resolveSingleAttack(
       kind: 'attack', turn: turnNumber,
       attackerName: attacker.data.name, defenderName: defender.data.name,
       moveName: move.name, moveType: move.type, damageClass: move.damageClass,
-      damage: damageThisHit, isCrit: result.isCrit,
+      damage: actualDamage, isCrit: result.isCrit,
       missed: result.missed, effectiveness: result.effectiveness,
       attackerHpAfter: attacker.currentHp, defenderHpAfter: newDefHp,
     });
