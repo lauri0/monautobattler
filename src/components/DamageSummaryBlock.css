@@ -1,0 +1,62 @@
+.dsb-title {
+  margin-bottom: 0.75rem;
+}
+
+.dsb-table-wrap {
+  overflow-x: auto;
+}
+
+.dsb-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.88rem;
+}
+
+.dsb-table th {
+  padding: 0.5rem 0.75rem;
+  font-size: 0.78rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--text-muted);
+  border-bottom: 1px solid var(--border);
+  text-align: right;
+  white-space: nowrap;
+}
+
+.dsb-th-left {
+  text-align: left !important;
+}
+
+.dsb-table td {
+  padding: 0.6rem 0.75rem;
+  border-bottom: 1px solid var(--border);
+  vertical-align: middle;
+  text-align: right;
+  font-variant-numeric: tabular-nums;
+}
+
+.dsb-table td:nth-child(2) {
+  text-align: left;
+  font-variant-numeric: normal;
+}
+
+.dsb-table tr:last-child td { border-bottom: none; }
+.dsb-table tr:hover td { background: var(--surface2); }
+
+.dsb-total {
+  font-weight: 700;
+}
+
+.dsb-pokemon-cell {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  white-space: nowrap;
+}
+
+.dsb-pokemon-cell img {
+  width: 32px;
+  height: 32px;
+  image-rendering: pixelated;
+}

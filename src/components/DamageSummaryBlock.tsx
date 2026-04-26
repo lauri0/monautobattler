@@ -1,5 +1,6 @@
 import type { MatchDamageSummary, PokemonData } from '../models/types';
 import { formatPokemonName } from '../utils/formatName';
+import './DamageSummaryBlock.css';
 
 interface Props {
   summary: MatchDamageSummary;
@@ -17,26 +18,47 @@ export default function DamageSummaryBlock({ summary, allPokemon }: Props) {
 
   return (
     <div className="card damage-summary-block">
-      <h3 className="section-title" style={{ marginBottom: '0.75rem' }}>Damage Summary</h3>
-      <ol className="damage-summary-list">
-        {sorted.map((entry, i) => {
-          const p = byId.get(entry.pokemonId);
-          const name = p ? formatPokemonName(p.name) : `#${entry.pokemonId}`;
-          const total = entry.physical + entry.special + entry.other;
-          return (
-            <li key={entry.pokemonId} className="damage-summary-row">
-              <span className="dsb-rank">{i + 1}.</span>
-              {p && <img className="dsb-sprite" src={p.spriteUrl} alt={p.name} />}
-              <span className="dsb-name">{name}</span>
-              <span className="dsb-total">{total} dmg</span>
-              <span className="dsb-breakdown">
-                (Phys: {entry.physical} / Spec: {entry.special} / Other: {entry.other}
-                {' | '}Recoil: {entry.recoil} / Heal: {entry.heal})
-              </span>
-            </li>
-          );
-        })}
-      </ol>
+      <h3 className="section-title dsb-title">Damage Summary</h3>
+      <div className="dsb-table-wrap">
+        <table className="dsb-table">
+          <thead>
+            <tr>
+              <th>#</th>
+              <th className="dsb-th-left">Pokemon</th>
+              <th>Phys</th>
+              <th>Spec</th>
+              <th>Other</th>
+              <th>Total</th>
+              <th>Recoil</th>
+              <th>Heal</th>
+            </tr>
+          </thead>
+          <tbody>
+            {sorted.map((entry, i) => {
+              const p = byId.get(entry.pokemonId);
+              const name = p ? formatPokemonName(p.name) : `#${entry.pokemonId}`;
+              const total = entry.physical + entry.special + entry.other;
+              return (
+                <tr key={entry.pokemonId}>
+                  <td>{i + 1}</td>
+                  <td>
+                    <div className="dsb-pokemon-cell">
+                      {p && <img src={p.spriteUrl} alt={p.name} />}
+                      <span>{name}</span>
+                    </div>
+                  </td>
+                  <td>{entry.physical}</td>
+                  <td>{entry.special}</td>
+                  <td>{entry.other}</td>
+                  <td className="dsb-total">{total}</td>
+                  <td>{entry.recoil}</td>
+                  <td>{entry.heal}</td>
+                </tr>
+              );
+            })}
+          </tbody>
+        </table>
+      </div>
     </div>
   );
 }
