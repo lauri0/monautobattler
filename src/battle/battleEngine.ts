@@ -865,7 +865,7 @@ function resolveStatusMove(
     events.push({
       kind: 'attack', turn,
       attackerName: attacker.data.name, defenderName: defender.data.name,
-      moveName: move.name, moveType: move.type,
+      moveName: move.name, moveType: move.type, damageClass: move.damageClass,
       damage: 0, isCrit: false, missed: true, effectiveness: 1,
       attackerHpAfter: attacker.currentHp, defenderHpAfter: defender.currentHp,
     });
@@ -876,7 +876,7 @@ function resolveStatusMove(
   events.push({
     kind: 'attack', turn,
     attackerName: attacker.data.name, defenderName: defender.data.name,
-    moveName: move.name, moveType: move.type,
+    moveName: move.name, moveType: move.type, damageClass: move.damageClass,
     damage: 0, isCrit: false, missed: false, effectiveness: 1,
     attackerHpAfter: attacker.currentHp, defenderHpAfter: defender.currentHp,
   });
@@ -1113,7 +1113,7 @@ export function resolveSingleAttack(
     events.push({
       kind: 'attack', turn: turnNumber,
       attackerName: attacker.data.name, defenderName: defender.data.name,
-      moveName: move.name, moveType: move.type,
+      moveName: move.name, moveType: move.type, damageClass: move.damageClass,
       damage: 0, isCrit: false, missed: false, effectiveness: 0,
       attackerHpAfter: attacker.currentHp, defenderHpAfter: defender.currentHp,
     });
@@ -1127,7 +1127,7 @@ export function resolveSingleAttack(
     events.push({
       kind: 'attack', turn: turnNumber,
       attackerName: attacker.data.name, defenderName: defender.data.name,
-      moveName: move.name, moveType: move.type,
+      moveName: move.name, moveType: move.type, damageClass: move.damageClass,
       damage: 0, isCrit: false, missed: false, effectiveness: 0,
       attackerHpAfter: attacker.currentHp, defenderHpAfter: defender.currentHp,
     });
@@ -1147,7 +1147,7 @@ export function resolveSingleAttack(
     events.push({
       kind: 'attack', turn: turnNumber,
       attackerName: attacker.data.name, defenderName: defender.data.name,
-      moveName: move.name, moveType: move.type,
+      moveName: move.name, moveType: move.type, damageClass: move.damageClass,
       damage: 0, isCrit: false, missed: false, effectiveness: 0,
       attackerHpAfter: attacker.currentHp, defenderHpAfter: defender.currentHp,
     });
@@ -1163,7 +1163,7 @@ export function resolveSingleAttack(
     events.push({
       kind: 'attack', turn: turnNumber,
       attackerName: attacker.data.name, defenderName: defender.data.name,
-      moveName: move.name, moveType: move.type,
+      moveName: move.name, moveType: move.type, damageClass: move.damageClass,
       damage: 0, isCrit: false, missed: false, effectiveness: 0,
       attackerHpAfter: attacker.currentHp, defenderHpAfter: defender.currentHp,
     });
@@ -1203,7 +1203,7 @@ export function resolveSingleAttack(
     events.push({
       kind: 'attack', turn: turnNumber,
       attackerName: attacker.data.name, defenderName: defender.data.name,
-      moveName: move.name, moveType: move.type,
+      moveName: move.name, moveType: move.type, damageClass: move.damageClass,
       damage: damageThisHit, isCrit: result.isCrit,
       missed: result.missed, effectiveness: result.effectiveness,
       attackerHpAfter: attacker.currentHp, defenderHpAfter: newDefHp,

@@ -177,6 +177,7 @@ export type TurnEvent =
       defenderName: string;
       moveName: string;
       moveType: TypeName;
+      damageClass: DamageClass;
       damage: number;
       isCrit: boolean;
       missed: boolean;
