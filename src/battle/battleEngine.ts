@@ -872,6 +872,15 @@ function resolveStatusMove(
     return { attacker, defender, dealtDamage: false, defenderFlinched: false, pivotTriggered: false, field };
   }
 
+  // Announce the move landed.
+  events.push({
+    kind: 'attack', turn,
+    attackerName: attacker.data.name, defenderName: defender.data.name,
+    moveName: move.name, moveType: move.type,
+    damage: 0, isCrit: false, missed: false, effectiveness: 1,
+    attackerHpAfter: attacker.currentHp, defenderHpAfter: defender.currentHp,
+  });
+
   // Field / side conditions (Trick Room, Tailwind, screens, Stealth Rock).
   // Setting an already-active effect fails; Stealth Rock lays on the opposing
   // side so switch-ins there take damage.

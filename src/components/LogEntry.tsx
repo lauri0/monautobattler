@@ -37,14 +37,16 @@ export default function LogEntry({ ev }: { ev: TurnEvent }) {
           ? <span className="log-miss"> — missed!</span>
           : ev.effectiveness === 0
             ? <span className="log-immune"> — had no effect!</span>
-            : (
-              <>
-                <span className="log-damage"> — {ev.damage} dmg</span>
-                {ev.isCrit && <span className="log-crit"> CRIT!</span>}
-                {effText && <span className="log-eff"> {effText}</span>}
-                <span className="log-hp"> ({ev.defenderName}: {ev.defenderHpAfter} HP)</span>
-              </>
-            )
+            : ev.damage > 0
+              ? (
+                <>
+                  <span className="log-damage"> — {ev.damage} dmg</span>
+                  {ev.isCrit && <span className="log-crit"> CRIT!</span>}
+                  {effText && <span className="log-eff"> {effText}</span>}
+                  <span className="log-hp"> ({ev.defenderName}: {ev.defenderHpAfter} HP)</span>
+                </>
+              )
+              : null
         }
       </div>
     );
