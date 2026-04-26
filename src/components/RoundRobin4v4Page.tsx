@@ -36,6 +36,7 @@ import RoundRobinStandingsView from './RoundRobinStandingsView';
 import WeatherDisplay from './WeatherDisplay';
 import TerrainDisplay from './TerrainDisplay';
 import { formatPokemonName } from '../utils/formatName';
+import DamageSummaryBlock from './DamageSummaryBlock';
 import './RoundRobin4v4Page.css';
 
 interface Props {
@@ -449,7 +450,7 @@ function MatchView(props: {
   onEnd: (result: RR4v4MatchResult) => void;
   onBack: () => void;
 }) {
-  const { tournamentState, pending, allPokemon: _allPokemon, onEnd, onBack } = props;
+  const { tournamentState, pending, allPokemon, onEnd, onBack } = props;
   const startup = useMemo(() => applyInitialSwitchInsTeam(pending.initial), [pending.initial]);
   const { state, log, thinking, winner, done, nextTurn, submitPlayerAction } =
     useTeamBattleController(startup.state, startup.events);
@@ -552,6 +553,9 @@ function MatchView(props: {
         )}
         {log.map((ev, i) => renderTeamEvent(ev, i))}
       </div>
+      {done && damageSummary && (
+        <DamageSummaryBlock summary={damageSummary} allPokemon={allPokemon} />
+      )}
     </div>
   );
 }

@@ -17,6 +17,8 @@ import PlayerActionBar from './PlayerActionBar';
 import { renderTeamEvent } from './TeamEventLog';
 import { useTeamBattleController } from './useTeamBattleController';
 import { formatPokemonName } from '../utils/formatName';
+import { parseDamageSummary, buildNameToIdMap } from '../battle/damageSummary';
+import DamageSummaryBlock from './DamageSummaryBlock';
 import './Battle4v4Page.css';
 
 interface Props {
@@ -72,6 +74,12 @@ export default function Battle4v4Page({ allPokemon, onBack }: Props) {
   );
   const { state, log, thinking, winner, done, nextTurn, submitPlayerAction, reset } =
     useTeamBattleController(initialState.state, initialState.events);
+
+  const damageSummary = useMemo(() => {
+    if (!done) return null;
+    const nameToId = buildNameToIdMap(initialState.state);
+    return parseDamageSummary(log, nameToId);
+  }, [done]); // eslint-disable-line react-hooks/exhaustive-deps
 
   useEffect(() => {
     if (logRef.current) logRef.current.scrollTop = logRef.current.scrollHeight;
@@ -215,6 +223,9 @@ export default function Battle4v4Page({ allPokemon, onBack }: Props) {
         {log.length === 0 && <p style={{ color: 'var(--text-muted)', fontSize: '0.85rem' }}>Press "Next Turn" to start.</p>}
         {log.map((ev, i) => renderTeamEvent(ev, i))}
       </div>
+      {done && damageSummary && (
+        <DamageSummaryBlock summary={damageSummary} allPokemon={allPokemon} />
+      )}
     </div>
   );
 }
