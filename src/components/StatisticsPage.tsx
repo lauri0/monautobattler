@@ -5,11 +5,12 @@ import { effectSummary } from '../utils/moveEffectSummary';
 import { damageClassIcon } from '../utils/moveIcon';
 import { getTypeEffectiveness, ALL_TYPES } from '../utils/typeChart';
 import { getTypeColor } from '../utils/typeColors';
+import { getDamageStats } from '../persistence/damageStatsStorage';
 import TypeBadge from './TypeBadge';
 import { formatPokemonName } from '../utils/formatName';
 import './StatisticsPage.css';
 
-type Tab = 'moves' | 'coverage' | 'elo';
+type Tab = 'moves' | 'coverage' | 'elo' | 'damage';
 
 interface Props {
   allPokemon: PokemonData[];
@@ -85,6 +86,18 @@ export default function StatisticsPage({ allPokemon, onBack }: Props) {
       .sort((a, b) => b.elo - a.elo);
   }, [nonDisabled]);
 
+  const damageRankings = useMemo(() => {
+    const stats = getDamageStats();
+    return nonDisabled
+      .map(p => ({ pokemon: p, accum: stats[p.id] }))
+      .filter(({ accum }) => accum !== undefined && accum.tournamentCount > 0)
+      .sort((a, b) => {
+        const avgA = a.accum.totalSum / a.accum.tournamentCount;
+        const avgB = b.accum.totalSum / b.accum.tournamentCount;
+        return avgB - avgA;
+      });
+  }, [nonDisabled]);
+
   return (
     <div className="page">
       <button className="back-btn" onClick={onBack}>← Back</button>
@@ -99,6 +112,9 @@ export default function StatisticsPage({ allPokemon, onBack }: Props) {
         </button>
         <button className={`stats-tab${tab === 'elo' ? ' active' : ''}`} onClick={() => setTab('elo')}>
           ELO Rankings
+        </button>
+        <button className={`stats-tab${tab === 'damage' ? ' active' : ''}`} onClick={() => setTab('damage')}>
+          Damage
         </button>
       </div>
 
@@ -240,6 +256,64 @@ export default function StatisticsPage({ allPokemon, onBack }: Props) {
               </tbody>
             </table>
           </div>
+        </div>
+      )}
+
+      {tab === 'damage' && (
+        <div className="card">
+          <p className="stats-desc">
+            Average damage contribution per battle across all completed Round Robin tournaments.
+          </p>
+          {damageRankings.length === 0 ? (
+            <p className="stats-desc">No tournament data yet. Complete a 4v4 Round Robin and start a new one to record stats.</p>
+          ) : (
+            <div className="stats-table-wrapper">
+              <table className="stats-table">
+                <thead>
+                  <tr>
+                    <th>Rank</th>
+                    <th>Pokemon</th>
+                    <th style={{ textAlign: 'right' }}>Phys%</th>
+                    <th style={{ textAlign: 'right' }}>Spec%</th>
+                    <th style={{ textAlign: 'right' }}>Other%</th>
+                    <th style={{ textAlign: 'right' }}>Total%</th>
+                    <th style={{ textAlign: 'right' }}>Recoil%</th>
+                    <th style={{ textAlign: 'right' }}>Heal%</th>
+                    <th style={{ textAlign: 'right' }}>Tournaments</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {damageRankings.map(({ pokemon, accum }, i) => {
+                    const n = accum.tournamentCount;
+                    const fmt = (sum: number) => (sum / n).toFixed(1) + '%';
+                    return (
+                      <tr key={pokemon.id}>
+                        <td className="rank-cell">#{i + 1}</td>
+                        <td>
+                          <div className="pokemon-cell">
+                            <img src={pokemon.spriteUrl} alt={pokemon.name} className="sim-sprite" />
+                            <div>
+                              <div className="stats-pokemon-name">{formatPokemonName(pokemon.name)}</div>
+                              <div style={{ display: 'flex', gap: 3 }}>
+                                {pokemon.types.map(t => <TypeBadge key={t} type={t} />)}
+                              </div>
+                            </div>
+                          </div>
+                        </td>
+                        <td style={{ textAlign: 'right' }}>{fmt(accum.physSum)}</td>
+                        <td style={{ textAlign: 'right' }}>{fmt(accum.specSum)}</td>
+                        <td style={{ textAlign: 'right' }}>{fmt(accum.otherSum)}</td>
+                        <td style={{ textAlign: 'right', fontWeight: 700 }}>{fmt(accum.totalSum)}</td>
+                        <td style={{ textAlign: 'right' }}>{fmt(accum.recoilSum)}</td>
+                        <td style={{ textAlign: 'right' }}>{fmt(accum.healSum)}</td>
+                        <td style={{ textAlign: 'right', color: 'var(--text-muted)' }}>{n}</td>
+                      </tr>
+                    );
+                  })}
+                </tbody>
+              </table>
+            </div>
+          )}
         </div>
       )}
 
