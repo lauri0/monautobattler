@@ -264,56 +264,54 @@ export default function StatisticsPage({ allPokemon, onBack }: Props) {
           <p className="stats-desc">
             Average damage contribution per battle across all completed Round Robin tournaments.
           </p>
-          {damageRankings.length === 0 ? (
-            <p className="stats-desc">No tournament data yet. Complete a 4v4 Round Robin and start a new one to record stats.</p>
-          ) : (
-            <div className="stats-table-wrapper">
-              <table className="stats-table">
-                <thead>
-                  <tr>
-                    <th>Rank</th>
-                    <th>Pokemon</th>
-                    <th style={{ textAlign: 'right' }}>Phys%</th>
-                    <th style={{ textAlign: 'right' }}>Spec%</th>
-                    <th style={{ textAlign: 'right' }}>Other%</th>
-                    <th style={{ textAlign: 'right' }}>Total%</th>
-                    <th style={{ textAlign: 'right' }}>Recoil%</th>
-                    <th style={{ textAlign: 'right' }}>Heal%</th>
-                    <th style={{ textAlign: 'right' }}>Tournaments</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {damageRankings.map(({ pokemon, accum }, i) => {
-                    const n = accum.tournamentCount;
-                    const fmt = (sum: number) => (sum / n).toFixed(1) + '%';
-                    return (
-                      <tr key={pokemon.id}>
-                        <td className="rank-cell">#{i + 1}</td>
-                        <td>
-                          <div className="pokemon-cell">
-                            <img src={pokemon.spriteUrl} alt={pokemon.name} className="sim-sprite" />
-                            <div>
-                              <div className="stats-pokemon-name">{formatPokemonName(pokemon.name)}</div>
-                              <div style={{ display: 'flex', gap: 3 }}>
-                                {pokemon.types.map(t => <TypeBadge key={t} type={t} />)}
-                              </div>
+          <div className="stats-table-wrapper">
+            <table className="stats-table">
+              <thead>
+                <tr>
+                  <th>Rank</th>
+                  <th>Pokemon</th>
+                  <th style={{ textAlign: 'right' }}>Phys%</th>
+                  <th style={{ textAlign: 'right' }}>Spec%</th>
+                  <th style={{ textAlign: 'right' }}>Other%</th>
+                  <th style={{ textAlign: 'right' }}>Total%</th>
+                  <th style={{ textAlign: 'right' }}>Recoil%</th>
+                  <th style={{ textAlign: 'right' }}>Heal%</th>
+                  <th style={{ textAlign: 'right' }}>Tournaments</th>
+                </tr>
+              </thead>
+              <tbody>
+                {damageRankings.length === 0 ? (
+                  <tr><td colSpan={9} className="stats-empty">No tournament data yet. Complete a 4v4 Round Robin and start a new one to record stats.</td></tr>
+                ) : damageRankings.map(({ pokemon, accum }, i) => {
+                  const n = accum.tournamentCount;
+                  const fmt = (sum: number) => (sum / n).toFixed(1) + '%';
+                  return (
+                    <tr key={pokemon.id}>
+                      <td className="rank-cell">#{i + 1}</td>
+                      <td>
+                        <div className="pokemon-cell">
+                          <img src={pokemon.spriteUrl} alt={pokemon.name} className="sim-sprite" />
+                          <div>
+                            <div className="stats-pokemon-name">{formatPokemonName(pokemon.name)}</div>
+                            <div style={{ display: 'flex', gap: 3 }}>
+                              {pokemon.types.map(t => <TypeBadge key={t} type={t} />)}
                             </div>
                           </div>
-                        </td>
-                        <td style={{ textAlign: 'right' }}>{fmt(accum.physSum)}</td>
-                        <td style={{ textAlign: 'right' }}>{fmt(accum.specSum)}</td>
-                        <td style={{ textAlign: 'right' }}>{fmt(accum.otherSum)}</td>
-                        <td style={{ textAlign: 'right', fontWeight: 700 }}>{fmt(accum.totalSum)}</td>
-                        <td style={{ textAlign: 'right' }}>{fmt(accum.recoilSum)}</td>
-                        <td style={{ textAlign: 'right' }}>{fmt(accum.healSum)}</td>
-                        <td style={{ textAlign: 'right', color: 'var(--text-muted)' }}>{n}</td>
-                      </tr>
-                    );
-                  })}
-                </tbody>
-              </table>
-            </div>
-          )}
+                        </div>
+                      </td>
+                      <td style={{ textAlign: 'right' }}>{fmt(accum.physSum)}</td>
+                      <td style={{ textAlign: 'right' }}>{fmt(accum.specSum)}</td>
+                      <td style={{ textAlign: 'right' }}>{fmt(accum.otherSum)}</td>
+                      <td style={{ textAlign: 'right', fontWeight: 700 }}>{fmt(accum.totalSum)}</td>
+                      <td style={{ textAlign: 'right' }}>{fmt(accum.recoilSum)}</td>
+                      <td style={{ textAlign: 'right' }}>{fmt(accum.healSum)}</td>
+                      <td style={{ textAlign: 'right', color: 'var(--text-muted)' }}>{n}</td>
+                    </tr>
+                  );
+                })}
+              </tbody>
+            </table>
+          </div>
         </div>
       )}
 
