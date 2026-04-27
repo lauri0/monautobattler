@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import type { PokemonData, DamageStat } from '../models/types';
+import type { PokemonData } from '../models/types';
 import type { RR4v4State } from '../tournament/roundRobin4v4Engine';
 import { computeStandings } from '../tournament/roundRobin4v4Engine';
 import { formatPokemonName } from '../utils/formatName';
@@ -130,6 +130,21 @@ export default function RoundRobinStandingsView({ state, allPokemon }: Props) {
   );
 }
 
+interface PctAccum {
+  physSum: number;
+  specSum: number;
+  otherSum: number;
+  totalSum: number;
+  recoilSum: number;
+  healSum: number;
+  count: number;
+}
+
+function avgPct(sum: number, count: number): string {
+  if (count === 0) return '0.0%';
+  return (sum / count).toFixed(1) + '%';
+}
+
 function DamageTab({
   state,
   byId,
@@ -137,60 +152,71 @@ function DamageTab({
   state: RR4v4State;
   byId: Map<number, PokemonData>;
 }) {
-  const totals = new Map<number, { pokemonId: number } & DamageStat>();
+  const allIds = state.teams.flatMap(t => t.roster);
+  const accum = new Map<number, PctAccum>(
+    allIds.map(id => [id, { physSum: 0, specSum: 0, otherSum: 0, totalSum: 0, recoilSum: 0, healSum: 0, count: 0 }]),
+  );
 
-  for (const result of state.results) {
-    if (!result?.damageSummary) continue;
-    for (const entry of result.damageSummary) {
-      const existing = totals.get(entry.pokemonId) ?? {
-        pokemonId: entry.pokemonId,
-        physical: 0, special: 0, other: 0, recoil: 0, heal: 0,
-      };
-      totals.set(entry.pokemonId, {
-        pokemonId: entry.pokemonId,
-        physical: existing.physical + entry.physical,
-        special: existing.special + entry.special,
-        other: existing.other + entry.other,
-        recoil: existing.recoil + entry.recoil,
-        heal: existing.heal + entry.heal,
-      });
+  state.schedule.forEach((pair, i) => {
+    const result = state.results[i];
+    if (!result?.damageSummary) return;
+
+    const participatingIds = [
+      ...state.teams[pair.a].roster,
+      ...state.teams[pair.b].roster,
+    ];
+    const battleTotal = result.damageSummary.reduce(
+      (s, e) => s + e.physical + e.special + e.other, 0,
+    );
+    const entryById = new Map(result.damageSummary.map(e => [e.pokemonId, e]));
+
+    for (const id of participatingIds) {
+      const a = accum.get(id)!;
+      const entry = entryById.get(id);
+      if (battleTotal > 0) {
+        const phys = (entry?.physical ?? 0) / battleTotal * 100;
+        const spec = (entry?.special ?? 0) / battleTotal * 100;
+        const other = (entry?.other ?? 0) / battleTotal * 100;
+        a.physSum += phys;
+        a.specSum += spec;
+        a.otherSum += other;
+        a.totalSum += phys + spec + other;
+        a.recoilSum += (entry?.recoil ?? 0) / battleTotal * 100;
+        a.healSum += (entry?.heal ?? 0) / battleTotal * 100;
+      }
+      a.count++;
     }
-  }
+  });
 
   const pokemonTeam = new Map<number, string>();
   state.teams.forEach(team => {
     team.roster.forEach(id => pokemonTeam.set(id, team.name));
   });
 
-  const allIds = state.teams.flatMap(t => t.roster);
-  const rows = allIds.map(id => totals.get(id) ?? {
-    pokemonId: id, physical: 0, special: 0, other: 0, recoil: 0, heal: 0,
-  });
-  rows.sort((a, b) =>
-    (b.physical + b.special + b.other) - (a.physical + a.special + a.other),
-  );
+  const rows = allIds
+    .map(id => ({ pokemonId: id, ...accum.get(id)! }))
+    .sort((a, b) => (b.totalSum / (b.count || 1)) - (a.totalSum / (a.count || 1)));
 
   return (
     <div className="rr-damage-tab">
-      <h3 className="section-title">Damage Dealt</h3>
+      <h3 className="section-title">Damage Dealt (avg % per battle)</h3>
       <table className="rr-damage-table">
         <thead>
           <tr>
             <th>#</th>
             <th>Pokemon</th>
             <th>Team</th>
-            <th>Phys</th>
-            <th>Spec</th>
-            <th>Other</th>
-            <th>Total</th>
-            <th>Recoil</th>
-            <th>Heal</th>
+            <th>Phys%</th>
+            <th>Spec%</th>
+            <th>Other%</th>
+            <th>Total%</th>
+            <th>Recoil%</th>
+            <th>Heal%</th>
           </tr>
         </thead>
         <tbody>
           {rows.map((row, i) => {
             const p = byId.get(row.pokemonId);
-            const total = row.physical + row.special + row.other;
             return (
               <tr key={row.pokemonId}>
                 <td>{i + 1}</td>
@@ -201,12 +227,12 @@ function DamageTab({
                   </div>
                 </td>
                 <td>{pokemonTeam.get(row.pokemonId) ?? '—'}</td>
-                <td>{row.physical}</td>
-                <td>{row.special}</td>
-                <td>{row.other}</td>
-                <td><strong>{total}</strong></td>
-                <td>{row.recoil}</td>
-                <td>{row.heal}</td>
+                <td>{avgPct(row.physSum, row.count)}</td>
+                <td>{avgPct(row.specSum, row.count)}</td>
+                <td>{avgPct(row.otherSum, row.count)}</td>
+                <td><strong>{avgPct(row.totalSum, row.count)}</strong></td>
+                <td>{avgPct(row.recoilSum, row.count)}</td>
+                <td>{avgPct(row.healSum, row.count)}</td>
               </tr>
             );
           })}

@@ -7,8 +7,15 @@ interface Props {
   allPokemon: PokemonData[];
 }
 
+function pct(value: number, total: number): string {
+  if (total === 0) return '0.0%';
+  return (value / total * 100).toFixed(1) + '%';
+}
+
 export default function DamageSummaryBlock({ summary, allPokemon }: Props) {
   const byId = new Map(allPokemon.map(p => [p.id, p]));
+
+  const totalDamage = summary.reduce((s, e) => s + e.physical + e.special + e.other, 0);
 
   const sorted = [...summary].sort(
     (a, b) => (b.physical + b.special + b.other) - (a.physical + a.special + a.other),
@@ -25,19 +32,19 @@ export default function DamageSummaryBlock({ summary, allPokemon }: Props) {
             <tr>
               <th>#</th>
               <th className="dsb-th-left">Pokemon</th>
-              <th>Phys</th>
-              <th>Spec</th>
-              <th>Other</th>
-              <th>Total</th>
-              <th>Recoil</th>
-              <th>Heal</th>
+              <th>Phys%</th>
+              <th>Spec%</th>
+              <th>Other%</th>
+              <th>Total%</th>
+              <th>Recoil%</th>
+              <th>Heal%</th>
             </tr>
           </thead>
           <tbody>
             {sorted.map((entry, i) => {
               const p = byId.get(entry.pokemonId);
               const name = p ? formatPokemonName(p.name) : `#${entry.pokemonId}`;
-              const total = entry.physical + entry.special + entry.other;
+              const entryTotal = entry.physical + entry.special + entry.other;
               return (
                 <tr key={entry.pokemonId}>
                   <td>{i + 1}</td>
@@ -47,12 +54,12 @@ export default function DamageSummaryBlock({ summary, allPokemon }: Props) {
                       <span>{name}</span>
                     </div>
                   </td>
-                  <td>{entry.physical}</td>
-                  <td>{entry.special}</td>
-                  <td>{entry.other}</td>
-                  <td className="dsb-total">{total}</td>
-                  <td>{entry.recoil}</td>
-                  <td>{entry.heal}</td>
+                  <td>{pct(entry.physical, totalDamage)}</td>
+                  <td>{pct(entry.special, totalDamage)}</td>
+                  <td>{pct(entry.other, totalDamage)}</td>
+                  <td className="dsb-total">{pct(entryTotal, totalDamage)}</td>
+                  <td>{pct(entry.recoil, totalDamage)}</td>
+                  <td>{pct(entry.heal, totalDamage)}</td>
                 </tr>
               );
             })}
