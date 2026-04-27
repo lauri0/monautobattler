@@ -59,8 +59,18 @@ export function applyInitialSwitchInsTeam(
   const events: TeamTurnEvent[] = [];
   const teams: [Team, Team] = [state.teams[0], state.teams[1]];
   let field = state.field;
-  field = applySwitchInInTeam(teams, 0, field, state.turn, events);
-  field = applySwitchInInTeam(teams, 1, field, state.turn, events);
+  // Apply in speed order (faster first) so the slower pokemon's ability fires
+  // last and overwrites when both sides set weather/terrain simultaneously.
+  const active0 = teams[0].pokemon[teams[0].activeIdx];
+  const active1 = teams[1].pokemon[teams[1].activeIdx];
+  const side0First = effectiveSpeed(active0) >= effectiveSpeed(active1);
+  if (side0First) {
+    field = applySwitchInInTeam(teams, 0, field, state.turn, events);
+    field = applySwitchInInTeam(teams, 1, field, state.turn, events);
+  } else {
+    field = applySwitchInInTeam(teams, 1, field, state.turn, events);
+    field = applySwitchInInTeam(teams, 0, field, state.turn, events);
+  }
   return { state: { ...state, teams, field }, events };
 }
 

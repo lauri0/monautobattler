@@ -47,6 +47,37 @@ describe('Weather-setting abilities', () => {
     });
   }
 
+  it('slower pokemon weather wins when both sides have weather abilities', () => {
+    // side0 is slower (speed 50), side1 is faster (speed 150) with drought
+    // side0 has drizzle. Faster side1 triggers first → sun set; then slower
+    // side0 triggers second → rain overwrites. Rain should be active.
+    const move = makeMove({ power: 40 });
+    const slowDrizzler = makePokemon({ id: 1, name: 'slowDrizzler', ability: 'drizzle', moves: [move], stats: { speed: 50 } });
+    const a = makePokemon({ id: 2, name: 'a', moves: [move] });
+    const b = makePokemon({ id: 3, name: 'b', moves: [move] });
+    const fastDrought = makePokemon({ id: 4, name: 'fastDrought', ability: 'drought', moves: [move], stats: { speed: 150 } });
+    const foe2 = makePokemon({ id: 5, name: 'foe2', moves: [move] });
+    const foe3 = makePokemon({ id: 6, name: 'foe3', moves: [move] });
+    const state = freshState([slowDrizzler, a, b], [fastDrought, foe2, foe3]);
+    const { state: next } = applyInitialSwitchInsTeam(state);
+    expect(next.field.weather).toBe('rain');
+  });
+
+  it('faster pokemon weather loses when both sides have weather abilities', () => {
+    // side0 is faster (speed 150) with drought, side1 is slower (speed 50) with drizzle
+    // side0 triggers first → sun; side1 triggers second → rain overwrites. Rain wins.
+    const move = makeMove({ power: 40 });
+    const fastDrought = makePokemon({ id: 1, name: 'fastDrought', ability: 'drought', moves: [move], stats: { speed: 150 } });
+    const a = makePokemon({ id: 2, name: 'a', moves: [move] });
+    const b = makePokemon({ id: 3, name: 'b', moves: [move] });
+    const slowDrizzler = makePokemon({ id: 4, name: 'slowDrizzler', ability: 'drizzle', moves: [move], stats: { speed: 50 } });
+    const foe2 = makePokemon({ id: 5, name: 'foe2', moves: [move] });
+    const foe3 = makePokemon({ id: 6, name: 'foe3', moves: [move] });
+    const state = freshState([fastDrought, a, b], [slowDrizzler, foe2, foe3]);
+    const { state: next } = applyInitialSwitchInsTeam(state);
+    expect(next.field.weather).toBe('rain');
+  });
+
   it('weather expires after 5 turns', () => {
     const move = makeMove({ power: 0, damageClass: 'status' });
     const setter = makePokemon({ id: 1, name: 'setter', ability: 'drought', moves: [move] });

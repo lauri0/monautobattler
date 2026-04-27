@@ -1439,10 +1439,20 @@ export function applyInitialSwitchIns(
   let p1 = pokemon1;
   let p2 = pokemon2;
   let field = initialField;
-  let r1 = applySwitchInAbility(p1, p2, field, 1, events);
-  p2 = r1.opponent; field = r1.field; if (r1.self) p1 = r1.self;
-  let r2 = applySwitchInAbility(p2, p1, field, 1, events);
-  p1 = r2.opponent; field = r2.field; if (r2.self) p2 = r2.self;
+  // Abilities trigger in speed order (faster first), so the slower pokemon's
+  // ability fires second and wins when both set weather/terrain simultaneously.
+  const p1First = effectiveSpeed(p1) >= effectiveSpeed(p2);
+  if (p1First) {
+    let r1 = applySwitchInAbility(p1, p2, field, 1, events);
+    p2 = r1.opponent; field = r1.field; if (r1.self) p1 = r1.self;
+    let r2 = applySwitchInAbility(p2, p1, field, 1, events);
+    p1 = r2.opponent; field = r2.field; if (r2.self) p2 = r2.self;
+  } else {
+    let r2 = applySwitchInAbility(p2, p1, field, 1, events);
+    p1 = r2.opponent; field = r2.field; if (r2.self) p2 = r2.self;
+    let r1 = applySwitchInAbility(p1, p2, field, 1, events);
+    p2 = r1.opponent; field = r1.field; if (r1.self) p1 = r1.self;
+  }
   return { p1, p2, events, field };
 }
 
