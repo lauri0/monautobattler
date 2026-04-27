@@ -17,6 +17,7 @@ import {
   loadRoundRobin4v4,
   clearRoundRobin4v4,
 } from '../persistence/roundRobin4v4Storage';
+import { recordTournamentDamage } from '../persistence/damageStatsStorage';
 import { pickStartingIndex } from '../tournament/rosterPicker';
 import {
   buildTeamBattleState,
@@ -101,6 +102,15 @@ export default function RoundRobin4v4Page({ allPokemon, onBack }: Props) {
 
   function abandonTournament() {
     if (!confirm('Abandon the current tournament? Progress will be lost.')) return;
+    clearRoundRobin4v4();
+    setState(null);
+    setPending(null);
+    setLocalPhase('setup');
+  }
+
+  function startNewTournament() {
+    if (!state) return;
+    recordTournamentDamage(state);
     clearRoundRobin4v4();
     setState(null);
     setPending(null);
@@ -281,7 +291,7 @@ export default function RoundRobin4v4Page({ allPokemon, onBack }: Props) {
         state={state}
         allPokemon={allPokemon}
         onBack={onBack}
-        onReset={abandonTournament}
+        onStartNew={startNewTournament}
       />
     );
   }
@@ -564,9 +574,9 @@ function FinishedView(props: {
   state: RR4v4State;
   allPokemon: PokemonData[];
   onBack: () => void;
-  onReset: () => void;
+  onStartNew: () => void;
 }) {
-  const { state, allPokemon, onBack, onReset } = props;
+  const { state, allPokemon, onBack, onStartNew } = props;
   return (
     <div className="page">
       <button className="back-btn" onClick={onBack}>← Back</button>
@@ -575,7 +585,7 @@ function FinishedView(props: {
         <RoundRobinStandingsView state={state} allPokemon={allPokemon} />
       </div>
       <div style={{ textAlign: 'center', marginTop: '1rem' }}>
-        <button className="btn-primary" onClick={onReset}>Start New Tournament</button>
+        <button className="btn-primary" onClick={onStartNew}>Start New Tournament</button>
       </div>
     </div>
   );
