@@ -10,7 +10,7 @@ export interface PokemonDamageAccum {
   tournamentCount: number;
 }
 
-interface TournamentAvg {
+export interface TournamentAvg {
   phys: number;
   spec: number;
   other: number;
@@ -93,6 +93,12 @@ export function getDamageStats(): Record<number, PokemonDamageAccum> {
   return loadDamageStats();
 }
 
+/**
+ * Merges this tournament's per-pokemon damage averages into the persistent store.
+ * Each pokemon's sums receive the within-tournament average (averaged across the
+ * battles that pokemon participated in), and tournamentCount increments by 1.
+ * Call this once per completed tournament, not once per battle.
+ */
 export function recordTournamentDamage(state: RR4v4State): void {
   const averages = computeTournamentAverages(state);
   if (averages.size === 0) return;
