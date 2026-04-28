@@ -108,6 +108,29 @@ describe('applyEventToState (1v1)', () => {
     expect(result.p2).toBe(p2);
     expect(result.field).toBe(field);
   });
+
+  it('field_expired stealthRock: clears stealthRock on the correct side', () => {
+    const p1 = makePokemon({ name: 'pika' });
+    const p2 = makePokemon({ name: 'char' });
+    const field = makeField();
+    field.sides[0].stealthRock = true;
+    const result = applyEventToState(p1, p2, field, {
+      kind: 'field_expired', turn: 3, effect: 'stealthRock', side: 0,
+    });
+    expect(result.field.sides[0].stealthRock).toBe(false);
+    expect(result.field.sides[1].stealthRock).toBe(false);
+  });
+
+  it('field_expired spikes: resets spikes to 0 on the correct side', () => {
+    const p1 = makePokemon({ name: 'pika' });
+    const p2 = makePokemon({ name: 'char' });
+    const field = makeField();
+    field.sides[1].spikes = 2;
+    const result = applyEventToState(p1, p2, field, {
+      kind: 'field_expired', turn: 4, effect: 'spikes', side: 1,
+    });
+    expect(result.field.sides[1].spikes).toBe(0);
+  });
 });
 
 describe('applyTeamEventToState (4v4)', () => {

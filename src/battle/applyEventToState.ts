@@ -118,6 +118,8 @@ export function applyEventToState(
     case 'field_expired':
       return { p1, p2, field: applyFieldExpired(field, event) };
     default:
+      // Log-only events (cant_move, move_failed, protected, ability_triggered, etc.)
+      // carry no state change — return inputs unchanged.
       return { p1, p2, field };
   }
 }
@@ -184,6 +186,7 @@ function applyTurnEventToTeamState(state: TeamBattleState, event: TurnEvent): Te
     case 'field_expired':
       return { ...state, field: applyFieldExpired(state.field, event) };
     default:
+      // Log-only events carry no state change — return state unchanged.
       return state;
   }
 }
