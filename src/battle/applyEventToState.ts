@@ -2,7 +2,6 @@ import type {
   BattlePokemon,
   FieldState,
   SideFieldState,
-  SideIndex,
   Team,
   TeamBattleState,
   TeamSlotIndex,
@@ -17,7 +16,7 @@ function applyFieldSet(
   event: Extract<TurnEvent, { kind: 'field_set' }>,
 ): FieldState {
   const { effect, side, turns } = event;
-  if (effect === 'trickroom') return { ...field, trickRoomTurns: turns };
+  if (effect === 'trickRoom') return { ...field, trickRoomTurns: turns };
   if (side === undefined) return field;
   const sides: [SideFieldState, SideFieldState] = [{ ...field.sides[0] }, { ...field.sides[1] }];
   const s = sides[side];
@@ -35,7 +34,7 @@ function applyFieldExpired(
   event: Extract<TurnEvent, { kind: 'field_expired' }>,
 ): FieldState {
   const { effect, side } = event;
-  if (effect === 'trickroom') return { ...field, trickRoomTurns: 0 };
+  if (effect === 'trickRoom') return { ...field, trickRoomTurns: 0 };
   if (side === undefined) return field;
   const sides: [SideFieldState, SideFieldState] = [{ ...field.sides[0] }, { ...field.sides[1] }];
   const s = sides[side];
