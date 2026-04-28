@@ -233,10 +233,9 @@ export default function Battle4v4Page({ allPokemon, onBack }: Props) {
       <div className="card battle-log" ref={logRef}>
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '0.75rem' }}>
           <h3 className="section-title" style={{ margin: 0 }}>Battle Log</h3>
-          <span style={{ display: 'flex', alignItems: 'center', gap: '0.4rem', fontSize: '0.8rem', color: 'var(--text-muted)', cursor: 'pointer', userSelect: 'none' }}>
+          <span onClick={toggleFastMode} style={{ display: 'flex', alignItems: 'center', gap: '0.4rem', fontSize: '0.8rem', color: 'var(--text-muted)', cursor: 'pointer', userSelect: 'none' }}>
             <span style={{ color: !fastMode ? 'var(--text)' : 'var(--text-muted)' }}>Slow</span>
             <span
-              onClick={toggleFastMode}
               style={{
                 display: 'inline-block', width: '2rem', height: '1rem',
                 background: fastMode ? 'var(--accent)' : 'var(--bg-card-alt, #2a3a2a)',
