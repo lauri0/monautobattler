@@ -72,8 +72,20 @@ export default function Battle4v4Page({ allPokemon, onBack }: Props) {
   const [initialState, setInitialState] = useState(() =>
     applyInitialSwitchInsTeam(buildTeamBattleState(team0Ids, team1Ids, allPokemon)),
   );
-  const { state, log, thinking, winner, done, nextTurn, submitPlayerAction, reset } =
-    useTeamBattleController(initialState.state, initialState.events);
+  const {
+    state,
+    displayedState,
+    log,
+    thinking,
+    winner,
+    done,
+    isPlaying,
+    fastMode,
+    toggleFastMode,
+    nextTurn,
+    submitPlayerAction,
+    reset,
+  } = useTeamBattleController(initialState.state, initialState.events);
 
   const damageSummary = useMemo(() => {
     if (!done) return null;
@@ -177,21 +189,21 @@ export default function Battle4v4Page({ allPokemon, onBack }: Props) {
 
       <div className="team-arena">
         <TeamView
-          state={state}
+          state={displayedState}
           side={0}
-          onSwitch={mode === 'play' && phase === 'battle' && !thinking
+          onSwitch={mode === 'play' && phase === 'battle' && !thinking && !isPlaying
             ? (slot) => submitPlayerAction({ kind: 'switch', targetIdx: slot })
             : undefined}
         />
         <div className="arena-center">
-          <WeatherDisplay field={state.field} />
+          <WeatherDisplay field={displayedState.field} />
           <div className="arena-vs">VS</div>
-          <TerrainDisplay field={state.field} />
+          <TerrainDisplay field={displayedState.field} />
         </div>
-        <TeamView state={state} side={1} />
+        <TeamView state={displayedState} side={1} />
       </div>
 
-      {done && winner !== null && (
+      {done && !isPlaying && winner !== null && (
         <div className="winner-banner card">
           <h2 style={{ color: '#f1c40f' }}>🏆 Team {winner + 1} wins!</h2>
           <div style={{ display: 'flex', gap: '0.75rem', marginTop: '1rem', justifyContent: 'center' }}>
@@ -204,8 +216,8 @@ export default function Battle4v4Page({ allPokemon, onBack }: Props) {
 
       {!done && mode === 'spectate' && (
         <div style={{ textAlign: 'center', margin: '1rem 0' }}>
-          <button className="btn-primary" onClick={nextTurn} disabled={thinking}>
-            {thinking ? 'Thinking…' : 'Next Turn →'}
+          <button className="btn-primary" onClick={nextTurn} disabled={thinking || isPlaying}>
+            {thinking ? 'Thinking…' : isPlaying ? 'Playing…' : 'Next Turn →'}
           </button>
         </div>
       )}
@@ -213,17 +225,40 @@ export default function Battle4v4Page({ allPokemon, onBack }: Props) {
       {!done && mode === 'play' && (
         <PlayerActionBar
           state={state}
-          thinking={thinking}
+          thinking={thinking || isPlaying}
           onAction={submitPlayerAction}
         />
       )}
 
       <div className="card battle-log" ref={logRef}>
-        <h3 className="section-title" style={{ marginBottom: '0.75rem' }}>Battle Log</h3>
+        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '0.75rem' }}>
+          <h3 className="section-title" style={{ margin: 0 }}>Battle Log</h3>
+          <span style={{ display: 'flex', alignItems: 'center', gap: '0.4rem', fontSize: '0.8rem', color: 'var(--text-muted)', cursor: 'pointer', userSelect: 'none' }}>
+            <span style={{ color: !fastMode ? 'var(--text)' : 'var(--text-muted)' }}>Slow</span>
+            <span
+              onClick={toggleFastMode}
+              style={{
+                display: 'inline-block', width: '2rem', height: '1rem',
+                background: fastMode ? 'var(--accent)' : 'var(--bg-card-alt, #2a3a2a)',
+                borderRadius: '0.5rem', position: 'relative', cursor: 'pointer',
+                border: '1px solid var(--border)',
+              }}
+            >
+              <span style={{
+                display: 'block', width: '0.75rem', height: '0.75rem',
+                background: 'var(--text)', borderRadius: '50%',
+                position: 'absolute', top: '0.1rem',
+                left: fastMode ? '1.1rem' : '0.1rem',
+                transition: 'left 0.15s',
+              }} />
+            </span>
+            <span style={{ color: fastMode ? 'var(--text)' : 'var(--text-muted)' }}>Fast</span>
+          </span>
+        </div>
         {log.length === 0 && <p style={{ color: 'var(--text-muted)', fontSize: '0.85rem' }}>Press "Next Turn" to start.</p>}
         {log.map((ev, i) => renderTeamEvent(ev, i))}
       </div>
-      {done && damageSummary && (
+      {done && !isPlaying && damageSummary && (
         <DamageSummaryBlock summary={damageSummary} allPokemon={allPokemon} />
       )}
     </div>
