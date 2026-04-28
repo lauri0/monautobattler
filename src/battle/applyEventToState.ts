@@ -41,6 +41,9 @@ function applyFieldExpired(
   if (effect === 'tailwind') s.tailwindTurns = 0;
   else if (effect === 'lightScreen') s.lightScreenTurns = 0;
   else if (effect === 'reflect') s.reflectTurns = 0;
+  else if (effect === 'stealthRock') s.stealthRock = false;
+  else if (effect === 'toxicSpikes') s.toxicSpikes = false;
+  else if (effect === 'spikes') s.spikes = 0;
   return { ...field, sides };
 }
 
