@@ -1,4 +1,4 @@
-import { useState, useCallback } from 'react';
+import { useState, useCallback, useEffect } from 'react';
 import type {
   TeamBattleState,
   TeamTurnEvent,
@@ -7,36 +7,52 @@ import type {
 } from '../models/types';
 import { applyActions, battleWinner, legalActions } from '../battle/teamBattleEngine';
 import { mctsTeamAI } from '../ai/mctsTeamAI';
+import { applyTeamEventToState } from '../battle/applyEventToState';
 
-/**
- * Shared controller for a live, interactive 4v4 team battle.
- * Handles both spectate (both sides AI-driven, advances one turn per click)
- * and play mode (side 0 is the human; AI auto-advances any turns where
- * only the opponent needs to act — e.g. replace phases for side 1 only).
- */
+const SLOW_DELAY_MS = 750;
+
 export function useTeamBattleController(initial: TeamBattleState, initialLog: TeamTurnEvent[] = []) {
   const [state, setState] = useState<TeamBattleState>(initial);
+  const [displayedState, setDisplayedState] = useState<TeamBattleState>(initial);
   const [log, setLog] = useState<TeamTurnEvent[]>(initialLog);
+  const [playbackQueue, setPlaybackQueue] = useState<TeamTurnEvent[]>([]);
   const [thinking, setThinking] = useState(false);
+  const [fastMode, setFastMode] = useState(false);
 
   const winner: SideIndex | null = battleWinner(state);
   const done = winner !== null;
+  const isPlaying = playbackQueue.length > 0;
+
+  // Drip one event from the queue on each tick.
+  useEffect(() => {
+    if (playbackQueue.length === 0) return;
+    const delay = fastMode ? 0 : SLOW_DELAY_MS;
+    const timer = setTimeout(() => {
+      const [event, ...rest] = playbackQueue;
+      setDisplayedState(prev => applyTeamEventToState(prev, event));
+      setLog(prev => [...prev, event]);
+      setPlaybackQueue(rest);
+    }, delay);
+    return () => clearTimeout(timer);
+  }, [playbackQueue, fastMode]);
+
+  const toggleFastMode = useCallback(() => setFastMode(f => !f), []);
 
   const nextTurn = useCallback(() => {
-    if (thinking || done) return;
+    if (thinking || isPlaying || done) return;
     setThinking(true);
     setTimeout(() => {
       const a0 = legalActions(state, 0).length > 0 ? mctsTeamAI.selectAction(state, 0) : null;
       const a1 = legalActions(state, 1).length > 0 ? mctsTeamAI.selectAction(state, 1) : null;
       const { next, events } = applyActions(state, a0, a1);
-      setLog(prev => [...prev, ...events]);
       setState(next);
+      setPlaybackQueue(events);
       setThinking(false);
     }, 0);
-  }, [state, thinking, done]);
+  }, [state, thinking, isPlaying, done]);
 
   const submitPlayerAction = useCallback((a0: TeamAction) => {
-    if (thinking || done) return;
+    if (thinking || isPlaying || done) return;
     setThinking(true);
     setTimeout(() => {
       let cur = state;
@@ -51,17 +67,32 @@ export function useTeamBattleController(initial: TeamBattleState, initialLog: Te
         newEvents.push(...step2.events);
         cur = step2.next;
       }
-      setLog(prev => [...prev, ...newEvents]);
       setState(cur);
+      setPlaybackQueue(newEvents);
       setThinking(false);
     }, 0);
-  }, [state, thinking, done]);
+  }, [state, thinking, isPlaying, done]);
 
   const reset = useCallback((newInitial: TeamBattleState, newLog: TeamTurnEvent[] = []) => {
     setState(newInitial);
+    setDisplayedState(newInitial);
     setLog(newLog);
+    setPlaybackQueue([]);
     setThinking(false);
   }, []);
 
-  return { state, log, thinking, winner, done, nextTurn, submitPlayerAction, reset };
+  return {
+    state,
+    displayedState,
+    log,
+    thinking,
+    winner,
+    done,
+    isPlaying,
+    fastMode,
+    toggleFastMode,
+    nextTurn,
+    submitPlayerAction,
+    reset,
+  };
 }
