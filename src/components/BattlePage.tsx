@@ -1,7 +1,8 @@
-import { useState, useRef, useEffect } from 'react';
-import type { PokemonData, BattlePokemon, TurnEvent } from '../models/types';
+import { useState, useRef, useEffect, useCallback } from 'react';
+import type { PokemonData, BattlePokemon, TurnEvent, FieldState } from '../models/types';
 import { buildBattlePokemon } from '../battle/buildBattlePokemon';
-import { resolveTurn, applyInitialSwitchIns } from '../battle/battleEngine';
+import { resolveTurn, applyInitialSwitchIns, makeInitialField } from '../battle/battleEngine';
+import { applyEventToState } from '../battle/applyEventToState';
 import { expectiminimaxAI } from '../ai/expectiminimaxAI';
 import { getPokemonPersisted, setPokemonPersisted, getBattleSelection, setBattleSelection } from '../persistence/userStorage';
 import BattlerPanel from './BattlerPanel';
@@ -29,16 +30,39 @@ export default function BattlePage({ allPokemon, onBack }: Props) {
   });
   const [p1, setP1] = useState<BattlePokemon | null>(null);
   const [p2, setP2] = useState<BattlePokemon | null>(null);
+  const [field, setField] = useState<FieldState>(() => makeInitialField());
+  const [displayedP1, setDisplayedP1] = useState<BattlePokemon | null>(null);
+  const [displayedP2, setDisplayedP2] = useState<BattlePokemon | null>(null);
+  const [displayedField, setDisplayedField] = useState<FieldState>(() => makeInitialField());
   const [log, setLog] = useState<TurnEvent[]>([]);
+  const [playbackQueue, setPlaybackQueue] = useState<TurnEvent[]>([]);
+  const [fastMode, setFastMode] = useState(false);
   const [turn, setTurn] = useState(1);
   const [battleOver, setBattleOver] = useState(false);
   const logRef = useRef<HTMLDivElement>(null);
+  const isPlaying = playbackQueue.length > 0;
+  const toggleFastMode = useCallback(() => setFastMode(f => !f), []);
 
   useEffect(() => {
     if (logRef.current) {
       logRef.current.scrollTop = logRef.current.scrollHeight;
     }
   }, [log]);
+
+  useEffect(() => {
+    if (playbackQueue.length === 0 || !displayedP1 || !displayedP2) return;
+    const delay = fastMode ? 0 : 750;
+    const timer = setTimeout(() => {
+      const [event, ...rest] = playbackQueue;
+      const next = applyEventToState(displayedP1, displayedP2, displayedField, event);
+      setDisplayedP1(next.p1);
+      setDisplayedP2(next.p2);
+      setDisplayedField(next.field);
+      setLog(prev => [...prev, event]);
+      setPlaybackQueue(rest);
+    }, delay);
+    return () => clearTimeout(timer);
+  }, [playbackQueue, fastMode, displayedP1, displayedP2, displayedField]);
 
   function startBattle() {
     const dataA = allPokemon.find(p => p.id === selA);
@@ -48,18 +72,25 @@ export default function BattlePage({ allPokemon, onBack }: Props) {
     const init = applyInitialSwitchIns(buildBattlePokemon(dataA), buildBattlePokemon(dataB));
     setP1(init.p1);
     setP2(init.p2);
+    setField(init.field);
+    setDisplayedP1(init.p1);
+    setDisplayedP2(init.p2);
+    setDisplayedField(init.field);
     setLog(init.events);
+    setPlaybackQueue([]);
     setTurn(1);
     setBattleOver(false);
     setPhase('battle');
   }
 
   function nextTurn() {
-    if (!p1 || !p2 || battleOver) return;
-    const { events, p1After, p2After, battleOver: over, lastAttackerIsP1 } = resolveTurn(p1, p2, turn, expectiminimaxAI, expectiminimaxAI);
-    setLog(prev => [...prev, ...events]);
+    if (!p1 || !p2 || battleOver || isPlaying) return;
+    const result = resolveTurn(p1, p2, turn, expectiminimaxAI, expectiminimaxAI, field);
+    const { events, p1After, p2After, battleOver: over, lastAttackerIsP1 } = result;
     setP1(p1After);
     setP2(p2After);
+    setField(result.field);
+    setPlaybackQueue(events);
     setTurn(t => t + 1);
     if (over) {
       setBattleOver(true);
@@ -90,7 +121,12 @@ export default function BattlePage({ allPokemon, onBack }: Props) {
     const init = applyInitialSwitchIns(buildBattlePokemon(dataA), buildBattlePokemon(dataB));
     setP1(init.p1);
     setP2(init.p2);
+    setField(init.field);
+    setDisplayedP1(init.p1);
+    setDisplayedP2(init.p2);
+    setDisplayedField(init.field);
     setLog(init.events);
+    setPlaybackQueue([]);
     setTurn(1);
     setBattleOver(false);
     setPhase('battle');
@@ -131,7 +167,7 @@ export default function BattlePage({ allPokemon, onBack }: Props) {
     );
   }
 
-  if (!p1 || !p2) return null;
+  if (!p1 || !p2 || !displayedP1 || !displayedP2) return null;
 
   const winner = phase === 'end' ? (p1.currentHp > 0 ? p1 : p2) : null;
 
@@ -141,12 +177,12 @@ export default function BattlePage({ allPokemon, onBack }: Props) {
       <h1 className="page-title">Battle!</h1>
 
       <div className="battle-arena">
-        <BattlerPanel pokemon={p1} />
+        <BattlerPanel pokemon={displayedP1} />
         <div className="arena-vs">VS</div>
-        <BattlerPanel pokemon={p2} />
+        <BattlerPanel pokemon={displayedP2} />
       </div>
 
-      {phase === 'end' && winner && (
+      {phase === 'end' && !isPlaying && winner && (
         <div className="winner-banner card">
           <h2 style={{ color: '#f1c40f' }}>🏆 {formatPokemonName(winner.data.name)} wins!</h2>
           <div style={{ display: 'flex', gap: '0.75rem', marginTop: '1rem' }}>
@@ -159,12 +195,37 @@ export default function BattlePage({ allPokemon, onBack }: Props) {
 
       {phase === 'battle' && (
         <div style={{ textAlign: 'center', margin: '1rem 0' }}>
-          <button className="btn-primary" onClick={nextTurn}>Next Turn →</button>
+          <button className="btn-primary" onClick={nextTurn} disabled={isPlaying}>
+            {isPlaying ? 'Playing…' : 'Next Turn →'}
+          </button>
         </div>
       )}
 
       <div className="card battle-log" ref={logRef}>
-        <h3 className="section-title" style={{ marginBottom: '0.75rem' }}>Battle Log</h3>
+        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '0.75rem' }}>
+          <h3 className="section-title" style={{ margin: 0 }}>Battle Log</h3>
+          <label style={{ display: 'flex', alignItems: 'center', gap: '0.4rem', fontSize: '0.8rem', color: 'var(--text-muted)', cursor: 'pointer', userSelect: 'none' }}>
+            <span style={{ color: !fastMode ? 'var(--text)' : 'var(--text-muted)' }}>Slow</span>
+            <span
+              onClick={toggleFastMode}
+              style={{
+                display: 'inline-block', width: '2rem', height: '1rem',
+                background: fastMode ? 'var(--accent)' : 'var(--bg-card-alt, #2a3a2a)',
+                borderRadius: '0.5rem', position: 'relative', cursor: 'pointer',
+                border: '1px solid var(--border)',
+              }}
+            >
+              <span style={{
+                display: 'block', width: '0.75rem', height: '0.75rem',
+                background: 'var(--text)', borderRadius: '50%',
+                position: 'absolute', top: '0.1rem',
+                left: fastMode ? '1.1rem' : '0.1rem',
+                transition: 'left 0.15s',
+              }} />
+            </span>
+            <span style={{ color: fastMode ? 'var(--text)' : 'var(--text-muted)' }}>Fast</span>
+          </label>
+        </div>
         {log.length === 0 && <p style={{ color: 'var(--text-muted)', fontSize: '0.85rem' }}>Press "Next Turn" to start.</p>}
         {log.map((ev, i) => (
           <LogEntry key={i} ev={ev} />
