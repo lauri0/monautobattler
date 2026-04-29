@@ -462,7 +462,7 @@ function MatchView(props: {
 }) {
   const { tournamentState, pending, allPokemon, onEnd, onBack } = props;
   const startup = useMemo(() => applyInitialSwitchInsTeam(pending.initial), [pending.initial]);
-  const { state, log, thinking, winner, done, nextTurn, submitPlayerAction } =
+  const { state, displayedState, log, thinking, winner, done, isPlaying, nextTurn, submitPlayerAction } =
     useTeamBattleController(startup.state, startup.events);
   const damageSummary = useMemo(() => {
     if (!done) return null;
@@ -513,21 +513,21 @@ function MatchView(props: {
 
       <div className="team-arena">
         <TeamView
-          state={state}
+          state={displayedState}
           side={0}
-          onSwitch={playerControlsSide0 && !thinking
+          onSwitch={playerControlsSide0 && !thinking && !isPlaying
             ? (slot) => submitPlayerAction({ kind: 'switch', targetIdx: slot })
             : undefined}
         />
         <div className="arena-center">
-          <WeatherDisplay field={state.field} />
+          <WeatherDisplay field={displayedState.field} />
           <div className="arena-vs">VS</div>
-          <TerrainDisplay field={state.field} />
+          <TerrainDisplay field={displayedState.field} />
         </div>
-        <TeamView state={state} side={1} />
+        <TeamView state={displayedState} side={1} />
       </div>
 
-      {done && winner !== null && (
+      {done && !isPlaying && winner !== null && (
         <div className="winner-banner card">
           <h2 style={{ color: '#f1c40f' }}>
             🏆 {winner === 0 ? leftTeam.name : rightTeam.name} wins!
@@ -540,8 +540,8 @@ function MatchView(props: {
 
       {!done && mode === 'spectate' && (
         <div style={{ textAlign: 'center', margin: '1rem 0' }}>
-          <button className="btn-primary" onClick={nextTurn} disabled={thinking}>
-            {thinking ? 'Thinking…' : 'Next Turn →'}
+          <button className="btn-primary" onClick={nextTurn} disabled={thinking || isPlaying}>
+            {thinking ? 'Thinking…' : isPlaying ? 'Playing…' : 'Next Turn →'}
           </button>
         </div>
       )}
@@ -549,7 +549,7 @@ function MatchView(props: {
       {!done && playerControlsSide0 && (
         <PlayerActionBar
           state={state}
-          thinking={thinking}
+          thinking={thinking || isPlaying}
           onAction={submitPlayerAction}
         />
       )}
@@ -563,7 +563,7 @@ function MatchView(props: {
         )}
         {log.map((ev, i) => renderTeamEvent(ev, i))}
       </div>
-      {done && damageSummary && (
+      {done && !isPlaying && damageSummary && (
         <DamageSummaryBlock summary={damageSummary} allPokemon={allPokemon} />
       )}
     </div>

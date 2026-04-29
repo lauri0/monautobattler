@@ -22,6 +22,7 @@ import {
   type GameVersion,
   type VariantSettings,
 } from '../persistence/userStorage';
+import { clearDamageStats } from '../persistence/damageStatsStorage';
 
 interface Props {
   onBack: () => void;
@@ -139,8 +140,9 @@ export default function SettingsPage({ onBack, onDataLoaded }: Props) {
   }
 
   function handleResetStats() {
-    if (!confirm('Reset all ELO and win/loss records to default? Movesets are kept.')) return;
+    if (!confirm('Reset all ELO, win/loss records, and damage statistics to default? Movesets are kept.')) return;
     resetAllStats();
+    clearDamageStats();
     alert('Stats reset.');
   }
 
@@ -473,7 +475,7 @@ export default function SettingsPage({ onBack, onDataLoaded }: Props) {
       <div className="card">
         <h2 style={{ marginBottom: '0.75rem', color: 'var(--text)' }}>Reset Stats</h2>
         <p style={{ color: 'var(--text-muted)', marginBottom: '1rem', fontSize: '0.9rem' }}>
-          Resets all ELO to 1500 and win/loss records to 0. Custom movesets and disabled flags are kept.
+          Resets all ELO to 1500, win/loss records to 0, and damage statistics. Custom movesets and disabled flags are kept.
         </p>
         <button className="btn-danger" onClick={handleResetStats}>Reset All Stats</button>
       </div>
