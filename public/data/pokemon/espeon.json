@@ -1,0 +1,63 @@
+{
+  "id": 196,
+  "name": "espeon",
+  "types": [
+    "psychic"
+  ],
+  "baseStats": {
+    "hp": 65,
+    "attack": 65,
+    "defense": 60,
+    "specialAttack": 130,
+    "specialDefense": 95,
+    "speed": 110
+  },
+  "spriteUrl": "/sprites/196.png",
+  "moves": [
+    "hyper-beam",
+    "giga-impact",
+    "last-resort",
+    "double-edge",
+    "future-sight",
+    "take-down",
+    "psychic",
+    "hyper-voice",
+    "body-slam",
+    "psychic-fangs",
+    "dig",
+    "shadow-ball",
+    "power-gem",
+    "zen-headbutt",
+    "psyshock",
+    "dazzling-gleam",
+    "expanding-force",
+    "tera-blast",
+    "alluring-voice",
+    "psychic-noise",
+    "facade",
+    "psybeam",
+    "bite",
+    "swift",
+    "covet",
+    "magical-leaf",
+    "confusion",
+    "weather-ball",
+    "draining-kiss",
+    "trailblaze",
+    "tackle",
+    "quick-attack",
+    "mud-slap",
+    "stored-power",
+    "growl",
+    "thunder-wave",
+    "light-screen",
+    "reflect",
+    "protect",
+    "calm-mind",
+    "trick-room"
+  ],
+  "abilities": [
+    "synchronize",
+    "magic-bounce"
+  ]
+}

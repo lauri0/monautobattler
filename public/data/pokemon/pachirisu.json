@@ -1,0 +1,63 @@
+{
+  "id": 417,
+  "name": "pachirisu",
+  "types": [
+    "electric"
+  ],
+  "baseStats": {
+    "hp": 60,
+    "attack": 45,
+    "defense": 70,
+    "specialAttack": 45,
+    "specialDefense": 90,
+    "speed": 95
+  },
+  "spriteUrl": "/sprites/417.png",
+  "moves": [
+    "hyper-beam",
+    "giga-impact",
+    "last-resort",
+    "gunk-shot",
+    "thunder",
+    "take-down",
+    "thunderbolt",
+    "uproar",
+    "wild-charge",
+    "play-rough",
+    "dig",
+    "seed-bomb",
+    "discharge",
+    "tera-blast",
+    "alluring-voice",
+    "thunder-punch",
+    "facade",
+    "u-turn",
+    "volt-switch",
+    "spark",
+    "thunder-fang",
+    "bite",
+    "swift",
+    "thief",
+    "aerial-ace",
+    "covet",
+    "mud-shot",
+    "electroweb",
+    "charge-beam",
+    "trailblaze",
+    "thunder-shock",
+    "quick-attack",
+    "rollout",
+    "mud-slap",
+    "nuzzle",
+    "growl",
+    "thunder-wave",
+    "agility",
+    "light-screen",
+    "protect"
+  ],
+  "abilities": [
+    "run-away",
+    "pickup",
+    "volt-absorb"
+  ]
+}

@@ -139,7 +139,8 @@ export function calcDamage(
   }
 
   const critRate = move.effect?.critRate ?? 0;
-  const critProb = critRate === 0 ? 1 / 24 : critRate === 1 ? 1 / 8 : 1 / 2;
+  const critStage = critRate + (attacker.ability === 'super-luck' ? 1 : 0);
+  const critProb = critStage === 0 ? 1 / 24 : critStage === 1 ? 1 / 8 : 1 / 2;
   const mercilessCrit = attacker.ability === 'merciless' && defender.statusCondition === 'poison';
   const isCrit = mercilessCrit || (defender.ability !== 'shell-armor' && Math.random() < critProb);
   const roll = randomRoll ?? (0.85 + Math.random() * 0.15);

@@ -1,0 +1,43 @@
+{
+  "id": 349,
+  "name": "feebas",
+  "types": [
+    "water"
+  ],
+  "baseStats": {
+    "hp": 20,
+    "attack": 15,
+    "defense": 20,
+    "specialAttack": 10,
+    "specialDefense": 55,
+    "speed": 80
+  },
+  "spriteUrl": "/sprites/349.png",
+  "moves": [
+    "double-edge",
+    "blizzard",
+    "surf",
+    "ice-beam",
+    "muddy-water",
+    "dragon-pulse",
+    "waterfall",
+    "tera-blast",
+    "facade",
+    "swift",
+    "dragon-breath",
+    "water-pulse",
+    "icy-wind",
+    "mud-shot",
+    "chilling-water",
+    "tackle",
+    "whirlpool",
+    "scale-shot",
+    "light-screen",
+    "protect"
+  ],
+  "abilities": [
+    "swift-swim",
+    "oblivious",
+    "adaptability"
+  ]
+}

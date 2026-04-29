@@ -1,0 +1,55 @@
+{
+  "id": 273,
+  "name": "seedot",
+  "types": [
+    "grass"
+  ],
+  "baseStats": {
+    "hp": 40,
+    "attack": 40,
+    "defense": 50,
+    "specialAttack": 30,
+    "specialDefense": 30,
+    "speed": 30
+  },
+  "spriteUrl": "/sprites/273.png",
+  "moves": [
+    "explosion",
+    "leaf-storm",
+    "double-edge",
+    "solar-beam",
+    "foul-play",
+    "take-down",
+    "energy-ball",
+    "body-slam",
+    "dig",
+    "shadow-ball",
+    "seed-bomb",
+    "tera-blast",
+    "giga-drain",
+    "headbutt",
+    "facade",
+    "sucker-punch",
+    "night-slash",
+    "magical-leaf",
+    "grassy-glide",
+    "payback",
+    "trailblaze",
+    "tackle",
+    "giga-drain",
+    "quick-attack",
+    "false-swipe",
+    "rollout",
+    "astonish",
+    "bullet-seed",
+    "absorb",
+    "amnesia",
+    "protect",
+    "nasty-plot"
+  ],
+  "abilities": [
+    "chlorophyll",
+    "early-bird",
+    "pickpocket"
+  ]
+}

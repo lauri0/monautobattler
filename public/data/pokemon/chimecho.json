@@ -1,0 +1,58 @@
+{
+  "id": 358,
+  "name": "chimecho",
+  "types": [
+    "psychic"
+  ],
+  "baseStats": {
+    "hp": 75,
+    "attack": 50,
+    "defense": 80,
+    "specialAttack": 95,
+    "specialDefense": 90,
+    "speed": 65
+  },
+  "spriteUrl": "/sprites/358.png",
+  "moves": [
+    "double-edge",
+    "future-sight",
+    "take-down",
+    "psychic",
+    "uproar",
+    "hyper-voice",
+    "energy-ball",
+    "shadow-ball",
+    "extrasensory",
+    "zen-headbutt",
+    "psyshock",
+    "dazzling-gleam",
+    "expanding-force",
+    "tera-blast",
+    "psychic-noise",
+    "facade",
+    "psybeam",
+    "knock-off",
+    "swift",
+    "icy-wind",
+    "snarl",
+    "confusion",
+    "charge-beam",
+    "draining-kiss",
+    "disarming-voice",
+    "astonish",
+    "stored-power",
+    "wrap",
+    "growl",
+    "thunder-wave",
+    "recover",
+    "light-screen",
+    "reflect",
+    "protect",
+    "taunt",
+    "calm-mind",
+    "trick-room"
+  ],
+  "abilities": [
+    "levitate"
+  ]
+}

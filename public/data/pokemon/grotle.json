@@ -1,0 +1,60 @@
+{
+  "id": 388,
+  "name": "grotle",
+  "types": [
+    "grass"
+  ],
+  "baseStats": {
+    "hp": 75,
+    "attack": 89,
+    "defense": 85,
+    "specialAttack": 55,
+    "specialDefense": 65,
+    "speed": 36
+  },
+  "spriteUrl": "/sprites/388.png",
+  "moves": [
+    "leaf-storm",
+    "thrash",
+    "double-edge",
+    "solar-beam",
+    "superpower",
+    "take-down",
+    "energy-ball",
+    "earth-power",
+    "body-slam",
+    "crunch",
+    "seed-bomb",
+    "zen-headbutt",
+    "iron-head",
+    "grass-pledge",
+    "tera-blast",
+    "giga-drain",
+    "facade",
+    "bite",
+    "magical-leaf",
+    "bulldoze",
+    "razor-leaf",
+    "mud-shot",
+    "grassy-glide",
+    "smack-down",
+    "trailblaze",
+    "tackle",
+    "giga-drain",
+    "sand-tomb",
+    "bullet-seed",
+    "absorb",
+    "mud-slap",
+    "swords-dance",
+    "light-screen",
+    "reflect",
+    "amnesia",
+    "protect",
+    "stealth-rock",
+    "shell-smash"
+  ],
+  "abilities": [
+    "overgrow",
+    "shell-armor"
+  ]
+}

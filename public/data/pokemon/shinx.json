@@ -1,0 +1,56 @@
+{
+  "id": 403,
+  "name": "shinx",
+  "types": [
+    "electric"
+  ],
+  "baseStats": {
+    "hp": 45,
+    "attack": 65,
+    "defense": 34,
+    "specialAttack": 40,
+    "specialDefense": 34,
+    "speed": 45
+  },
+  "spriteUrl": "/sprites/403.png",
+  "moves": [
+    "double-edge",
+    "thunder",
+    "take-down",
+    "thunderbolt",
+    "wild-charge",
+    "play-rough",
+    "psychic-fangs",
+    "crunch",
+    "discharge",
+    "tera-blast",
+    "facade",
+    "night-slash",
+    "volt-switch",
+    "spark",
+    "thunder-fang",
+    "ice-fang",
+    "fire-fang",
+    "bite",
+    "swift",
+    "thief",
+    "shock-wave",
+    "electroweb",
+    "snarl",
+    "charge-beam",
+    "trailblaze",
+    "tackle",
+    "thunder-shock",
+    "quick-attack",
+    "double-kick",
+    "leer",
+    "thunder-wave",
+    "light-screen",
+    "protect"
+  ],
+  "abilities": [
+    "rivalry",
+    "intimidate",
+    "guts"
+  ]
+}

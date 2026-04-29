@@ -1,0 +1,10 @@
+{
+  "id": 353,
+  "name": "doom-desire",
+  "type": "steel",
+  "power": 140,
+  "accuracy": 100,
+  "pp": 5,
+  "damageClass": "special",
+  "priority": 0
+}

@@ -21,6 +21,8 @@ export interface AbilityEffect {
   // Applied when the bearer switches out voluntarily (not when fainting).
   // Returns the updated bearer. May push events.
   onSwitchOut?: (self: BattlePokemon, turn: number, events: TurnEvent[]) => BattlePokemon;
+  // Applied at the end of every turn. Returns the (possibly updated) bearer.
+  onEndOfTurn?: (self: BattlePokemon, turn: number, events: TurnEvent[]) => BattlePokemon;
   // Multiplier applied to the bearer's outgoing damage.
   damageMultiplier?: (self: BattlePokemon, move: Move) => number;
   // When true, variable-hit moves (hitsVariable) always hit their maximum (5).
@@ -110,7 +112,20 @@ export const IMPLEMENTED_ABILITIES: Record<string, AbilityEffect> = {
     damageMultiplier: (_self, move) => sheerForceApplies(move) ? 1.3 : 1,
   },
   'sniper': {},
+  'super-luck': {},
   'thick-fat': {},
+  'speed-boost': {
+    onEndOfTurn: (self, turn, events) => {
+      if (self.currentHp <= 0) return self;
+      const marker: TurnEvent[] = [];
+      const updated = applyStatChange(self, 'speed', 1, turn, marker);
+      if (marker.length > 0) {
+        events.push({ kind: 'ability_triggered', turn, pokemonName: self.data.name, ability: 'speed-boost' });
+        for (const ev of marker) events.push(ev);
+      }
+      return updated;
+    },
+  },
   'regenerator': {
     onSwitchOut: (self, turn, events) => {
       const heal = Math.floor(self.level50Stats.hp / 3);
@@ -486,6 +501,7 @@ export const ABILITY_DESCRIPTIONS: Record<string, string> = {
   'defiant':        'Raises Attack by 2 when a foe lowers any of this Pokémon\'s stats',
   'sheer-force':    'Removes secondary effects of moves to boost their power by 30%',
   'sniper':         'Boosts the power of critical hits to 2.25× instead of 1.5×',
+  'super-luck':     'Raises this Pokémon\'s critical hit ratio by one stage',
   'thick-fat':      'Halves damage taken from Fire- and Ice-type moves',
   'regenerator':    'Heals 1/3 of max HP when switching out',
   'rock-head':      'Prevents recoil damage from recoil-dealing moves',
@@ -569,6 +585,20 @@ export function applySwitchOutAbility(
   const entry = IMPLEMENTED_ABILITIES[ability];
   if (!entry?.onSwitchOut) return outgoing;
   return entry.onSwitchOut(outgoing, turn, events);
+}
+
+// Applies the bearer's end-of-turn ability (e.g. Speed Boost). Returns the
+// (possibly updated) bearer. Emits events when the ability activates.
+export function applyEndOfTurnAbility(
+  p: BattlePokemon,
+  turn: number,
+  events: TurnEvent[],
+): BattlePokemon {
+  const ability = p.ability;
+  if (!ability) return p;
+  const entry = IMPLEMENTED_ABILITIES[ability];
+  if (!entry?.onEndOfTurn) return p;
+  return entry.onEndOfTurn(p, turn, events);
 }
 
 // Applies the incoming pokemon's switch-in ability against the opponent and

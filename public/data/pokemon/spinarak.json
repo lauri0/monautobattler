@@ -1,0 +1,62 @@
+{
+  "id": 167,
+  "name": "spinarak",
+  "types": [
+    "bug",
+    "poison"
+  ],
+  "baseStats": {
+    "hp": 40,
+    "attack": 60,
+    "defense": 40,
+    "specialAttack": 40,
+    "specialDefense": 40,
+    "speed": 30
+  },
+  "spriteUrl": "/sprites/167.png",
+  "moves": [
+    "solar-beam",
+    "megahorn",
+    "sludge-wave",
+    "foul-play",
+    "psychic",
+    "sludge-bomb",
+    "bug-buzz",
+    "dig",
+    "leech-life",
+    "poison-jab",
+    "x-scissor",
+    "lunge",
+    "tera-blast",
+    "giga-drain",
+    "facade",
+    "sucker-punch",
+    "night-slash",
+    "cross-poison",
+    "skitter-smack",
+    "knock-off",
+    "venoshock",
+    "hex",
+    "thief",
+    "bug-bite",
+    "electroweb",
+    "struggle-bug",
+    "pounce",
+    "trailblaze",
+    "shadow-sneak",
+    "acid-spray",
+    "pin-missile",
+    "absorb",
+    "infestation",
+    "fury-swipes",
+    "poison-sting",
+    "agility",
+    "protect",
+    "toxic-spikes"
+  ],
+  "abilities": [
+    "swarm",
+    "insomnia",
+    "sniper"
+  ]
+}

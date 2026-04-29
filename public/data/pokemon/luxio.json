@@ -1,0 +1,52 @@
+{
+  "id": 404,
+  "name": "luxio",
+  "types": [
+    "electric"
+  ],
+  "baseStats": {
+    "hp": 60,
+    "attack": 85,
+    "defense": 49,
+    "specialAttack": 60,
+    "specialDefense": 49,
+    "speed": 60
+  },
+  "spriteUrl": "/sprites/404.png",
+  "moves": [
+    "double-edge",
+    "thunder",
+    "take-down",
+    "thunderbolt",
+    "wild-charge",
+    "play-rough",
+    "psychic-fangs",
+    "crunch",
+    "discharge",
+    "tera-blast",
+    "facade",
+    "volt-switch",
+    "spark",
+    "thunder-fang",
+    "ice-fang",
+    "fire-fang",
+    "bite",
+    "swift",
+    "thief",
+    "electroweb",
+    "snarl",
+    "charge-beam",
+    "trailblaze",
+    "tackle",
+    "thunder-shock",
+    "leer",
+    "thunder-wave",
+    "light-screen",
+    "protect"
+  ],
+  "abilities": [
+    "rivalry",
+    "intimidate",
+    "guts"
+  ]
+}

@@ -1,0 +1,58 @@
+{
+  "id": 378,
+  "name": "regice",
+  "types": [
+    "ice"
+  ],
+  "baseStats": {
+    "hp": 80,
+    "attack": 50,
+    "defense": 100,
+    "specialAttack": 100,
+    "specialDefense": 200,
+    "speed": 50
+  },
+  "spriteUrl": "/sprites/378.png",
+  "moves": [
+    "explosion",
+    "hyper-beam",
+    "focus-punch",
+    "giga-impact",
+    "zap-cannon",
+    "superpower",
+    "focus-blast",
+    "blizzard",
+    "thunder",
+    "earthquake",
+    "hammer-arm",
+    "ice-beam",
+    "thunderbolt",
+    "body-slam",
+    "flash-cannon",
+    "iron-head",
+    "body-press",
+    "tera-blast",
+    "ice-spinner",
+    "ice-punch",
+    "thunder-punch",
+    "rock-slide",
+    "brick-break",
+    "stomping-tantrum",
+    "facade",
+    "stomp",
+    "ancient-power",
+    "rock-tomb",
+    "avalanche",
+    "bulldoze",
+    "icy-wind",
+    "charge-beam",
+    "icicle-spear",
+    "thunder-wave",
+    "amnesia",
+    "protect"
+  ],
+  "abilities": [
+    "clear-body",
+    "ice-body"
+  ]
+}

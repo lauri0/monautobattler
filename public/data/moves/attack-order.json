@@ -1,0 +1,13 @@
+{
+  "id": 454,
+  "name": "attack-order",
+  "type": "bug",
+  "power": 90,
+  "accuracy": 100,
+  "pp": 15,
+  "damageClass": "physical",
+  "priority": 0,
+  "effect": {
+    "critRate": 1
+  }
+}

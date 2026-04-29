@@ -1,0 +1,10 @@
+{
+  "id": 828,
+  "name": "psyshield-bash",
+  "type": "psychic",
+  "power": 70,
+  "accuracy": 90,
+  "pp": 10,
+  "damageClass": "physical",
+  "priority": 0
+}

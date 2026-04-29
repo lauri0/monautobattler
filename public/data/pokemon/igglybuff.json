@@ -1,0 +1,53 @@
+{
+  "id": 174,
+  "name": "igglybuff",
+  "types": [
+    "normal",
+    "fairy"
+  ],
+  "baseStats": {
+    "hp": 90,
+    "attack": 30,
+    "defense": 15,
+    "specialAttack": 40,
+    "specialDefense": 20,
+    "speed": 15
+  },
+  "spriteUrl": "/sprites/174.png",
+  "moves": [
+    "last-resort",
+    "double-edge",
+    "solar-beam",
+    "fire-blast",
+    "take-down",
+    "flamethrower",
+    "psychic",
+    "hyper-voice",
+    "wild-charge",
+    "play-rough",
+    "body-slam",
+    "dig",
+    "shadow-ball",
+    "dazzling-gleam",
+    "tera-blast",
+    "alluring-voice",
+    "facade",
+    "swift",
+    "covet",
+    "icy-wind",
+    "draining-kiss",
+    "trailblaze",
+    "pound",
+    "disarming-voice",
+    "rollout",
+    "thunder-wave",
+    "light-screen",
+    "reflect",
+    "protect"
+  ],
+  "abilities": [
+    "cute-charm",
+    "competitive",
+    "friend-guard"
+  ]
+}

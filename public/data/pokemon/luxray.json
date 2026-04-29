@@ -1,0 +1,58 @@
+{
+  "id": 405,
+  "name": "luxray",
+  "types": [
+    "electric"
+  ],
+  "baseStats": {
+    "hp": 80,
+    "attack": 120,
+    "defense": 79,
+    "specialAttack": 95,
+    "specialDefense": 79,
+    "speed": 70
+  },
+  "spriteUrl": "/sprites/405.png",
+  "moves": [
+    "hyper-beam",
+    "giga-impact",
+    "double-edge",
+    "thunder",
+    "supercell-slam",
+    "take-down",
+    "thunderbolt",
+    "wild-charge",
+    "play-rough",
+    "body-slam",
+    "psychic-fangs",
+    "crunch",
+    "discharge",
+    "throat-chop",
+    "tera-blast",
+    "facade",
+    "volt-switch",
+    "spark",
+    "thunder-fang",
+    "ice-fang",
+    "fire-fang",
+    "bite",
+    "swift",
+    "thief",
+    "electroweb",
+    "snarl",
+    "charge-beam",
+    "trailblaze",
+    "tackle",
+    "thunder-shock",
+    "leer",
+    "thunder-wave",
+    "agility",
+    "light-screen",
+    "protect"
+  ],
+  "abilities": [
+    "rivalry",
+    "intimidate",
+    "guts"
+  ]
+}

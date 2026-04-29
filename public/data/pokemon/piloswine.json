@@ -1,0 +1,63 @@
+{
+  "id": 221,
+  "name": "piloswine",
+  "types": [
+    "ice",
+    "ground"
+  ],
+  "baseStats": {
+    "hp": 100,
+    "attack": 100,
+    "defense": 80,
+    "specialAttack": 60,
+    "specialDefense": 60,
+    "speed": 50
+  },
+  "spriteUrl": "/sprites/221.png",
+  "moves": [
+    "hyper-beam",
+    "giga-impact",
+    "thrash",
+    "double-edge",
+    "blizzard",
+    "earthquake",
+    "stone-edge",
+    "high-horsepower",
+    "take-down",
+    "ice-beam",
+    "earth-power",
+    "body-slam",
+    "icicle-crash",
+    "dig",
+    "throat-chop",
+    "tera-blast",
+    "rock-slide",
+    "stomping-tantrum",
+    "facade",
+    "freeze-dry",
+    "ice-fang",
+    "bite",
+    "ancient-power",
+    "rock-tomb",
+    "avalanche",
+    "bulldoze",
+    "icy-wind",
+    "mud-shot",
+    "smack-down",
+    "trailblaze",
+    "tackle",
+    "powder-snow",
+    "ice-shard",
+    "sand-tomb",
+    "icicle-spear",
+    "mud-slap",
+    "amnesia",
+    "protect",
+    "stealth-rock"
+  ],
+  "abilities": [
+    "oblivious",
+    "snow-cloak",
+    "thick-fat"
+  ]
+}

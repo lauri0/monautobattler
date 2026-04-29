@@ -1,0 +1,45 @@
+{
+  "id": 236,
+  "name": "tyrogue",
+  "types": [
+    "fighting"
+  ],
+  "baseStats": {
+    "hp": 35,
+    "attack": 35,
+    "defense": 35,
+    "specialAttack": 35,
+    "specialDefense": 35,
+    "speed": 35
+  },
+  "spriteUrl": "/sprites/236.png",
+  "moves": [
+    "high-jump-kick",
+    "take-down",
+    "uproar",
+    "body-slam",
+    "tera-blast",
+    "rock-slide",
+    "brick-break",
+    "facade",
+    "low-sweep",
+    "upper-hand",
+    "swift",
+    "thief",
+    "bulldoze",
+    "rapid-spin",
+    "tackle",
+    "mach-punch",
+    "fake-out",
+    "vacuum-wave",
+    "bullet-punch",
+    "feint",
+    "protect",
+    "bulk-up"
+  ],
+  "abilities": [
+    "guts",
+    "steadfast",
+    "vital-spirit"
+  ]
+}

@@ -1,0 +1,30 @@
+{
+  "id": 415,
+  "name": "combee",
+  "types": [
+    "bug",
+    "flying"
+  ],
+  "baseStats": {
+    "hp": 30,
+    "attack": 30,
+    "defense": 42,
+    "specialAttack": 30,
+    "specialDefense": 42,
+    "speed": 70
+  },
+  "spriteUrl": "/sprites/415.png",
+  "moves": [
+    "bug-buzz",
+    "lunge",
+    "tera-blast",
+    "skitter-smack",
+    "bug-bite",
+    "struggle-bug",
+    "gust"
+  ],
+  "abilities": [
+    "honey-gather",
+    "hustle"
+  ]
+}

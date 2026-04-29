@@ -1,0 +1,63 @@
+{
+  "id": 186,
+  "name": "politoed",
+  "types": [
+    "water"
+  ],
+  "baseStats": {
+    "hp": 90,
+    "attack": 75,
+    "defense": 75,
+    "specialAttack": 90,
+    "specialDefense": 100,
+    "speed": 70
+  },
+  "spriteUrl": "/sprites/186.png",
+  "moves": [
+    "hyper-beam",
+    "focus-punch",
+    "giga-impact",
+    "double-edge",
+    "focus-blast",
+    "hydro-pump",
+    "blizzard",
+    "earthquake",
+    "take-down",
+    "surf",
+    "ice-beam",
+    "psychic",
+    "hyper-voice",
+    "muddy-water",
+    "earth-power",
+    "body-slam",
+    "bounce",
+    "liquidation",
+    "dig",
+    "waterfall",
+    "tera-blast",
+    "ice-punch",
+    "brick-break",
+    "facade",
+    "bubble-beam",
+    "low-sweep",
+    "swift",
+    "thief",
+    "water-pulse",
+    "bulldoze",
+    "icy-wind",
+    "mud-shot",
+    "weather-ball",
+    "chilling-water",
+    "pound",
+    "water-gun",
+    "whirlpool",
+    "mud-slap",
+    "amnesia",
+    "protect"
+  ],
+  "abilities": [
+    "water-absorb",
+    "damp",
+    "drizzle"
+  ]
+}

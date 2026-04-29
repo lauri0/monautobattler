@@ -25,7 +25,8 @@
       "Bash(git add *)",
       "Bash(git commit *)",
       "Bash(grep -E \"\\\\.\\(ts|tsx\\)$\")",
-      "Bash(C:/Users/lauri/.claude/plugins/cache/claude-plugins-official/superpowers/5.0.7/scripts/start-server.sh *)"
+      "Bash(C:/Users/lauri/.claude/plugins/cache/claude-plugins-official/superpowers/5.0.7/scripts/start-server.sh *)",
+      "Bash(xargs grep *)"
     ]
   }
 }

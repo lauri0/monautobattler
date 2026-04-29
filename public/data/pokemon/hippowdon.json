@@ -1,0 +1,55 @@
+{
+  "id": 450,
+  "name": "hippowdon",
+  "types": [
+    "ground"
+  ],
+  "baseStats": {
+    "hp": 108,
+    "attack": 112,
+    "defense": 118,
+    "specialAttack": 68,
+    "specialDefense": 72,
+    "speed": 47
+  },
+  "spriteUrl": "/sprites/450.png",
+  "moves": [
+    "hyper-beam",
+    "giga-impact",
+    "double-edge",
+    "earthquake",
+    "stone-edge",
+    "high-horsepower",
+    "take-down",
+    "hyper-voice",
+    "muddy-water",
+    "earth-power",
+    "body-slam",
+    "dig",
+    "crunch",
+    "iron-head",
+    "body-press",
+    "tera-blast",
+    "rock-slide",
+    "stomping-tantrum",
+    "facade",
+    "scorching-sands",
+    "thunder-fang",
+    "ice-fang",
+    "fire-fang",
+    "bite",
+    "rock-tomb",
+    "bulldoze",
+    "mud-shot",
+    "tackle",
+    "sand-tomb",
+    "mud-slap",
+    "amnesia",
+    "protect",
+    "stealth-rock"
+  ],
+  "abilities": [
+    "sand-stream",
+    "sand-force"
+  ]
+}

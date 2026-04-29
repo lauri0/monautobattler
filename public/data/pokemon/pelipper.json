@@ -1,0 +1,63 @@
+{
+  "id": 279,
+  "name": "pelipper",
+  "types": [
+    "water",
+    "flying"
+  ],
+  "baseStats": {
+    "hp": 60,
+    "attack": 50,
+    "defense": 100,
+    "specialAttack": 95,
+    "specialDefense": 70,
+    "speed": 65
+  },
+  "spriteUrl": "/sprites/279.png",
+  "moves": [
+    "hyper-beam",
+    "giga-impact",
+    "brave-bird",
+    "gunk-shot",
+    "hydro-pump",
+    "blizzard",
+    "hurricane",
+    "fly",
+    "take-down",
+    "surf",
+    "ice-beam",
+    "muddy-water",
+    "body-slam",
+    "liquidation",
+    "waterfall",
+    "seed-bomb",
+    "tera-blast",
+    "air-slash",
+    "facade",
+    "u-turn",
+    "knock-off",
+    "wing-attack",
+    "swift",
+    "thief",
+    "air-cutter",
+    "aerial-ace",
+    "water-pulse",
+    "icy-wind",
+    "acrobatics",
+    "weather-ball",
+    "chilling-water",
+    "water-gun",
+    "quick-attack",
+    "dual-wingbeat",
+    "whirlpool",
+    "growl",
+    "agility",
+    "protect",
+    "tailwind"
+  ],
+  "abilities": [
+    "keen-eye",
+    "drizzle",
+    "rain-dish"
+  ]
+}

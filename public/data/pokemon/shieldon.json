@@ -1,0 +1,59 @@
+{
+  "id": 410,
+  "name": "shieldon",
+  "types": [
+    "rock",
+    "steel"
+  ],
+  "baseStats": {
+    "hp": 30,
+    "attack": 42,
+    "defense": 118,
+    "specialAttack": 42,
+    "specialDefense": 88,
+    "speed": 30
+  },
+  "spriteUrl": "/sprites/410.png",
+  "moves": [
+    "steel-beam",
+    "double-edge",
+    "blizzard",
+    "thunder",
+    "fire-blast",
+    "earthquake",
+    "stone-edge",
+    "take-down",
+    "flamethrower",
+    "ice-beam",
+    "thunderbolt",
+    "earth-power",
+    "body-slam",
+    "dig",
+    "power-gem",
+    "flash-cannon",
+    "iron-head",
+    "tera-blast",
+    "rock-slide",
+    "stomping-tantrum",
+    "headbutt",
+    "facade",
+    "scorching-sands",
+    "ancient-power",
+    "rock-tomb",
+    "bulldoze",
+    "smack-down",
+    "trailblaze",
+    "tackle",
+    "sand-tomb",
+    "rock-blast",
+    "mud-slap",
+    "protect",
+    "taunt",
+    "iron-defense",
+    "stealth-rock"
+  ],
+  "abilities": [
+    "sturdy",
+    "soundproof"
+  ]
+}

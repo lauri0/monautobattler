@@ -44,7 +44,12 @@ export default function PlayerActionBar({ state, thinking, onAction }: Props) {
                 onClick={() => onAction(a)}
                 style={{ background: color, borderColor: color, color: '#fff' }}
               >
-                {a.move.name}
+                <span className="btn-move-name">{a.move.name}</span>
+                <span className="btn-move-stats">
+                  {a.move.power > 0 ? `PWR ${a.move.power}` : '—'}
+                  {' · '}
+                  {a.move.accuracy != null ? `ACC ${a.move.accuracy}` : '—'}
+                </span>
               </button>
             );
           })}

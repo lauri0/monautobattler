@@ -1,0 +1,52 @@
+{
+  "id": 456,
+  "name": "finneon",
+  "types": [
+    "water"
+  ],
+  "baseStats": {
+    "hp": 49,
+    "attack": 49,
+    "defense": 56,
+    "specialAttack": 49,
+    "specialDefense": 61,
+    "speed": 66
+  },
+  "spriteUrl": "/sprites/456.png",
+  "moves": [
+    "hydro-pump",
+    "blizzard",
+    "take-down",
+    "surf",
+    "ice-beam",
+    "aqua-tail",
+    "bounce",
+    "waterfall",
+    "dazzling-gleam",
+    "tera-blast",
+    "alluring-voice",
+    "facade",
+    "u-turn",
+    "psybeam",
+    "aurora-beam",
+    "swift",
+    "thief",
+    "water-pulse",
+    "flip-turn",
+    "icy-wind",
+    "acrobatics",
+    "chilling-water",
+    "pound",
+    "gust",
+    "water-gun",
+    "whirlpool",
+    "agility",
+    "protect",
+    "tailwind"
+  ],
+  "abilities": [
+    "swift-swim",
+    "storm-drain",
+    "water-veil"
+  ]
+}

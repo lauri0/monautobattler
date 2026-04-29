@@ -1,0 +1,60 @@
+{
+  "id": 354,
+  "name": "banette",
+  "types": [
+    "ghost"
+  ],
+  "baseStats": {
+    "hp": 64,
+    "attack": 115,
+    "defense": 65,
+    "specialAttack": 83,
+    "specialDefense": 63,
+    "speed": 65
+  },
+  "spriteUrl": "/sprites/354.png",
+  "moves": [
+    "hyper-beam",
+    "giga-impact",
+    "gunk-shot",
+    "thunder",
+    "poltergeist",
+    "foul-play",
+    "thunderbolt",
+    "psychic",
+    "phantom-force",
+    "shadow-ball",
+    "dark-pulse",
+    "dazzling-gleam",
+    "throat-chop",
+    "tera-blast",
+    "lash-out",
+    "facade",
+    "sucker-punch",
+    "shadow-claw",
+    "skitter-smack",
+    "burning-jealousy",
+    "psybeam",
+    "knock-off",
+    "hex",
+    "thief",
+    "icy-wind",
+    "charge-beam",
+    "pounce",
+    "trailblaze",
+    "shadow-sneak",
+    "swords-dance",
+    "thunder-wave",
+    "protect",
+    "will-o-wisp",
+    "taunt",
+    "calm-mind",
+    "nasty-plot",
+    "trick-room"
+  ],
+  "abilities": [
+    "insomnia",
+    "frisk",
+    "cursed-body"
+  ]
+}

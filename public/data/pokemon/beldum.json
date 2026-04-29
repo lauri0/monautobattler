@@ -1,0 +1,30 @@
+{
+  "id": 374,
+  "name": "beldum",
+  "types": [
+    "steel",
+    "psychic"
+  ],
+  "baseStats": {
+    "hp": 40,
+    "attack": 55,
+    "defense": 80,
+    "specialAttack": 35,
+    "specialDefense": 60,
+    "speed": 30
+  },
+  "spriteUrl": "/sprites/374.png",
+  "moves": [
+    "steel-beam",
+    "take-down",
+    "zen-headbutt",
+    "iron-head",
+    "tera-blast",
+    "tackle",
+    "iron-defense"
+  ],
+  "abilities": [
+    "clear-body",
+    "light-metal"
+  ]
+}

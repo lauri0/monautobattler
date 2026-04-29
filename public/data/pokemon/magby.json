@@ -1,0 +1,56 @@
+{
+  "id": 240,
+  "name": "magby",
+  "types": [
+    "fire"
+  ],
+  "baseStats": {
+    "hp": 45,
+    "attack": 75,
+    "defense": 37,
+    "specialAttack": 70,
+    "specialDefense": 55,
+    "speed": 83
+  },
+  "spriteUrl": "/sprites/240.png",
+  "moves": [
+    "focus-punch",
+    "overheat",
+    "double-edge",
+    "flare-blitz",
+    "belch",
+    "fire-blast",
+    "dynamic-punch",
+    "cross-chop",
+    "heat-wave",
+    "take-down",
+    "flamethrower",
+    "psychic",
+    "body-slam",
+    "poison-jab",
+    "lava-plume",
+    "tera-blast",
+    "fire-punch",
+    "thunder-punch",
+    "brick-break",
+    "temper-flare",
+    "facade",
+    "burning-jealousy",
+    "thief",
+    "flame-wheel",
+    "flame-charge",
+    "clear-smog",
+    "ember",
+    "mach-punch",
+    "acid-spray",
+    "fire-spin",
+    "smog",
+    "leer",
+    "protect",
+    "will-o-wisp"
+  ],
+  "abilities": [
+    "flame-body",
+    "vital-spirit"
+  ]
+}

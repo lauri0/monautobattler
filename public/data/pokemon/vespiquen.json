@@ -1,0 +1,61 @@
+{
+  "id": 416,
+  "name": "vespiquen",
+  "types": [
+    "bug",
+    "flying"
+  ],
+  "baseStats": {
+    "hp": 70,
+    "attack": 80,
+    "defense": 102,
+    "specialAttack": 80,
+    "specialDefense": 102,
+    "speed": 40
+  },
+  "spriteUrl": "/sprites/416.png",
+  "moves": [
+    "hyper-beam",
+    "giga-impact",
+    "hurricane",
+    "take-down",
+    "sludge-bomb",
+    "bug-buzz",
+    "attack-order",
+    "pollen-puff",
+    "x-scissor",
+    "power-gem",
+    "lunge",
+    "tera-blast",
+    "air-slash",
+    "psychic-noise",
+    "slash",
+    "facade",
+    "u-turn",
+    "skitter-smack",
+    "venoshock",
+    "hex",
+    "swift",
+    "thief",
+    "aerial-ace",
+    "bug-bite",
+    "acrobatics",
+    "struggle-bug",
+    "fell-stinger",
+    "pounce",
+    "gust",
+    "fury-cutter",
+    "dual-wingbeat",
+    "fury-swipes",
+    "poison-sting",
+    "agility",
+    "protect",
+    "spikes",
+    "taunt",
+    "toxic-spikes"
+  ],
+  "abilities": [
+    "pressure",
+    "unnerve"
+  ]
+}

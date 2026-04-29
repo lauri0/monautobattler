@@ -1,0 +1,56 @@
+{
+  "id": 316,
+  "name": "gulpin",
+  "types": [
+    "poison"
+  ],
+  "baseStats": {
+    "hp": 70,
+    "attack": 43,
+    "defense": 53,
+    "specialAttack": 43,
+    "specialDefense": 53,
+    "speed": 40
+  },
+  "spriteUrl": "/sprites/316.png",
+  "moves": [
+    "solar-beam",
+    "gunk-shot",
+    "belch",
+    "sludge-wave",
+    "take-down",
+    "ice-beam",
+    "sludge-bomb",
+    "body-slam",
+    "shadow-ball",
+    "poison-jab",
+    "seed-bomb",
+    "tera-blast",
+    "fire-punch",
+    "ice-punch",
+    "thunder-punch",
+    "giga-drain",
+    "facade",
+    "sludge",
+    "venoshock",
+    "thief",
+    "water-pulse",
+    "mud-shot",
+    "clear-smog",
+    "pound",
+    "acid-spray",
+    "smog",
+    "bullet-seed",
+    "mud-slap",
+    "swords-dance",
+    "thunder-wave",
+    "amnesia",
+    "protect",
+    "toxic-spikes"
+  ],
+  "abilities": [
+    "liquid-ooze",
+    "sticky-hold",
+    "gluttony"
+  ]
+}

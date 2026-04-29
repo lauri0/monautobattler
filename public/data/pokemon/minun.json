@@ -1,0 +1,48 @@
+{
+  "id": 312,
+  "name": "minun",
+  "types": [
+    "electric"
+  ],
+  "baseStats": {
+    "hp": 60,
+    "attack": 40,
+    "defense": 50,
+    "specialAttack": 75,
+    "specialDefense": 85,
+    "speed": 95
+  },
+  "spriteUrl": "/sprites/312.png",
+  "moves": [
+    "last-resort",
+    "thunder",
+    "thunderbolt",
+    "uproar",
+    "wild-charge",
+    "play-rough",
+    "discharge",
+    "tera-blast",
+    "alluring-voice",
+    "thunder-punch",
+    "facade",
+    "volt-switch",
+    "spark",
+    "swift",
+    "electroweb",
+    "charge-beam",
+    "trailblaze",
+    "quick-attack",
+    "mud-slap",
+    "nuzzle",
+    "growl",
+    "thunder-wave",
+    "agility",
+    "light-screen",
+    "protect",
+    "nasty-plot"
+  ],
+  "abilities": [
+    "minus",
+    "volt-absorb"
+  ]
+}

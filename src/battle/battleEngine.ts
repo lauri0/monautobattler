@@ -2,7 +2,7 @@ import type { BattlePokemon, Move, TurnEvent, BattleResult, StatStageName, StatS
 import { calcDamage, calcExpectedDamage, effectiveSpeed, type DefenderScreens } from './damageCalc';
 import { defaultAI } from '../ai/aiModule';
 import { getTypeEffectiveness } from '../utils/typeChart';
-import { abilityMaxVariableHits, applySwitchInAbility, applyStatChangeFromFoe, noGuardInEffect, sheerForceSuppresses, absorbsWater, absorbsElectric, absorbsVoltAbsorb, absorbsFire, sturdyActive, ignoresRecoil, applyContactAbility, applyRattledByMove, applyWeakArmor, abilityBlocksAilment, abilityBlocksConfusion, hasMagicGuard, applyShedSkin, applyMoxie } from './abilities';
+import { abilityMaxVariableHits, applySwitchInAbility, applyStatChangeFromFoe, noGuardInEffect, sheerForceSuppresses, absorbsWater, absorbsElectric, absorbsVoltAbsorb, absorbsFire, sturdyActive, ignoresRecoil, applyContactAbility, applyRattledByMove, applyWeakArmor, abilityBlocksAilment, abilityBlocksConfusion, hasMagicGuard, applyShedSkin, applyMoxie, applyEndOfTurnAbility } from './abilities';
 import { isGrounded } from './damageCalc';
 
 export const TRICK_ROOM_TURNS = 5;
@@ -1394,6 +1394,12 @@ export function resolveTurnWithMoves(
   if (!battleOver) {
     p1 = applyShedSkin(p1, turnNumber, events);
     p2 = applyShedSkin(p2, turnNumber, events);
+  }
+
+  // End-of-turn abilities (e.g. Speed Boost).
+  if (!battleOver) {
+    p1 = applyEndOfTurnAbility(p1, turnNumber, events);
+    p2 = applyEndOfTurnAbility(p2, turnNumber, events);
   }
 
   // End-of-turn weather chip damage (sandstorm only).

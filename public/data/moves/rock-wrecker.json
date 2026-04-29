@@ -1,0 +1,10 @@
+{
+  "id": 439,
+  "name": "rock-wrecker",
+  "type": "rock",
+  "power": 150,
+  "accuracy": 90,
+  "pp": 5,
+  "damageClass": "physical",
+  "priority": 0
+}

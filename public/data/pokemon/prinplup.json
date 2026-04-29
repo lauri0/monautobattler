@@ -1,0 +1,60 @@
+{
+  "id": 394,
+  "name": "prinplup",
+  "types": [
+    "water"
+  ],
+  "baseStats": {
+    "hp": 64,
+    "attack": 66,
+    "defense": 68,
+    "specialAttack": 81,
+    "specialDefense": 76,
+    "speed": 50
+  },
+  "spriteUrl": "/sprites/394.png",
+  "moves": [
+    "double-edge",
+    "hydro-pump",
+    "blizzard",
+    "take-down",
+    "surf",
+    "ice-beam",
+    "liquidation",
+    "drill-peck",
+    "waterfall",
+    "water-pledge",
+    "tera-blast",
+    "ice-spinner",
+    "brick-break",
+    "facade",
+    "shadow-claw",
+    "bubble-beam",
+    "brine",
+    "swift",
+    "rock-tomb",
+    "aerial-ace",
+    "water-pulse",
+    "flip-turn",
+    "icy-wind",
+    "snore",
+    "metal-claw",
+    "weather-ball",
+    "chilling-water",
+    "tackle",
+    "water-gun",
+    "disarming-voice",
+    "peck",
+    "whirlpool",
+    "power-trip",
+    "triple-axel",
+    "fury-attack",
+    "growl",
+    "agility",
+    "protect"
+  ],
+  "abilities": [
+    "torrent",
+    "competitive"
+  ]
+}

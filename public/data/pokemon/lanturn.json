@@ -1,0 +1,60 @@
+{
+  "id": 171,
+  "name": "lanturn",
+  "types": [
+    "water",
+    "electric"
+  ],
+  "baseStats": {
+    "hp": 125,
+    "attack": 58,
+    "defense": 58,
+    "specialAttack": 76,
+    "specialDefense": 76,
+    "speed": 67
+  },
+  "spriteUrl": "/sprites/171.png",
+  "moves": [
+    "hyper-beam",
+    "giga-impact",
+    "double-edge",
+    "hydro-pump",
+    "blizzard",
+    "thunder",
+    "take-down",
+    "surf",
+    "ice-beam",
+    "thunderbolt",
+    "muddy-water",
+    "wild-charge",
+    "liquidation",
+    "waterfall",
+    "discharge",
+    "scald",
+    "dazzling-gleam",
+    "tera-blast",
+    "facade",
+    "sucker-punch",
+    "volt-switch",
+    "psybeam",
+    "bubble-beam",
+    "spark",
+    "water-pulse",
+    "flip-turn",
+    "icy-wind",
+    "electroweb",
+    "charge-beam",
+    "chilling-water",
+    "water-gun",
+    "whirlpool",
+    "thunder-wave",
+    "agility",
+    "amnesia",
+    "protect"
+  ],
+  "abilities": [
+    "volt-absorb",
+    "illuminate",
+    "water-absorb"
+  ]
+}

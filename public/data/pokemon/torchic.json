@@ -1,0 +1,58 @@
+{
+  "id": 255,
+  "name": "torchic",
+  "types": [
+    "fire"
+  ],
+  "baseStats": {
+    "hp": 45,
+    "attack": 60,
+    "defense": 40,
+    "specialAttack": 70,
+    "specialDefense": 50,
+    "speed": 45
+  },
+  "spriteUrl": "/sprites/255.png",
+  "moves": [
+    "last-resort",
+    "overheat",
+    "double-edge",
+    "flare-blitz",
+    "fire-blast",
+    "heat-wave",
+    "take-down",
+    "flamethrower",
+    "uproar",
+    "body-slam",
+    "bounce",
+    "dig",
+    "fire-pledge",
+    "tera-blast",
+    "rock-slide",
+    "crush-claw",
+    "temper-flare",
+    "slash",
+    "facade",
+    "night-slash",
+    "shadow-claw",
+    "swift",
+    "rock-tomb",
+    "aerial-ace",
+    "flame-charge",
+    "scratch",
+    "ember",
+    "quick-attack",
+    "peck",
+    "fire-spin",
+    "feint",
+    "swords-dance",
+    "growl",
+    "agility",
+    "protect",
+    "will-o-wisp"
+  ],
+  "abilities": [
+    "blaze",
+    "speed-boost"
+  ]
+}

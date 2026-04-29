@@ -1,0 +1,60 @@
+{
+  "id": 426,
+  "name": "drifblim",
+  "types": [
+    "ghost",
+    "flying"
+  ],
+  "baseStats": {
+    "hp": 150,
+    "attack": 80,
+    "defense": 44,
+    "specialAttack": 90,
+    "specialDefense": 54,
+    "speed": 80
+  },
+  "spriteUrl": "/sprites/426.png",
+  "moves": [
+    "explosion",
+    "self-destruct",
+    "hyper-beam",
+    "giga-impact",
+    "thunder",
+    "fly",
+    "thunderbolt",
+    "psychic",
+    "phantom-force",
+    "body-slam",
+    "shadow-ball",
+    "tera-blast",
+    "air-slash",
+    "temper-flare",
+    "facade",
+    "psybeam",
+    "knock-off",
+    "hex",
+    "swift",
+    "thief",
+    "air-cutter",
+    "aerial-ace",
+    "icy-wind",
+    "acrobatics",
+    "weather-ball",
+    "payback",
+    "gust",
+    "astonish",
+    "stored-power",
+    "thunder-wave",
+    "amnesia",
+    "protect",
+    "will-o-wisp",
+    "calm-mind",
+    "tailwind",
+    "trick-room"
+  ],
+  "abilities": [
+    "aftermath",
+    "unburden",
+    "flare-boost"
+  ]
+}

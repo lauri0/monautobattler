@@ -1,0 +1,29 @@
+{
+  "id": 401,
+  "name": "kricketot",
+  "types": [
+    "bug"
+  ],
+  "baseStats": {
+    "hp": 37,
+    "attack": 25,
+    "defense": 41,
+    "specialAttack": 25,
+    "specialDefense": 41,
+    "speed": 25
+  },
+  "spriteUrl": "/sprites/401.png",
+  "moves": [
+    "lunge",
+    "tera-blast",
+    "skitter-smack",
+    "bug-bite",
+    "struggle-bug",
+    "tackle",
+    "growl"
+  ],
+  "abilities": [
+    "shed-skin",
+    "run-away"
+  ]
+}

@@ -1,0 +1,14 @@
+{
+  "id": 221,
+  "name": "sacred-fire",
+  "type": "fire",
+  "power": 100,
+  "accuracy": 95,
+  "pp": 5,
+  "damageClass": "physical",
+  "priority": 0,
+  "effect": {
+    "ailment": "burn",
+    "ailmentChance": 50
+  }
+}

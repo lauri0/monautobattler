@@ -1,0 +1,47 @@
+{
+  "id": 355,
+  "name": "duskull",
+  "types": [
+    "ghost"
+  ],
+  "baseStats": {
+    "hp": 20,
+    "attack": 40,
+    "defense": 90,
+    "specialAttack": 30,
+    "specialDefense": 90,
+    "speed": 25
+  },
+  "spriteUrl": "/sprites/355.png",
+  "moves": [
+    "future-sight",
+    "blizzard",
+    "poltergeist",
+    "ice-beam",
+    "psychic",
+    "phantom-force",
+    "leech-life",
+    "shadow-ball",
+    "dark-pulse",
+    "tera-blast",
+    "facade",
+    "skitter-smack",
+    "hex",
+    "thief",
+    "icy-wind",
+    "payback",
+    "charge-beam",
+    "shadow-sneak",
+    "astonish",
+    "leer",
+    "protect",
+    "will-o-wisp",
+    "taunt",
+    "calm-mind",
+    "trick-room"
+  ],
+  "abilities": [
+    "levitate",
+    "frisk"
+  ]
+}

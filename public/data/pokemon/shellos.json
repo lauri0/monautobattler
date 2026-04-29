@@ -1,0 +1,54 @@
+{
+  "id": 422,
+  "name": "shellos",
+  "types": [
+    "water"
+  ],
+  "baseStats": {
+    "hp": 76,
+    "attack": 48,
+    "defense": 48,
+    "specialAttack": 57,
+    "specialDefense": 62,
+    "speed": 34
+  },
+  "spriteUrl": "/sprites/422.png",
+  "moves": [
+    "hydro-pump",
+    "blizzard",
+    "stone-edge",
+    "take-down",
+    "surf",
+    "ice-beam",
+    "muddy-water",
+    "earth-power",
+    "body-slam",
+    "liquidation",
+    "waterfall",
+    "tera-blast",
+    "rock-slide",
+    "facade",
+    "skitter-smack",
+    "sludge",
+    "ancient-power",
+    "rock-tomb",
+    "water-pulse",
+    "bulldoze",
+    "icy-wind",
+    "mud-shot",
+    "clear-smog",
+    "chilling-water",
+    "water-gun",
+    "whirlpool",
+    "mud-slap",
+    "recover",
+    "amnesia",
+    "protect",
+    "stealth-rock"
+  ],
+  "abilities": [
+    "sticky-hold",
+    "storm-drain",
+    "sand-force"
+  ]
+}

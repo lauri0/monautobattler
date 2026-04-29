@@ -1,0 +1,63 @@
+{
+  "id": 280,
+  "name": "ralts",
+  "types": [
+    "psychic",
+    "fairy"
+  ],
+  "baseStats": {
+    "hp": 28,
+    "attack": 25,
+    "defense": 25,
+    "specialAttack": 45,
+    "specialDefense": 35,
+    "speed": 40
+  },
+  "spriteUrl": "/sprites/280.png",
+  "moves": [
+    "future-sight",
+    "dream-eater",
+    "thunderbolt",
+    "psychic",
+    "hyper-voice",
+    "body-slam",
+    "shadow-ball",
+    "zen-headbutt",
+    "psyshock",
+    "dazzling-gleam",
+    "expanding-force",
+    "tera-blast",
+    "alluring-voice",
+    "fire-punch",
+    "ice-punch",
+    "thunder-punch",
+    "mystical-fire",
+    "facade",
+    "psybeam",
+    "knock-off",
+    "swift",
+    "thief",
+    "magical-leaf",
+    "icy-wind",
+    "confusion",
+    "charge-beam",
+    "draining-kiss",
+    "shadow-sneak",
+    "disarming-voice",
+    "stored-power",
+    "growl",
+    "thunder-wave",
+    "light-screen",
+    "reflect",
+    "protect",
+    "will-o-wisp",
+    "taunt",
+    "calm-mind",
+    "trick-room"
+  ],
+  "abilities": [
+    "synchronize",
+    "trace",
+    "telepathy"
+  ]
+}

@@ -1,0 +1,42 @@
+{
+  "id": 370,
+  "name": "luvdisc",
+  "types": [
+    "water"
+  ],
+  "baseStats": {
+    "hp": 43,
+    "attack": 30,
+    "defense": 55,
+    "specialAttack": 40,
+    "specialDefense": 65,
+    "speed": 97
+  },
+  "spriteUrl": "/sprites/370.png",
+  "moves": [
+    "hydro-pump",
+    "blizzard",
+    "take-down",
+    "surf",
+    "ice-beam",
+    "liquidation",
+    "waterfall",
+    "tera-blast",
+    "facade",
+    "water-pulse",
+    "flip-turn",
+    "icy-wind",
+    "draining-kiss",
+    "tackle",
+    "water-gun",
+    "aqua-jet",
+    "whirlpool",
+    "scale-shot",
+    "agility",
+    "protect"
+  ],
+  "abilities": [
+    "swift-swim",
+    "hydration"
+  ]
+}

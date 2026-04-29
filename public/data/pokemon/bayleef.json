@@ -1,0 +1,51 @@
+{
+  "id": 153,
+  "name": "bayleef",
+  "types": [
+    "grass"
+  ],
+  "baseStats": {
+    "hp": 60,
+    "attack": 62,
+    "defense": 80,
+    "specialAttack": 63,
+    "specialDefense": 80,
+    "speed": 60
+  },
+  "spriteUrl": "/sprites/153.png",
+  "moves": [
+    "leaf-storm",
+    "solar-blade",
+    "double-edge",
+    "solar-beam",
+    "take-down",
+    "energy-ball",
+    "body-slam",
+    "seed-bomb",
+    "grass-pledge",
+    "tera-blast",
+    "giga-drain",
+    "stomping-tantrum",
+    "facade",
+    "knock-off",
+    "ancient-power",
+    "magical-leaf",
+    "razor-leaf",
+    "grassy-glide",
+    "trailblaze",
+    "vine-whip",
+    "tackle",
+    "bullet-seed",
+    "mud-slap",
+    "swords-dance",
+    "growl",
+    "poison-powder",
+    "light-screen",
+    "reflect",
+    "protect"
+  ],
+  "abilities": [
+    "overgrow",
+    "leaf-guard"
+  ]
+}

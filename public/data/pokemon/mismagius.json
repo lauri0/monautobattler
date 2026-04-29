@@ -1,0 +1,61 @@
+{
+  "id": 429,
+  "name": "mismagius",
+  "types": [
+    "ghost"
+  ],
+  "baseStats": {
+    "hp": 60,
+    "attack": 60,
+    "defense": 60,
+    "specialAttack": 105,
+    "specialDefense": 105,
+    "speed": 105
+  },
+  "spriteUrl": "/sprites/429.png",
+  "moves": [
+    "hyper-beam",
+    "giga-impact",
+    "future-sight",
+    "thunder",
+    "poltergeist",
+    "foul-play",
+    "thunderbolt",
+    "psychic",
+    "hyper-voice",
+    "energy-ball",
+    "phantom-force",
+    "shadow-ball",
+    "dark-pulse",
+    "power-gem",
+    "psyshock",
+    "dazzling-gleam",
+    "tera-blast",
+    "mystical-fire",
+    "lash-out",
+    "psychic-noise",
+    "facade",
+    "burning-jealousy",
+    "psybeam",
+    "hex",
+    "swift",
+    "thief",
+    "magical-leaf",
+    "icy-wind",
+    "charge-beam",
+    "draining-kiss",
+    "astonish",
+    "stored-power",
+    "growl",
+    "thunder-wave",
+    "protect",
+    "will-o-wisp",
+    "taunt",
+    "calm-mind",
+    "nasty-plot",
+    "trick-room"
+  ],
+  "abilities": [
+    "levitate"
+  ]
+}

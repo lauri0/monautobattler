@@ -1,0 +1,46 @@
+{
+  "id": 179,
+  "name": "mareep",
+  "types": [
+    "electric"
+  ],
+  "baseStats": {
+    "hp": 55,
+    "attack": 40,
+    "defense": 40,
+    "specialAttack": 65,
+    "specialDefense": 45,
+    "speed": 35
+  },
+  "spriteUrl": "/sprites/179.png",
+  "moves": [
+    "double-edge",
+    "thunder",
+    "take-down",
+    "thunderbolt",
+    "wild-charge",
+    "body-slam",
+    "dig",
+    "power-gem",
+    "discharge",
+    "dazzling-gleam",
+    "tera-blast",
+    "facade",
+    "volt-switch",
+    "electroweb",
+    "charge-beam",
+    "trailblaze",
+    "tackle",
+    "thunder-shock",
+    "growl",
+    "thunder-wave",
+    "agility",
+    "light-screen",
+    "reflect",
+    "protect"
+  ],
+  "abilities": [
+    "static",
+    "plus"
+  ]
+}

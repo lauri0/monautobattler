@@ -1,0 +1,63 @@
+{
+  "id": 478,
+  "name": "froslass",
+  "types": [
+    "ice",
+    "ghost"
+  ],
+  "baseStats": {
+    "hp": 70,
+    "attack": 80,
+    "defense": 70,
+    "specialAttack": 80,
+    "specialDefense": 70,
+    "speed": 110
+  },
+  "spriteUrl": "/sprites/478.png",
+  "moves": [
+    "hyper-beam",
+    "giga-impact",
+    "blizzard",
+    "thunder",
+    "poltergeist",
+    "take-down",
+    "ice-beam",
+    "thunderbolt",
+    "psychic",
+    "body-slam",
+    "crunch",
+    "shadow-ball",
+    "tera-blast",
+    "ice-spinner",
+    "ice-punch",
+    "headbutt",
+    "facade",
+    "ice-fang",
+    "hex",
+    "bite",
+    "water-pulse",
+    "avalanche",
+    "frost-breath",
+    "icy-wind",
+    "weather-ball",
+    "draining-kiss",
+    "chilling-water",
+    "powder-snow",
+    "ice-shard",
+    "astonish",
+    "icicle-spear",
+    "triple-axel",
+    "leer",
+    "thunder-wave",
+    "light-screen",
+    "reflect",
+    "protect",
+    "spikes",
+    "will-o-wisp",
+    "taunt"
+  ],
+  "abilities": [
+    "snow-cloak",
+    "cursed-body"
+  ]
+}

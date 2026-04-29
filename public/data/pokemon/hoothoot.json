@@ -1,0 +1,61 @@
+{
+  "id": 163,
+  "name": "hoothoot",
+  "types": [
+    "normal",
+    "flying"
+  ],
+  "baseStats": {
+    "hp": 60,
+    "attack": 30,
+    "defense": 30,
+    "specialAttack": 36,
+    "specialDefense": 56,
+    "speed": 50
+  },
+  "spriteUrl": "/sprites/163.png",
+  "moves": [
+    "brave-bird",
+    "hurricane",
+    "dream-eater",
+    "heat-wave",
+    "moonblast",
+    "fly",
+    "take-down",
+    "psychic",
+    "uproar",
+    "hyper-voice",
+    "shadow-ball",
+    "extrasensory",
+    "zen-headbutt",
+    "tera-blast",
+    "air-slash",
+    "facade",
+    "psybeam",
+    "wing-attack",
+    "swift",
+    "thief",
+    "air-cutter",
+    "aerial-ace",
+    "acrobatics",
+    "confusion",
+    "tackle",
+    "echoed-voice",
+    "dual-wingbeat",
+    "peck",
+    "stored-power",
+    "growl",
+    "agility",
+    "reflect",
+    "amnesia",
+    "protect",
+    "calm-mind",
+    "tailwind",
+    "nasty-plot"
+  ],
+  "abilities": [
+    "insomnia",
+    "keen-eye",
+    "tinted-lens"
+  ]
+}

@@ -1,0 +1,63 @@
+{
+  "id": 200,
+  "name": "misdreavus",
+  "types": [
+    "ghost"
+  ],
+  "baseStats": {
+    "hp": 60,
+    "attack": 60,
+    "defense": 60,
+    "specialAttack": 85,
+    "specialDefense": 85,
+    "speed": 85
+  },
+  "spriteUrl": "/sprites/200.png",
+  "moves": [
+    "hyper-beam",
+    "giga-impact",
+    "future-sight",
+    "thunder",
+    "poltergeist",
+    "foul-play",
+    "thunderbolt",
+    "psychic",
+    "hyper-voice",
+    "energy-ball",
+    "phantom-force",
+    "shadow-ball",
+    "dark-pulse",
+    "power-gem",
+    "psyshock",
+    "dazzling-gleam",
+    "tera-blast",
+    "psychic-noise",
+    "facade",
+    "sucker-punch",
+    "burning-jealousy",
+    "psybeam",
+    "hex",
+    "swift",
+    "thief",
+    "magical-leaf",
+    "icy-wind",
+    "confusion",
+    "payback",
+    "charge-beam",
+    "draining-kiss",
+    "shadow-sneak",
+    "astonish",
+    "stored-power",
+    "growl",
+    "thunder-wave",
+    "protect",
+    "will-o-wisp",
+    "taunt",
+    "calm-mind",
+    "nasty-plot",
+    "trick-room"
+  ],
+  "abilities": [
+    "levitate"
+  ]
+}

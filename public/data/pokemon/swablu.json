@@ -1,0 +1,55 @@
+{
+  "id": 333,
+  "name": "swablu",
+  "types": [
+    "normal",
+    "flying"
+  ],
+  "baseStats": {
+    "hp": 45,
+    "attack": 40,
+    "defense": 60,
+    "specialAttack": 40,
+    "specialDefense": 75,
+    "speed": 50
+  },
+  "spriteUrl": "/sprites/333.png",
+  "moves": [
+    "solar-beam",
+    "brave-bird",
+    "hurricane",
+    "dragon-rush",
+    "heat-wave",
+    "moonblast",
+    "fly",
+    "take-down",
+    "ice-beam",
+    "hyper-voice",
+    "play-rough",
+    "body-slam",
+    "dragon-pulse",
+    "dazzling-gleam",
+    "tera-blast",
+    "facade",
+    "swift",
+    "thief",
+    "dragon-breath",
+    "aerial-ace",
+    "round",
+    "acrobatics",
+    "trailblaze",
+    "disarming-voice",
+    "dual-wingbeat",
+    "peck",
+    "astonish",
+    "fury-attack",
+    "growl",
+    "agility",
+    "protect",
+    "tailwind"
+  ],
+  "abilities": [
+    "natural-cure",
+    "cloud-nine"
+  ]
+}

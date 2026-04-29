@@ -1,0 +1,10 @@
+{
+  "id": 888,
+  "name": "twin-beam",
+  "type": "psychic",
+  "power": 40,
+  "accuracy": 100,
+  "pp": 10,
+  "damageClass": "special",
+  "priority": 0
+}

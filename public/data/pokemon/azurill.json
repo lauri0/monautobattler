@@ -1,0 +1,45 @@
+{
+  "id": 298,
+  "name": "azurill",
+  "types": [
+    "normal",
+    "fairy"
+  ],
+  "baseStats": {
+    "hp": 50,
+    "attack": 20,
+    "defense": 40,
+    "specialAttack": 20,
+    "specialDefense": 40,
+    "speed": 20
+  },
+  "spriteUrl": "/sprites/298.png",
+  "moves": [
+    "blizzard",
+    "take-down",
+    "surf",
+    "ice-beam",
+    "hyper-voice",
+    "body-slam",
+    "bounce",
+    "slam",
+    "waterfall",
+    "tera-blast",
+    "alluring-voice",
+    "facade",
+    "bubble-beam",
+    "icy-wind",
+    "mud-shot",
+    "draining-kiss",
+    "water-gun",
+    "aqua-jet",
+    "mud-slap",
+    "light-screen",
+    "protect"
+  ],
+  "abilities": [
+    "thick-fat",
+    "huge-power",
+    "sap-sipper"
+  ]
+}

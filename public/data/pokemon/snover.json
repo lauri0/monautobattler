@@ -1,0 +1,57 @@
+{
+  "id": 459,
+  "name": "snover",
+  "types": [
+    "grass",
+    "ice"
+  ],
+  "baseStats": {
+    "hp": 60,
+    "attack": 62,
+    "defense": 50,
+    "specialAttack": 62,
+    "specialDefense": 60,
+    "speed": 40
+  },
+  "spriteUrl": "/sprites/459.png",
+  "moves": [
+    "leaf-storm",
+    "double-edge",
+    "solar-beam",
+    "wood-hammer",
+    "blizzard",
+    "take-down",
+    "ice-beam",
+    "energy-ball",
+    "body-slam",
+    "seed-bomb",
+    "tera-blast",
+    "ice-spinner",
+    "ice-punch",
+    "giga-drain",
+    "facade",
+    "stomp",
+    "magical-leaf",
+    "water-pulse",
+    "avalanche",
+    "razor-leaf",
+    "icy-wind",
+    "grassy-glide",
+    "weather-ball",
+    "trailblaze",
+    "chilling-water",
+    "powder-snow",
+    "ice-shard",
+    "leafage",
+    "bullet-seed",
+    "icicle-spear",
+    "mud-slap",
+    "swords-dance",
+    "leer",
+    "protect"
+  ],
+  "abilities": [
+    "snow-warning",
+    "soundproof"
+  ]
+}

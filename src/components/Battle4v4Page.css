@@ -305,6 +305,22 @@
   font-weight: 600;
   cursor: pointer;
   text-transform: capitalize;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.15rem;
+}
+
+.btn-move-name {
+  font-size: 0.95rem;
+}
+
+.btn-move-stats {
+  font-size: 0.7rem;
+  font-weight: 400;
+  opacity: 0.85;
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
 }
 
 .btn-move:hover:not(:disabled),

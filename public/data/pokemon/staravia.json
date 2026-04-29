@@ -1,0 +1,47 @@
+{
+  "id": 397,
+  "name": "staravia",
+  "types": [
+    "normal",
+    "flying"
+  ],
+  "baseStats": {
+    "hp": 55,
+    "attack": 75,
+    "defense": 50,
+    "specialAttack": 40,
+    "specialDefense": 40,
+    "speed": 80
+  },
+  "spriteUrl": "/sprites/397.png",
+  "moves": [
+    "double-edge",
+    "brave-bird",
+    "hurricane",
+    "heat-wave",
+    "fly",
+    "take-down",
+    "uproar",
+    "tera-blast",
+    "air-slash",
+    "facade",
+    "u-turn",
+    "wing-attack",
+    "swift",
+    "thief",
+    "air-cutter",
+    "aerial-ace",
+    "acrobatics",
+    "tackle",
+    "quick-attack",
+    "dual-wingbeat",
+    "growl",
+    "agility",
+    "protect",
+    "tailwind"
+  ],
+  "abilities": [
+    "intimidate",
+    "reckless"
+  ]
+}

@@ -1,0 +1,43 @@
+{
+  "id": 191,
+  "name": "sunkern",
+  "types": [
+    "grass"
+  ],
+  "baseStats": {
+    "hp": 30,
+    "attack": 30,
+    "defense": 30,
+    "specialAttack": 30,
+    "specialDefense": 30,
+    "speed": 30
+  },
+  "spriteUrl": "/sprites/191.png",
+  "moves": [
+    "leaf-storm",
+    "double-edge",
+    "solar-beam",
+    "take-down",
+    "energy-ball",
+    "earth-power",
+    "seed-bomb",
+    "tera-blast",
+    "giga-drain",
+    "facade",
+    "magical-leaf",
+    "razor-leaf",
+    "weather-ball",
+    "trailblaze",
+    "tackle",
+    "giga-drain",
+    "bullet-seed",
+    "absorb",
+    "light-screen",
+    "protect"
+  ],
+  "abilities": [
+    "chlorophyll",
+    "solar-power",
+    "early-bird"
+  ]
+}

@@ -1,0 +1,54 @@
+{
+  "id": 457,
+  "name": "lumineon",
+  "types": [
+    "water"
+  ],
+  "baseStats": {
+    "hp": 69,
+    "attack": 69,
+    "defense": 76,
+    "specialAttack": 69,
+    "specialDefense": 86,
+    "speed": 91
+  },
+  "spriteUrl": "/sprites/457.png",
+  "moves": [
+    "hyper-beam",
+    "giga-impact",
+    "hydro-pump",
+    "blizzard",
+    "take-down",
+    "surf",
+    "ice-beam",
+    "bounce",
+    "waterfall",
+    "dazzling-gleam",
+    "tera-blast",
+    "alluring-voice",
+    "air-slash",
+    "facade",
+    "u-turn",
+    "psybeam",
+    "swift",
+    "thief",
+    "air-cutter",
+    "water-pulse",
+    "flip-turn",
+    "icy-wind",
+    "acrobatics",
+    "chilling-water",
+    "pound",
+    "gust",
+    "water-gun",
+    "whirlpool",
+    "agility",
+    "protect",
+    "tailwind"
+  ],
+  "abilities": [
+    "swift-swim",
+    "storm-drain",
+    "water-veil"
+  ]
+}

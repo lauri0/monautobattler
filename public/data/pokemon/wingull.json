@@ -1,0 +1,59 @@
+{
+  "id": 278,
+  "name": "wingull",
+  "types": [
+    "water",
+    "flying"
+  ],
+  "baseStats": {
+    "hp": 40,
+    "attack": 30,
+    "defense": 30,
+    "specialAttack": 55,
+    "specialDefense": 30,
+    "speed": 85
+  },
+  "spriteUrl": "/sprites/278.png",
+  "moves": [
+    "brave-bird",
+    "hydro-pump",
+    "blizzard",
+    "hurricane",
+    "fly",
+    "take-down",
+    "surf",
+    "ice-beam",
+    "muddy-water",
+    "liquidation",
+    "waterfall",
+    "tera-blast",
+    "air-slash",
+    "facade",
+    "u-turn",
+    "knock-off",
+    "wing-attack",
+    "swift",
+    "thief",
+    "air-cutter",
+    "aerial-ace",
+    "water-pulse",
+    "icy-wind",
+    "acrobatics",
+    "chilling-water",
+    "gust",
+    "water-gun",
+    "quick-attack",
+    "twister",
+    "dual-wingbeat",
+    "whirlpool",
+    "growl",
+    "agility",
+    "protect",
+    "tailwind"
+  ],
+  "abilities": [
+    "keen-eye",
+    "hydration",
+    "rain-dish"
+  ]
+}

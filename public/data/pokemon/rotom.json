@@ -1,0 +1,49 @@
+{
+  "id": 479,
+  "name": "rotom",
+  "types": [
+    "electric",
+    "ghost"
+  ],
+  "baseStats": {
+    "hp": 50,
+    "attack": 50,
+    "defense": 77,
+    "specialAttack": 95,
+    "specialDefense": 77,
+    "speed": 91
+  },
+  "spriteUrl": "/sprites/479.png",
+  "moves": [
+    "thunder",
+    "poltergeist",
+    "foul-play",
+    "thunderbolt",
+    "uproar",
+    "hyper-voice",
+    "shadow-ball",
+    "dark-pulse",
+    "discharge",
+    "tera-blast",
+    "facade",
+    "volt-switch",
+    "hex",
+    "swift",
+    "thief",
+    "shock-wave",
+    "electroweb",
+    "charge-beam",
+    "thunder-shock",
+    "astonish",
+    "stored-power",
+    "thunder-wave",
+    "light-screen",
+    "reflect",
+    "protect",
+    "will-o-wisp",
+    "nasty-plot"
+  ],
+  "abilities": [
+    "levitate"
+  ]
+}

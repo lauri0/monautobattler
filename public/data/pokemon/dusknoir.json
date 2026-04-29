@@ -1,0 +1,62 @@
+{
+  "id": 477,
+  "name": "dusknoir",
+  "types": [
+    "ghost"
+  ],
+  "baseStats": {
+    "hp": 45,
+    "attack": 100,
+    "defense": 135,
+    "specialAttack": 65,
+    "specialDefense": 135,
+    "speed": 45
+  },
+  "spriteUrl": "/sprites/477.png",
+  "moves": [
+    "hyper-beam",
+    "focus-punch",
+    "giga-impact",
+    "future-sight",
+    "focus-blast",
+    "blizzard",
+    "poltergeist",
+    "earthquake",
+    "ice-beam",
+    "psychic",
+    "phantom-force",
+    "body-slam",
+    "leech-life",
+    "shadow-ball",
+    "dark-pulse",
+    "tera-blast",
+    "fire-punch",
+    "ice-punch",
+    "thunder-punch",
+    "rock-slide",
+    "brick-break",
+    "facade",
+    "skitter-smack",
+    "hex",
+    "swift",
+    "thief",
+    "rock-tomb",
+    "shadow-punch",
+    "icy-wind",
+    "payback",
+    "charge-beam",
+    "shadow-sneak",
+    "astonish",
+    "bind",
+    "leer",
+    "protect",
+    "will-o-wisp",
+    "taunt",
+    "calm-mind",
+    "trick-room"
+  ],
+  "abilities": [
+    "pressure",
+    "frisk"
+  ]
+}

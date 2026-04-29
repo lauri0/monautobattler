@@ -1,0 +1,54 @@
+{
+  "id": 462,
+  "name": "magnezone",
+  "types": [
+    "electric",
+    "steel"
+  ],
+  "baseStats": {
+    "hp": 70,
+    "attack": 70,
+    "defense": 115,
+    "specialAttack": 130,
+    "specialDefense": 90,
+    "speed": 60
+  },
+  "spriteUrl": "/sprites/462.png",
+  "moves": [
+    "hyper-beam",
+    "giga-impact",
+    "steel-beam",
+    "double-edge",
+    "zap-cannon",
+    "thunder",
+    "supercell-slam",
+    "take-down",
+    "thunderbolt",
+    "wild-charge",
+    "body-slam",
+    "tri-attack",
+    "flash-cannon",
+    "discharge",
+    "iron-head",
+    "body-press",
+    "tera-blast",
+    "facade",
+    "volt-switch",
+    "spark",
+    "swift",
+    "electroweb",
+    "charge-beam",
+    "tackle",
+    "thunder-shock",
+    "thunder-wave",
+    "light-screen",
+    "reflect",
+    "protect",
+    "iron-defense"
+  ],
+  "abilities": [
+    "magnet-pull",
+    "sturdy",
+    "analytic"
+  ]
+}

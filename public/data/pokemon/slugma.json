@@ -1,0 +1,63 @@
+{
+  "id": 218,
+  "name": "slugma",
+  "types": [
+    "fire"
+  ],
+  "baseStats": {
+    "hp": 40,
+    "attack": 40,
+    "defense": 40,
+    "specialAttack": 70,
+    "specialDefense": 40,
+    "speed": 20
+  },
+  "spriteUrl": "/sprites/218.png",
+  "moves": [
+    "overheat",
+    "fire-blast",
+    "earthquake",
+    "stone-edge",
+    "inferno",
+    "heat-wave",
+    "high-horsepower",
+    "take-down",
+    "flamethrower",
+    "earth-power",
+    "body-slam",
+    "power-gem",
+    "lava-plume",
+    "tera-blast",
+    "rock-slide",
+    "temper-flare",
+    "facade",
+    "ancient-power",
+    "rock-tomb",
+    "incinerate",
+    "bulldoze",
+    "mud-shot",
+    "rock-throw",
+    "smack-down",
+    "flame-charge",
+    "clear-smog",
+    "ember",
+    "fire-spin",
+    "smog",
+    "rollout",
+    "rock-blast",
+    "mud-slap",
+    "recover",
+    "light-screen",
+    "reflect",
+    "amnesia",
+    "protect",
+    "will-o-wisp",
+    "iron-defense",
+    "stealth-rock"
+  ],
+  "abilities": [
+    "magma-armor",
+    "flame-body",
+    "weak-armor"
+  ]
+}

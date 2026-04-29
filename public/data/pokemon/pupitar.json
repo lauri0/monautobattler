@@ -1,0 +1,62 @@
+{
+  "id": 247,
+  "name": "pupitar",
+  "types": [
+    "rock",
+    "ground"
+  ],
+  "baseStats": {
+    "hp": 70,
+    "attack": 84,
+    "defense": 70,
+    "specialAttack": 65,
+    "specialDefense": 70,
+    "speed": 51
+  },
+  "spriteUrl": "/sprites/247.png",
+  "moves": [
+    "hyper-beam",
+    "giga-impact",
+    "thrash",
+    "double-edge",
+    "outrage",
+    "earthquake",
+    "stone-edge",
+    "high-horsepower",
+    "take-down",
+    "earth-power",
+    "body-slam",
+    "dig",
+    "crunch",
+    "dark-pulse",
+    "iron-head",
+    "tera-blast",
+    "rock-slide",
+    "brick-break",
+    "stomping-tantrum",
+    "lash-out",
+    "facade",
+    "bite",
+    "rock-tomb",
+    "aerial-ace",
+    "bulldoze",
+    "mud-shot",
+    "snarl",
+    "rock-throw",
+    "payback",
+    "smack-down",
+    "tackle",
+    "sand-tomb",
+    "rock-blast",
+    "mud-slap",
+    "leer",
+    "protect",
+    "taunt",
+    "iron-defense",
+    "dragon-dance",
+    "stealth-rock"
+  ],
+  "abilities": [
+    "shed-skin"
+  ]
+}

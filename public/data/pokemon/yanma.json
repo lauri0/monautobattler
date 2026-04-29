@@ -1,0 +1,55 @@
+{
+  "id": 193,
+  "name": "yanma",
+  "types": [
+    "bug",
+    "flying"
+  ],
+  "baseStats": {
+    "hp": 65,
+    "attack": 65,
+    "defense": 45,
+    "specialAttack": 75,
+    "specialDefense": 45,
+    "speed": 95
+  },
+  "spriteUrl": "/sprites/193.png",
+  "moves": [
+    "double-edge",
+    "solar-beam",
+    "take-down",
+    "psychic",
+    "uproar",
+    "bug-buzz",
+    "leech-life",
+    "shadow-ball",
+    "lunge",
+    "tera-blast",
+    "giga-drain",
+    "air-slash",
+    "psychic-noise",
+    "facade",
+    "u-turn",
+    "skitter-smack",
+    "wing-attack",
+    "swift",
+    "thief",
+    "ancient-power",
+    "air-cutter",
+    "aerial-ace",
+    "bug-bite",
+    "struggle-bug",
+    "pounce",
+    "tackle",
+    "quick-attack",
+    "feint",
+    "swords-dance",
+    "protect",
+    "tailwind"
+  ],
+  "abilities": [
+    "speed-boost",
+    "compound-eyes",
+    "frisk"
+  ]
+}

@@ -1,0 +1,13 @@
+{
+  "id": 524,
+  "name": "frost-breath",
+  "type": "ice",
+  "power": 60,
+  "accuracy": 90,
+  "pp": 10,
+  "damageClass": "special",
+  "priority": 0,
+  "effect": {
+    "critRate": 6
+  }
+}

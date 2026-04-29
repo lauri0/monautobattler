@@ -1,0 +1,57 @@
+{
+  "id": 471,
+  "name": "glaceon",
+  "types": [
+    "ice"
+  ],
+  "baseStats": {
+    "hp": 65,
+    "attack": 60,
+    "defense": 110,
+    "specialAttack": 130,
+    "specialDefense": 95,
+    "speed": 65
+  },
+  "spriteUrl": "/sprites/471.png",
+  "moves": [
+    "hyper-beam",
+    "giga-impact",
+    "last-resort",
+    "double-edge",
+    "blizzard",
+    "take-down",
+    "ice-beam",
+    "hyper-voice",
+    "body-slam",
+    "dig",
+    "shadow-ball",
+    "tera-blast",
+    "alluring-voice",
+    "facade",
+    "freeze-dry",
+    "ice-fang",
+    "bite",
+    "swift",
+    "covet",
+    "water-pulse",
+    "avalanche",
+    "icy-wind",
+    "mud-shot",
+    "weather-ball",
+    "chilling-water",
+    "tackle",
+    "quick-attack",
+    "ice-shard",
+    "icicle-spear",
+    "mud-slap",
+    "stored-power",
+    "triple-axel",
+    "growl",
+    "protect",
+    "calm-mind"
+  ],
+  "abilities": [
+    "snow-cloak",
+    "ice-body"
+  ]
+}

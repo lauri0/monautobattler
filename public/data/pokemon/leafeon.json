@@ -1,0 +1,62 @@
+{
+  "id": 470,
+  "name": "leafeon",
+  "types": [
+    "grass"
+  ],
+  "baseStats": {
+    "hp": 65,
+    "attack": 110,
+    "defense": 130,
+    "specialAttack": 60,
+    "specialDefense": 65,
+    "speed": 95
+  },
+  "spriteUrl": "/sprites/470.png",
+  "moves": [
+    "hyper-beam",
+    "giga-impact",
+    "last-resort",
+    "leaf-storm",
+    "solar-blade",
+    "double-edge",
+    "solar-beam",
+    "take-down",
+    "hyper-voice",
+    "leaf-blade",
+    "energy-ball",
+    "body-slam",
+    "dig",
+    "shadow-ball",
+    "seed-bomb",
+    "x-scissor",
+    "tera-blast",
+    "alluring-voice",
+    "giga-drain",
+    "facade",
+    "knock-off",
+    "bite",
+    "swift",
+    "aerial-ace",
+    "covet",
+    "magical-leaf",
+    "razor-leaf",
+    "mud-shot",
+    "grassy-glide",
+    "weather-ball",
+    "trailblaze",
+    "tackle",
+    "quick-attack",
+    "bullet-seed",
+    "mud-slap",
+    "stored-power",
+    "swords-dance",
+    "growl",
+    "protect",
+    "calm-mind"
+  ],
+  "abilities": [
+    "leaf-guard",
+    "chlorophyll"
+  ]
+}

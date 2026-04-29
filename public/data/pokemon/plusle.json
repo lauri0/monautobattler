@@ -1,0 +1,48 @@
+{
+  "id": 311,
+  "name": "plusle",
+  "types": [
+    "electric"
+  ],
+  "baseStats": {
+    "hp": 60,
+    "attack": 50,
+    "defense": 40,
+    "specialAttack": 85,
+    "specialDefense": 75,
+    "speed": 95
+  },
+  "spriteUrl": "/sprites/311.png",
+  "moves": [
+    "last-resort",
+    "thunder",
+    "thunderbolt",
+    "uproar",
+    "wild-charge",
+    "play-rough",
+    "discharge",
+    "tera-blast",
+    "alluring-voice",
+    "thunder-punch",
+    "facade",
+    "volt-switch",
+    "spark",
+    "swift",
+    "electroweb",
+    "charge-beam",
+    "trailblaze",
+    "quick-attack",
+    "mud-slap",
+    "nuzzle",
+    "growl",
+    "thunder-wave",
+    "agility",
+    "light-screen",
+    "protect",
+    "nasty-plot"
+  ],
+  "abilities": [
+    "plus",
+    "lightning-rod"
+  ]
+}

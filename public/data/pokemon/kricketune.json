@@ -1,0 +1,54 @@
+{
+  "id": 402,
+  "name": "kricketune",
+  "types": [
+    "bug"
+  ],
+  "baseStats": {
+    "hp": 77,
+    "attack": 85,
+    "defense": 51,
+    "specialAttack": 55,
+    "specialDefense": 51,
+    "speed": 65
+  },
+  "spriteUrl": "/sprites/402.png",
+  "moves": [
+    "hyper-beam",
+    "giga-impact",
+    "take-down",
+    "uproar",
+    "hyper-voice",
+    "bug-buzz",
+    "leech-life",
+    "x-scissor",
+    "throat-chop",
+    "lunge",
+    "tera-blast",
+    "giga-drain",
+    "brick-break",
+    "slash",
+    "facade",
+    "night-slash",
+    "skitter-smack",
+    "knock-off",
+    "aerial-ace",
+    "bug-bite",
+    "struggle-bug",
+    "fell-stinger",
+    "pounce",
+    "trailblaze",
+    "tackle",
+    "false-swipe",
+    "fury-cutter",
+    "absorb",
+    "swords-dance",
+    "growl",
+    "protect",
+    "taunt"
+  ],
+  "abilities": [
+    "swarm",
+    "technician"
+  ]
+}

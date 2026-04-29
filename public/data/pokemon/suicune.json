@@ -1,0 +1,60 @@
+{
+  "id": 245,
+  "name": "suicune",
+  "types": [
+    "water"
+  ],
+  "baseStats": {
+    "hp": 100,
+    "attack": 75,
+    "defense": 115,
+    "specialAttack": 90,
+    "specialDefense": 115,
+    "speed": 85
+  },
+  "spriteUrl": "/sprites/245.png",
+  "moves": [
+    "hyper-beam",
+    "giga-impact",
+    "double-edge",
+    "hydro-pump",
+    "blizzard",
+    "take-down",
+    "surf",
+    "ice-beam",
+    "body-slam",
+    "liquidation",
+    "waterfall",
+    "crunch",
+    "extreme-speed",
+    "shadow-ball",
+    "extrasensory",
+    "iron-head",
+    "scald",
+    "tera-blast",
+    "air-slash",
+    "facade",
+    "ice-fang",
+    "bite",
+    "swift",
+    "water-pulse",
+    "avalanche",
+    "icy-wind",
+    "snarl",
+    "weather-ball",
+    "trailblaze",
+    "chilling-water",
+    "gust",
+    "water-gun",
+    "whirlpool",
+    "leer",
+    "agility",
+    "protect",
+    "calm-mind",
+    "tailwind"
+  ],
+  "abilities": [
+    "pressure",
+    "inner-focus"
+  ]
+}

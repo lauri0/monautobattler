@@ -1,0 +1,58 @@
+{
+  "id": 170,
+  "name": "chinchou",
+  "types": [
+    "water",
+    "electric"
+  ],
+  "baseStats": {
+    "hp": 75,
+    "attack": 38,
+    "defense": 38,
+    "specialAttack": 56,
+    "specialDefense": 56,
+    "speed": 67
+  },
+  "spriteUrl": "/sprites/170.png",
+  "moves": [
+    "double-edge",
+    "hydro-pump",
+    "blizzard",
+    "thunder",
+    "take-down",
+    "surf",
+    "ice-beam",
+    "thunderbolt",
+    "muddy-water",
+    "wild-charge",
+    "liquidation",
+    "waterfall",
+    "discharge",
+    "scald",
+    "dazzling-gleam",
+    "tera-blast",
+    "facade",
+    "sucker-punch",
+    "volt-switch",
+    "psybeam",
+    "bubble-beam",
+    "spark",
+    "water-pulse",
+    "flip-turn",
+    "icy-wind",
+    "electroweb",
+    "charge-beam",
+    "chilling-water",
+    "water-gun",
+    "whirlpool",
+    "thunder-wave",
+    "agility",
+    "amnesia",
+    "protect"
+  ],
+  "abilities": [
+    "volt-absorb",
+    "illuminate",
+    "water-absorb"
+  ]
+}

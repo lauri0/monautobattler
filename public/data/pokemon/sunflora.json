@@ -1,0 +1,52 @@
+{
+  "id": 192,
+  "name": "sunflora",
+  "types": [
+    "grass"
+  ],
+  "baseStats": {
+    "hp": 75,
+    "attack": 75,
+    "defense": 55,
+    "specialAttack": 105,
+    "specialDefense": 85,
+    "speed": 30
+  },
+  "spriteUrl": "/sprites/192.png",
+  "moves": [
+    "hyper-beam",
+    "giga-impact",
+    "leaf-storm",
+    "double-edge",
+    "solar-beam",
+    "petal-dance",
+    "take-down",
+    "sludge-bomb",
+    "energy-ball",
+    "earth-power",
+    "petal-blizzard",
+    "seed-bomb",
+    "dazzling-gleam",
+    "tera-blast",
+    "giga-drain",
+    "facade",
+    "magical-leaf",
+    "razor-leaf",
+    "grassy-glide",
+    "weather-ball",
+    "trailblaze",
+    "pound",
+    "tackle",
+    "giga-drain",
+    "bullet-seed",
+    "absorb",
+    "swords-dance",
+    "light-screen",
+    "protect"
+  ],
+  "abilities": [
+    "chlorophyll",
+    "solar-power",
+    "early-bird"
+  ]
+}

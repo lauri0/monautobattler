@@ -1,0 +1,55 @@
+{
+  "id": 173,
+  "name": "cleffa",
+  "types": [
+    "fairy"
+  ],
+  "baseStats": {
+    "hp": 50,
+    "attack": 25,
+    "defense": 28,
+    "specialAttack": 45,
+    "specialDefense": 55,
+    "speed": 15
+  },
+  "spriteUrl": "/sprites/173.png",
+  "moves": [
+    "solar-beam",
+    "fire-blast",
+    "flamethrower",
+    "psychic",
+    "uproar",
+    "hyper-voice",
+    "play-rough",
+    "body-slam",
+    "dig",
+    "shadow-ball",
+    "zen-headbutt",
+    "psyshock",
+    "dazzling-gleam",
+    "tera-blast",
+    "alluring-voice",
+    "facade",
+    "psybeam",
+    "swift",
+    "magical-leaf",
+    "water-pulse",
+    "icy-wind",
+    "draining-kiss",
+    "chilling-water",
+    "pound",
+    "disarming-voice",
+    "stored-power",
+    "thunder-wave",
+    "light-screen",
+    "reflect",
+    "amnesia",
+    "protect",
+    "calm-mind"
+  ],
+  "abilities": [
+    "cute-charm",
+    "magic-guard",
+    "friend-guard"
+  ]
+}

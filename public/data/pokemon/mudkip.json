@@ -1,0 +1,59 @@
+{
+  "id": 258,
+  "name": "mudkip",
+  "types": [
+    "water"
+  ],
+  "baseStats": {
+    "hp": 50,
+    "attack": 70,
+    "defense": 50,
+    "specialAttack": 50,
+    "specialDefense": 50,
+    "speed": 40
+  },
+  "spriteUrl": "/sprites/258.png",
+  "moves": [
+    "double-edge",
+    "hydro-pump",
+    "blizzard",
+    "sludge-wave",
+    "take-down",
+    "surf",
+    "ice-beam",
+    "uproar",
+    "muddy-water",
+    "earth-power",
+    "body-slam",
+    "liquidation",
+    "dig",
+    "waterfall",
+    "water-pledge",
+    "tera-blast",
+    "rock-slide",
+    "facade",
+    "stomp",
+    "sludge",
+    "bite",
+    "ancient-power",
+    "rock-tomb",
+    "water-pulse",
+    "avalanche",
+    "icy-wind",
+    "mud-shot",
+    "rock-throw",
+    "chilling-water",
+    "tackle",
+    "water-gun",
+    "rock-smash",
+    "whirlpool",
+    "mud-slap",
+    "growl",
+    "amnesia",
+    "protect"
+  ],
+  "abilities": [
+    "torrent",
+    "damp"
+  ]
+}

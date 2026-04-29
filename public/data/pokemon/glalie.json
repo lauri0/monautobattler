@@ -1,0 +1,60 @@
+{
+  "id": 362,
+  "name": "glalie",
+  "types": [
+    "ice"
+  ],
+  "baseStats": {
+    "hp": 80,
+    "attack": 80,
+    "defense": 80,
+    "specialAttack": 80,
+    "specialDefense": 80,
+    "speed": 80
+  },
+  "spriteUrl": "/sprites/362.png",
+  "moves": [
+    "hyper-beam",
+    "giga-impact",
+    "blizzard",
+    "earthquake",
+    "foul-play",
+    "take-down",
+    "ice-beam",
+    "body-slam",
+    "crunch",
+    "shadow-ball",
+    "dark-pulse",
+    "iron-head",
+    "tera-blast",
+    "ice-spinner",
+    "headbutt",
+    "facade",
+    "freeze-dry",
+    "ice-fang",
+    "hex",
+    "bite",
+    "water-pulse",
+    "avalanche",
+    "bulldoze",
+    "frost-breath",
+    "icy-wind",
+    "weather-ball",
+    "trailblaze",
+    "chilling-water",
+    "powder-snow",
+    "ice-shard",
+    "astonish",
+    "icicle-spear",
+    "leer",
+    "light-screen",
+    "protect",
+    "spikes",
+    "taunt"
+  ],
+  "abilities": [
+    "inner-focus",
+    "ice-body",
+    "moody"
+  ]
+}

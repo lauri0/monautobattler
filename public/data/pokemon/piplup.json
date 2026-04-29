@@ -1,0 +1,56 @@
+{
+  "id": 393,
+  "name": "piplup",
+  "types": [
+    "water"
+  ],
+  "baseStats": {
+    "hp": 53,
+    "attack": 51,
+    "defense": 53,
+    "specialAttack": 61,
+    "specialDefense": 56,
+    "speed": 40
+  },
+  "spriteUrl": "/sprites/393.png",
+  "moves": [
+    "hydro-pump",
+    "blizzard",
+    "surf",
+    "ice-beam",
+    "liquidation",
+    "drill-peck",
+    "waterfall",
+    "water-pledge",
+    "tera-blast",
+    "ice-spinner",
+    "brick-break",
+    "facade",
+    "bubble-beam",
+    "brine",
+    "swift",
+    "rock-tomb",
+    "aerial-ace",
+    "water-pulse",
+    "flip-turn",
+    "icy-wind",
+    "snore",
+    "weather-ball",
+    "chilling-water",
+    "pound",
+    "water-gun",
+    "disarming-voice",
+    "peck",
+    "whirlpool",
+    "power-trip",
+    "triple-axel",
+    "fury-attack",
+    "growl",
+    "agility",
+    "protect"
+  ],
+  "abilities": [
+    "torrent",
+    "competitive"
+  ]
+}

@@ -1,0 +1,63 @@
+{
+  "id": 281,
+  "name": "kirlia",
+  "types": [
+    "psychic",
+    "fairy"
+  ],
+  "baseStats": {
+    "hp": 38,
+    "attack": 35,
+    "defense": 35,
+    "specialAttack": 65,
+    "specialDefense": 55,
+    "speed": 50
+  },
+  "spriteUrl": "/sprites/281.png",
+  "moves": [
+    "hyper-beam",
+    "future-sight",
+    "dream-eater",
+    "thunderbolt",
+    "psychic",
+    "hyper-voice",
+    "body-slam",
+    "shadow-ball",
+    "zen-headbutt",
+    "psyshock",
+    "dazzling-gleam",
+    "expanding-force",
+    "tera-blast",
+    "alluring-voice",
+    "fire-punch",
+    "ice-punch",
+    "thunder-punch",
+    "facade",
+    "psybeam",
+    "knock-off",
+    "swift",
+    "thief",
+    "magical-leaf",
+    "icy-wind",
+    "confusion",
+    "charge-beam",
+    "draining-kiss",
+    "disarming-voice",
+    "stored-power",
+    "triple-axel",
+    "growl",
+    "thunder-wave",
+    "light-screen",
+    "reflect",
+    "protect",
+    "will-o-wisp",
+    "taunt",
+    "calm-mind",
+    "trick-room"
+  ],
+  "abilities": [
+    "synchronize",
+    "trace",
+    "telepathy"
+  ]
+}

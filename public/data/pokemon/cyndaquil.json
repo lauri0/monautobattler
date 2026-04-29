@@ -1,0 +1,59 @@
+{
+  "id": 155,
+  "name": "cyndaquil",
+  "types": [
+    "fire"
+  ],
+  "baseStats": {
+    "hp": 39,
+    "attack": 52,
+    "defense": 43,
+    "specialAttack": 60,
+    "specialDefense": 50,
+    "speed": 65
+  },
+  "spriteUrl": "/sprites/155.png",
+  "moves": [
+    "eruption",
+    "overheat",
+    "double-edge",
+    "flare-blitz",
+    "fire-blast",
+    "inferno",
+    "heat-wave",
+    "take-down",
+    "flamethrower",
+    "wild-charge",
+    "play-rough",
+    "body-slam",
+    "dig",
+    "extrasensory",
+    "zen-headbutt",
+    "lava-plume",
+    "iron-head",
+    "fire-pledge",
+    "tera-blast",
+    "temper-flare",
+    "facade",
+    "burning-jealousy",
+    "fire-fang",
+    "swift",
+    "flame-wheel",
+    "aerial-ace",
+    "covet",
+    "flame-charge",
+    "tackle",
+    "ember",
+    "quick-attack",
+    "fire-spin",
+    "double-kick",
+    "rollout",
+    "leer",
+    "protect",
+    "will-o-wisp"
+  ],
+  "abilities": [
+    "blaze",
+    "flash-fire"
+  ]
+}

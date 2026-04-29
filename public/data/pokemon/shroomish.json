@@ -1,0 +1,47 @@
+{
+  "id": 285,
+  "name": "shroomish",
+  "types": [
+    "grass"
+  ],
+  "baseStats": {
+    "hp": 60,
+    "attack": 40,
+    "defense": 60,
+    "specialAttack": 40,
+    "specialDefense": 60,
+    "speed": 35
+  },
+  "spriteUrl": "/sprites/285.png",
+  "moves": [
+    "solar-beam",
+    "gunk-shot",
+    "take-down",
+    "sludge-bomb",
+    "energy-ball",
+    "body-slam",
+    "seed-bomb",
+    "zen-headbutt",
+    "tera-blast",
+    "giga-drain",
+    "drain-punch",
+    "headbutt",
+    "facade",
+    "venoshock",
+    "swift",
+    "magical-leaf",
+    "pounce",
+    "tackle",
+    "giga-drain",
+    "false-swipe",
+    "bullet-seed",
+    "absorb",
+    "poison-powder",
+    "protect"
+  ],
+  "abilities": [
+    "effect-spore",
+    "poison-heal",
+    "quick-feet"
+  ]
+}

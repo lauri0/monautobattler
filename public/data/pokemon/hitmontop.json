@@ -1,0 +1,60 @@
+{
+  "id": 237,
+  "name": "hitmontop",
+  "types": [
+    "fighting"
+  ],
+  "baseStats": {
+    "hp": 50,
+    "attack": 95,
+    "defense": 95,
+    "specialAttack": 35,
+    "specialDefense": 110,
+    "speed": 70
+  },
+  "spriteUrl": "/sprites/237.png",
+  "moves": [
+    "giga-impact",
+    "high-jump-kick",
+    "double-edge",
+    "close-combat",
+    "focus-blast",
+    "earthquake",
+    "stone-edge",
+    "take-down",
+    "uproar",
+    "body-slam",
+    "dig",
+    "drill-run",
+    "tera-blast",
+    "ice-spinner",
+    "rock-slide",
+    "brick-break",
+    "facade",
+    "sucker-punch",
+    "low-sweep",
+    "upper-hand",
+    "swift",
+    "thief",
+    "aerial-ace",
+    "bulldoze",
+    "rapid-spin",
+    "tackle",
+    "quick-attack",
+    "mach-punch",
+    "fake-out",
+    "vacuum-wave",
+    "bullet-punch",
+    "feint",
+    "triple-axel",
+    "triple-kick",
+    "agility",
+    "protect",
+    "bulk-up"
+  ],
+  "abilities": [
+    "intimidate",
+    "technician",
+    "steadfast"
+  ]
+}

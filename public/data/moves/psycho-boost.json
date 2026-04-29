@@ -1,0 +1,20 @@
+{
+  "id": 354,
+  "name": "psycho-boost",
+  "type": "psychic",
+  "power": 140,
+  "accuracy": 90,
+  "pp": 5,
+  "damageClass": "special",
+  "priority": 0,
+  "effect": {
+    "statChanges": [
+      {
+        "stat": "special-attack",
+        "change": -2,
+        "target": "user"
+      }
+    ],
+    "statChance": 100
+  }
+}

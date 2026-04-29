@@ -1,0 +1,10 @@
+{
+  "id": 584,
+  "name": "fairy-wind",
+  "type": "fairy",
+  "power": 40,
+  "accuracy": 100,
+  "pp": 30,
+  "damageClass": "special",
+  "priority": 0
+}

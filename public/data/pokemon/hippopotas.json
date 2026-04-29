@@ -1,0 +1,51 @@
+{
+  "id": 449,
+  "name": "hippopotas",
+  "types": [
+    "ground"
+  ],
+  "baseStats": {
+    "hp": 68,
+    "attack": 72,
+    "defense": 78,
+    "specialAttack": 38,
+    "specialDefense": 42,
+    "speed": 32
+  },
+  "spriteUrl": "/sprites/449.png",
+  "moves": [
+    "double-edge",
+    "earthquake",
+    "stone-edge",
+    "high-horsepower",
+    "take-down",
+    "muddy-water",
+    "earth-power",
+    "body-slam",
+    "dig",
+    "crunch",
+    "body-press",
+    "tera-blast",
+    "rock-slide",
+    "stomping-tantrum",
+    "facade",
+    "scorching-sands",
+    "thunder-fang",
+    "ice-fang",
+    "fire-fang",
+    "bite",
+    "rock-tomb",
+    "bulldoze",
+    "mud-shot",
+    "tackle",
+    "sand-tomb",
+    "mud-slap",
+    "amnesia",
+    "protect",
+    "stealth-rock"
+  ],
+  "abilities": [
+    "sand-stream",
+    "sand-force"
+  ]
+}

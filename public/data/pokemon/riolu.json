@@ -1,0 +1,63 @@
+{
+  "id": 447,
+  "name": "riolu",
+  "types": [
+    "fighting"
+  ],
+  "baseStats": {
+    "hp": 40,
+    "attack": 70,
+    "defense": 40,
+    "specialAttack": 35,
+    "specialDefense": 40,
+    "speed": 60
+  },
+  "spriteUrl": "/sprites/447.png",
+  "moves": [
+    "focus-punch",
+    "high-jump-kick",
+    "close-combat",
+    "focus-blast",
+    "earthquake",
+    "cross-chop",
+    "take-down",
+    "dig",
+    "crunch",
+    "poison-jab",
+    "zen-headbutt",
+    "tera-blast",
+    "ice-punch",
+    "thunder-punch",
+    "rock-slide",
+    "brick-break",
+    "drain-punch",
+    "facade",
+    "shadow-claw",
+    "low-sweep",
+    "upper-hand",
+    "bite",
+    "swift",
+    "rock-tomb",
+    "aerial-ace",
+    "force-palm",
+    "circle-throw",
+    "bulldoze",
+    "metal-claw",
+    "trailblaze",
+    "quick-attack",
+    "rock-smash",
+    "vacuum-wave",
+    "bullet-punch",
+    "feint",
+    "swords-dance",
+    "agility",
+    "protect",
+    "bulk-up",
+    "nasty-plot"
+  ],
+  "abilities": [
+    "steadfast",
+    "inner-focus",
+    "prankster"
+  ]
+}

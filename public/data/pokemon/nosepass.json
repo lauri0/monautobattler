@@ -1,0 +1,63 @@
+{
+  "id": 299,
+  "name": "nosepass",
+  "types": [
+    "rock"
+  ],
+  "baseStats": {
+    "hp": 30,
+    "attack": 45,
+    "defense": 135,
+    "specialAttack": 45,
+    "specialDefense": 90,
+    "speed": 30
+  },
+  "spriteUrl": "/sprites/299.png",
+  "moves": [
+    "head-smash",
+    "steel-beam",
+    "double-edge",
+    "zap-cannon",
+    "meteor-beam",
+    "thunder",
+    "earthquake",
+    "stone-edge",
+    "high-horsepower",
+    "take-down",
+    "thunderbolt",
+    "earth-power",
+    "body-slam",
+    "power-gem",
+    "flash-cannon",
+    "discharge",
+    "dazzling-gleam",
+    "body-press",
+    "tera-blast",
+    "fire-punch",
+    "ice-punch",
+    "thunder-punch",
+    "rock-slide",
+    "stomping-tantrum",
+    "facade",
+    "volt-switch",
+    "spark",
+    "rock-tomb",
+    "bulldoze",
+    "rock-throw",
+    "smack-down",
+    "tackle",
+    "sand-tomb",
+    "rollout",
+    "rock-blast",
+    "thunder-wave",
+    "protect",
+    "taunt",
+    "iron-defense",
+    "stealth-rock"
+  ],
+  "abilities": [
+    "sturdy",
+    "magnet-pull",
+    "sand-force"
+  ]
+}

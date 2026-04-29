@@ -1,0 +1,10 @@
+{
+  "id": 660,
+  "name": "first-impression",
+  "type": "bug",
+  "power": 90,
+  "accuracy": 100,
+  "pp": 10,
+  "damageClass": "physical",
+  "priority": 2
+}

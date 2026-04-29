@@ -1,0 +1,62 @@
+{
+  "id": 339,
+  "name": "barboach",
+  "types": [
+    "water",
+    "ground"
+  ],
+  "baseStats": {
+    "hp": 50,
+    "attack": 48,
+    "defense": 43,
+    "specialAttack": 46,
+    "specialDefense": 41,
+    "speed": 60
+  },
+  "spriteUrl": "/sprites/339.png",
+  "moves": [
+    "thrash",
+    "double-edge",
+    "outrage",
+    "future-sight",
+    "hydro-pump",
+    "blizzard",
+    "earthquake",
+    "stone-edge",
+    "high-horsepower",
+    "take-down",
+    "surf",
+    "ice-beam",
+    "muddy-water",
+    "aqua-tail",
+    "earth-power",
+    "liquidation",
+    "waterfall",
+    "zen-headbutt",
+    "tera-blast",
+    "rock-slide",
+    "stomping-tantrum",
+    "facade",
+    "spark",
+    "swift",
+    "rock-tomb",
+    "water-pulse",
+    "bulldoze",
+    "icy-wind",
+    "mud-shot",
+    "snore",
+    "chilling-water",
+    "water-gun",
+    "whirlpool",
+    "mud-slap",
+    "amnesia",
+    "protect",
+    "dragon-dance",
+    "stealth-rock"
+  ],
+  "abilities": [
+    "oblivious",
+    "anticipation",
+    "hydration"
+  ]
+}

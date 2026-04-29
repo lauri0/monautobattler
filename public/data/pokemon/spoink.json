@@ -1,0 +1,61 @@
+{
+  "id": 325,
+  "name": "spoink",
+  "types": [
+    "psychic"
+  ],
+  "baseStats": {
+    "hp": 60,
+    "attack": 25,
+    "defense": 35,
+    "specialAttack": 70,
+    "specialDefense": 80,
+    "speed": 60
+  },
+  "spriteUrl": "/sprites/325.png",
+  "moves": [
+    "future-sight",
+    "take-down",
+    "psychic",
+    "uproar",
+    "body-slam",
+    "bounce",
+    "shadow-ball",
+    "extrasensory",
+    "power-gem",
+    "zen-headbutt",
+    "flash-cannon",
+    "psyshock",
+    "dazzling-gleam",
+    "lunge",
+    "expanding-force",
+    "tera-blast",
+    "facade",
+    "psybeam",
+    "swift",
+    "thief",
+    "icy-wind",
+    "snarl",
+    "confusion",
+    "snore",
+    "payback",
+    "charge-beam",
+    "trailblaze",
+    "chilling-water",
+    "stored-power",
+    "growl",
+    "thunder-wave",
+    "light-screen",
+    "reflect",
+    "amnesia",
+    "protect",
+    "taunt",
+    "calm-mind",
+    "trick-room"
+  ],
+  "abilities": [
+    "thick-fat",
+    "own-tempo",
+    "gluttony"
+  ]
+}

@@ -1,0 +1,20 @@
+{
+  "id": 595,
+  "name": "mystical-fire",
+  "type": "fire",
+  "power": 75,
+  "accuracy": 100,
+  "pp": 10,
+  "damageClass": "special",
+  "priority": 0,
+  "effect": {
+    "statChanges": [
+      {
+        "stat": "special-attack",
+        "change": -1,
+        "target": "foe"
+      }
+    ],
+    "statChance": 100
+  }
+}

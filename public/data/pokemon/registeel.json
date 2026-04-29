@@ -1,0 +1,62 @@
+{
+  "id": 379,
+  "name": "registeel",
+  "types": [
+    "steel"
+  ],
+  "baseStats": {
+    "hp": 80,
+    "attack": 75,
+    "defense": 150,
+    "specialAttack": 75,
+    "specialDefense": 150,
+    "speed": 50
+  },
+  "spriteUrl": "/sprites/379.png",
+  "moves": [
+    "explosion",
+    "hyper-beam",
+    "focus-punch",
+    "giga-impact",
+    "steel-beam",
+    "double-edge",
+    "zap-cannon",
+    "superpower",
+    "focus-blast",
+    "meteor-beam",
+    "thunder",
+    "earthquake",
+    "hammer-arm",
+    "take-down",
+    "thunderbolt",
+    "body-slam",
+    "flash-cannon",
+    "iron-head",
+    "body-press",
+    "tera-blast",
+    "ice-spinner",
+    "ice-punch",
+    "thunder-punch",
+    "rock-slide",
+    "brick-break",
+    "stomping-tantrum",
+    "facade",
+    "shadow-claw",
+    "stomp",
+    "ancient-power",
+    "rock-tomb",
+    "bulldoze",
+    "metal-claw",
+    "charge-beam",
+    "sand-tomb",
+    "thunder-wave",
+    "amnesia",
+    "protect",
+    "iron-defense",
+    "stealth-rock"
+  ],
+  "abilities": [
+    "clear-body",
+    "light-metal"
+  ]
+}

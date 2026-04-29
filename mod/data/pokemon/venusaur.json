@@ -23,7 +23,6 @@
     "solar-beam",
     "petal-dance",
     "power-whip",
-    "earthquake",
     "take-down",
     "sludge-bomb",
     "energy-ball",
@@ -59,7 +58,7 @@
   ],
   "abilities": [
     "overgrow",
-    "chlorophyll",
+    "thick-fat",
 	"grassy-surge"
   ]
 }

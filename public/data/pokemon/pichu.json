@@ -1,0 +1,45 @@
+{
+  "id": 172,
+  "name": "pichu",
+  "types": [
+    "electric"
+  ],
+  "baseStats": {
+    "hp": 20,
+    "attack": 40,
+    "defense": 15,
+    "specialAttack": 35,
+    "specialDefense": 35,
+    "speed": 60
+  },
+  "spriteUrl": "/sprites/172.png",
+  "moves": [
+    "thunder",
+    "take-down",
+    "surf",
+    "thunderbolt",
+    "wild-charge",
+    "play-rough",
+    "body-slam",
+    "tera-blast",
+    "thunder-punch",
+    "facade",
+    "volt-switch",
+    "swift",
+    "electroweb",
+    "trailblaze",
+    "thunder-shock",
+    "fake-out",
+    "disarming-voice",
+    "nuzzle",
+    "thunder-wave",
+    "light-screen",
+    "reflect",
+    "protect",
+    "nasty-plot"
+  ],
+  "abilities": [
+    "static",
+    "lightning-rod"
+  ]
+}

@@ -1,0 +1,63 @@
+{
+  "id": 443,
+  "name": "gible",
+  "types": [
+    "dragon",
+    "ground"
+  ],
+  "baseStats": {
+    "hp": 58,
+    "attack": 70,
+    "defense": 45,
+    "specialAttack": 40,
+    "specialDefense": 45,
+    "speed": 42
+  },
+  "spriteUrl": "/sprites/443.png",
+  "moves": [
+    "draco-meteor",
+    "thrash",
+    "double-edge",
+    "outrage",
+    "fire-blast",
+    "earthquake",
+    "dragon-rush",
+    "stone-edge",
+    "take-down",
+    "flamethrower",
+    "earth-power",
+    "body-slam",
+    "dragon-pulse",
+    "dig",
+    "dragon-claw",
+    "iron-head",
+    "tera-blast",
+    "rock-slide",
+    "slash",
+    "facade",
+    "shadow-claw",
+    "scorching-sands",
+    "thunder-fang",
+    "fire-fang",
+    "bite",
+    "swift",
+    "dragon-breath",
+    "rock-tomb",
+    "bulldoze",
+    "dragon-tail",
+    "mud-shot",
+    "metal-claw",
+    "tackle",
+    "false-swipe",
+    "twister",
+    "sand-tomb",
+    "scale-shot",
+    "swords-dance",
+    "protect",
+    "stealth-rock"
+  ],
+  "abilities": [
+    "sand-veil",
+    "rough-skin"
+  ]
+}

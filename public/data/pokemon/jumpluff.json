@@ -1,0 +1,57 @@
+{
+  "id": 189,
+  "name": "jumpluff",
+  "types": [
+    "grass",
+    "flying"
+  ],
+  "baseStats": {
+    "hp": 75,
+    "attack": 55,
+    "defense": 70,
+    "specialAttack": 55,
+    "specialDefense": 95,
+    "speed": 110
+  },
+  "spriteUrl": "/sprites/189.png",
+  "moves": [
+    "hyper-beam",
+    "giga-impact",
+    "leaf-storm",
+    "double-edge",
+    "solar-beam",
+    "take-down",
+    "energy-ball",
+    "pollen-puff",
+    "bounce",
+    "seed-bomb",
+    "dazzling-gleam",
+    "lunge",
+    "tera-blast",
+    "giga-drain",
+    "facade",
+    "u-turn",
+    "thief",
+    "aerial-ace",
+    "magical-leaf",
+    "acrobatics",
+    "trailblaze",
+    "tackle",
+    "giga-drain",
+    "fairy-wind",
+    "bullet-seed",
+    "absorb",
+    "swords-dance",
+    "poison-powder",
+    "sleep-powder",
+    "light-screen",
+    "reflect",
+    "protect",
+    "tailwind"
+  ],
+  "abilities": [
+    "chlorophyll",
+    "leaf-guard",
+    "infiltrator"
+  ]
+}

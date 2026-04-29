@@ -1,0 +1,59 @@
+{
+  "id": 231,
+  "name": "phanpy",
+  "types": [
+    "ground"
+  ],
+  "baseStats": {
+    "hp": 90,
+    "attack": 60,
+    "defense": 60,
+    "specialAttack": 40,
+    "specialDefense": 40,
+    "speed": 40
+  },
+  "spriteUrl": "/sprites/231.png",
+  "moves": [
+    "head-smash",
+    "last-resort",
+    "double-edge",
+    "gunk-shot",
+    "earthquake",
+    "stone-edge",
+    "high-horsepower",
+    "take-down",
+    "hyper-voice",
+    "earth-power",
+    "play-rough",
+    "body-slam",
+    "slam",
+    "dig",
+    "seed-bomb",
+    "iron-head",
+    "tera-blast",
+    "rock-slide",
+    "stomping-tantrum",
+    "facade",
+    "knock-off",
+    "thief",
+    "ancient-power",
+    "rock-tomb",
+    "bulldoze",
+    "mud-shot",
+    "snore",
+    "smack-down",
+    "trailblaze",
+    "tackle",
+    "ice-shard",
+    "sand-tomb",
+    "rollout",
+    "mud-slap",
+    "growl",
+    "protect",
+    "stealth-rock"
+  ],
+  "abilities": [
+    "pickup",
+    "sand-veil"
+  ]
+}

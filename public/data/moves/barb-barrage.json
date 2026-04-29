@@ -1,0 +1,10 @@
+{
+  "id": 839,
+  "name": "barb-barrage",
+  "type": "poison",
+  "power": 60,
+  "accuracy": 100,
+  "pp": 10,
+  "damageClass": "physical",
+  "priority": 0
+}

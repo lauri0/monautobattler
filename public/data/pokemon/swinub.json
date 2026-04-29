@@ -1,0 +1,59 @@
+{
+  "id": 220,
+  "name": "swinub",
+  "types": [
+    "ice",
+    "ground"
+  ],
+  "baseStats": {
+    "hp": 50,
+    "attack": 50,
+    "defense": 40,
+    "specialAttack": 30,
+    "specialDefense": 30,
+    "speed": 50
+  },
+  "spriteUrl": "/sprites/220.png",
+  "moves": [
+    "double-edge",
+    "blizzard",
+    "earthquake",
+    "stone-edge",
+    "high-horsepower",
+    "take-down",
+    "ice-beam",
+    "earth-power",
+    "body-slam",
+    "icicle-crash",
+    "dig",
+    "tera-blast",
+    "rock-slide",
+    "stomping-tantrum",
+    "facade",
+    "freeze-dry",
+    "ice-fang",
+    "bite",
+    "ancient-power",
+    "rock-tomb",
+    "avalanche",
+    "bulldoze",
+    "icy-wind",
+    "mud-shot",
+    "smack-down",
+    "trailblaze",
+    "tackle",
+    "powder-snow",
+    "ice-shard",
+    "sand-tomb",
+    "icicle-spear",
+    "mud-slap",
+    "amnesia",
+    "protect",
+    "stealth-rock"
+  ],
+  "abilities": [
+    "oblivious",
+    "snow-cloak",
+    "thick-fat"
+  ]
+}

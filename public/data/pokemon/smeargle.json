@@ -1,0 +1,22 @@
+{
+  "id": 235,
+  "name": "smeargle",
+  "types": [
+    "normal"
+  ],
+  "baseStats": {
+    "hp": 55,
+    "attack": 20,
+    "defense": 35,
+    "specialAttack": 20,
+    "specialDefense": 45,
+    "speed": 75
+  },
+  "spriteUrl": "/sprites/235.png",
+  "moves": [],
+  "abilities": [
+    "own-tempo",
+    "technician",
+    "moody"
+  ]
+}

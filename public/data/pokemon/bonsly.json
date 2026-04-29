@@ -1,0 +1,54 @@
+{
+  "id": 438,
+  "name": "bonsly",
+  "types": [
+    "rock"
+  ],
+  "baseStats": {
+    "hp": 50,
+    "attack": 80,
+    "defense": 95,
+    "specialAttack": 10,
+    "specialDefense": 45,
+    "speed": 10
+  },
+  "spriteUrl": "/sprites/438.png",
+  "moves": [
+    "double-edge",
+    "earthquake",
+    "stone-edge",
+    "foul-play",
+    "take-down",
+    "earth-power",
+    "body-slam",
+    "dig",
+    "power-gem",
+    "tera-blast",
+    "rock-slide",
+    "brick-break",
+    "stomping-tantrum",
+    "headbutt",
+    "facade",
+    "sucker-punch",
+    "thief",
+    "rock-tomb",
+    "bulldoze",
+    "mud-shot",
+    "rock-throw",
+    "smack-down",
+    "trailblaze",
+    "sand-tomb",
+    "rollout",
+    "rock-blast",
+    "mud-slap",
+    "protect",
+    "spikes",
+    "calm-mind",
+    "stealth-rock"
+  ],
+  "abilities": [
+    "sturdy",
+    "rock-head",
+    "rattled"
+  ]
+}

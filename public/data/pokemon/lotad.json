@@ -1,0 +1,59 @@
+{
+  "id": 270,
+  "name": "lotad",
+  "types": [
+    "water",
+    "grass"
+  ],
+  "baseStats": {
+    "hp": 40,
+    "attack": 30,
+    "defense": 30,
+    "specialAttack": 40,
+    "specialDefense": 50,
+    "speed": 30
+  },
+  "spriteUrl": "/sprites/270.png",
+  "moves": [
+    "double-edge",
+    "solar-beam",
+    "blizzard",
+    "take-down",
+    "surf",
+    "ice-beam",
+    "uproar",
+    "muddy-water",
+    "energy-ball",
+    "body-slam",
+    "seed-bomb",
+    "zen-headbutt",
+    "tera-blast",
+    "giga-drain",
+    "facade",
+    "bubble-beam",
+    "thief",
+    "magical-leaf",
+    "water-pulse",
+    "razor-leaf",
+    "icy-wind",
+    "grassy-glide",
+    "weather-ball",
+    "trailblaze",
+    "chilling-water",
+    "water-gun",
+    "giga-drain",
+    "disarming-voice",
+    "whirlpool",
+    "astonish",
+    "bullet-seed",
+    "absorb",
+    "swords-dance",
+    "growl",
+    "protect"
+  ],
+  "abilities": [
+    "swift-swim",
+    "rain-dish",
+    "own-tempo"
+  ]
+}

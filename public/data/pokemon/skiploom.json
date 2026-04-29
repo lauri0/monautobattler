@@ -1,0 +1,55 @@
+{
+  "id": 188,
+  "name": "skiploom",
+  "types": [
+    "grass",
+    "flying"
+  ],
+  "baseStats": {
+    "hp": 55,
+    "attack": 45,
+    "defense": 50,
+    "specialAttack": 45,
+    "specialDefense": 65,
+    "speed": 80
+  },
+  "spriteUrl": "/sprites/188.png",
+  "moves": [
+    "leaf-storm",
+    "double-edge",
+    "solar-beam",
+    "take-down",
+    "energy-ball",
+    "pollen-puff",
+    "bounce",
+    "seed-bomb",
+    "dazzling-gleam",
+    "lunge",
+    "tera-blast",
+    "giga-drain",
+    "facade",
+    "u-turn",
+    "thief",
+    "aerial-ace",
+    "magical-leaf",
+    "acrobatics",
+    "trailblaze",
+    "tackle",
+    "giga-drain",
+    "fairy-wind",
+    "bullet-seed",
+    "absorb",
+    "swords-dance",
+    "poison-powder",
+    "sleep-powder",
+    "light-screen",
+    "reflect",
+    "protect",
+    "tailwind"
+  ],
+  "abilities": [
+    "chlorophyll",
+    "leaf-guard",
+    "infiltrator"
+  ]
+}

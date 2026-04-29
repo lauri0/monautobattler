@@ -1,0 +1,63 @@
+{
+  "id": 243,
+  "name": "raikou",
+  "types": [
+    "electric"
+  ],
+  "baseStats": {
+    "hp": 90,
+    "attack": 85,
+    "defense": 75,
+    "specialAttack": 115,
+    "specialDefense": 100,
+    "speed": 115
+  },
+  "spriteUrl": "/sprites/243.png",
+  "moves": [
+    "hyper-beam",
+    "giga-impact",
+    "double-edge",
+    "zap-cannon",
+    "thunder",
+    "supercell-slam",
+    "take-down",
+    "thunderbolt",
+    "wild-charge",
+    "body-slam",
+    "crunch",
+    "extreme-speed",
+    "shadow-ball",
+    "extrasensory",
+    "aura-sphere",
+    "discharge",
+    "iron-head",
+    "scald",
+    "throat-chop",
+    "tera-blast",
+    "facade",
+    "volt-switch",
+    "spark",
+    "thunder-fang",
+    "bite",
+    "swift",
+    "electroweb",
+    "snarl",
+    "weather-ball",
+    "charge-beam",
+    "trailblaze",
+    "thunder-shock",
+    "quick-attack",
+    "mud-slap",
+    "leer",
+    "thunder-wave",
+    "agility",
+    "light-screen",
+    "reflect",
+    "protect",
+    "calm-mind"
+  ],
+  "abilities": [
+    "pressure",
+    "inner-focus"
+  ]
+}

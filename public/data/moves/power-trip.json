@@ -1,0 +1,10 @@
+{
+  "id": 681,
+  "name": "power-trip",
+  "type": "dark",
+  "power": 20,
+  "accuracy": 100,
+  "pp": 10,
+  "damageClass": "physical",
+  "priority": 0
+}

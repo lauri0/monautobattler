@@ -1,0 +1,49 @@
+{
+  "id": 396,
+  "name": "starly",
+  "types": [
+    "normal",
+    "flying"
+  ],
+  "baseStats": {
+    "hp": 40,
+    "attack": 55,
+    "defense": 30,
+    "specialAttack": 30,
+    "specialDefense": 30,
+    "speed": 60
+  },
+  "spriteUrl": "/sprites/396.png",
+  "moves": [
+    "double-edge",
+    "brave-bird",
+    "hurricane",
+    "heat-wave",
+    "fly",
+    "take-down",
+    "uproar",
+    "tera-blast",
+    "air-slash",
+    "facade",
+    "u-turn",
+    "wing-attack",
+    "swift",
+    "thief",
+    "air-cutter",
+    "aerial-ace",
+    "acrobatics",
+    "tackle",
+    "quick-attack",
+    "dual-wingbeat",
+    "astonish",
+    "fury-attack",
+    "growl",
+    "agility",
+    "protect",
+    "tailwind"
+  ],
+  "abilities": [
+    "keen-eye",
+    "reckless"
+  ]
+}

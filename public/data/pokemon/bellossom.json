@@ -1,0 +1,58 @@
+{
+  "id": 182,
+  "name": "bellossom",
+  "types": [
+    "grass"
+  ],
+  "baseStats": {
+    "hp": 75,
+    "attack": 80,
+    "defense": 95,
+    "specialAttack": 90,
+    "specialDefense": 100,
+    "speed": 50
+  },
+  "spriteUrl": "/sprites/182.png",
+  "moves": [
+    "hyper-beam",
+    "giga-impact",
+    "leaf-storm",
+    "solar-blade",
+    "solar-beam",
+    "petal-dance",
+    "moonblast",
+    "sludge-bomb",
+    "uproar",
+    "energy-ball",
+    "petal-blizzard",
+    "play-rough",
+    "pollen-puff",
+    "seed-bomb",
+    "dazzling-gleam",
+    "tera-blast",
+    "giga-drain",
+    "drain-punch",
+    "facade",
+    "venoshock",
+    "magical-leaf",
+    "razor-leaf",
+    "grassy-glide",
+    "weather-ball",
+    "trailblaze",
+    "acid",
+    "giga-drain",
+    "acid-spray",
+    "bullet-seed",
+    "absorb",
+    "triple-axel",
+    "swords-dance",
+    "poison-powder",
+    "sleep-powder",
+    "protect",
+    "quiver-dance"
+  ],
+  "abilities": [
+    "chlorophyll",
+    "healer"
+  ]
+}

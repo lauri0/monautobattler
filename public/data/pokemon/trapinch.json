@@ -1,0 +1,53 @@
+{
+  "id": 328,
+  "name": "trapinch",
+  "types": [
+    "ground"
+  ],
+  "baseStats": {
+    "hp": 45,
+    "attack": 100,
+    "defense": 45,
+    "specialAttack": 45,
+    "specialDefense": 45,
+    "speed": 10
+  },
+  "spriteUrl": "/sprites/328.png",
+  "moves": [
+    "hyper-beam",
+    "superpower",
+    "earthquake",
+    "stone-edge",
+    "take-down",
+    "earth-power",
+    "first-impression",
+    "body-slam",
+    "dig",
+    "crunch",
+    "tera-blast",
+    "rock-slide",
+    "giga-drain",
+    "facade",
+    "scorching-sands",
+    "bite",
+    "rock-tomb",
+    "bug-bite",
+    "bulldoze",
+    "mud-shot",
+    "struggle-bug",
+    "gust",
+    "quick-attack",
+    "fury-cutter",
+    "sand-tomb",
+    "astonish",
+    "feint",
+    "mud-slap",
+    "protect",
+    "stealth-rock"
+  ],
+  "abilities": [
+    "hyper-cutter",
+    "arena-trap",
+    "sheer-force"
+  ]
+}

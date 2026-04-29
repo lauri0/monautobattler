@@ -1,0 +1,63 @@
+{
+  "id": 154,
+  "name": "meganium",
+  "types": [
+    "grass"
+  ],
+  "baseStats": {
+    "hp": 80,
+    "attack": 82,
+    "defense": 100,
+    "specialAttack": 83,
+    "specialDefense": 100,
+    "speed": 80
+  },
+  "spriteUrl": "/sprites/154.png",
+  "moves": [
+    "hyper-beam",
+    "frenzy-plant",
+    "giga-impact",
+    "leaf-storm",
+    "solar-blade",
+    "double-edge",
+    "solar-beam",
+    "petal-dance",
+    "outrage",
+    "earthquake",
+    "take-down",
+    "energy-ball",
+    "petal-blizzard",
+    "body-slam",
+    "seed-bomb",
+    "zen-headbutt",
+    "grass-pledge",
+    "body-press",
+    "tera-blast",
+    "giga-drain",
+    "stomping-tantrum",
+    "facade",
+    "knock-off",
+    "ancient-power",
+    "magical-leaf",
+    "bulldoze",
+    "dragon-tail",
+    "razor-leaf",
+    "grassy-glide",
+    "weather-ball",
+    "trailblaze",
+    "vine-whip",
+    "tackle",
+    "bullet-seed",
+    "mud-slap",
+    "swords-dance",
+    "growl",
+    "poison-powder",
+    "light-screen",
+    "reflect",
+    "protect"
+  ],
+  "abilities": [
+    "overgrow",
+    "leaf-guard"
+  ]
+}

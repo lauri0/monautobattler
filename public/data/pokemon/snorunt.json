@@ -1,0 +1,53 @@
+{
+  "id": 361,
+  "name": "snorunt",
+  "types": [
+    "ice"
+  ],
+  "baseStats": {
+    "hp": 50,
+    "attack": 50,
+    "defense": 50,
+    "specialAttack": 50,
+    "specialDefense": 50,
+    "speed": 50
+  },
+  "spriteUrl": "/sprites/361.png",
+  "moves": [
+    "blizzard",
+    "take-down",
+    "ice-beam",
+    "body-slam",
+    "icicle-crash",
+    "crunch",
+    "shadow-ball",
+    "tera-blast",
+    "ice-spinner",
+    "headbutt",
+    "facade",
+    "ice-fang",
+    "hex",
+    "bite",
+    "water-pulse",
+    "avalanche",
+    "frost-breath",
+    "icy-wind",
+    "weather-ball",
+    "trailblaze",
+    "chilling-water",
+    "powder-snow",
+    "ice-shard",
+    "rollout",
+    "astonish",
+    "icicle-spear",
+    "leer",
+    "light-screen",
+    "protect",
+    "spikes"
+  ],
+  "abilities": [
+    "inner-focus",
+    "ice-body",
+    "moody"
+  ]
+}

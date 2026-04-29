@@ -1,0 +1,59 @@
+{
+  "id": 239,
+  "name": "elekid",
+  "types": [
+    "electric"
+  ],
+  "baseStats": {
+    "hp": 45,
+    "attack": 63,
+    "defense": 37,
+    "specialAttack": 65,
+    "specialDefense": 55,
+    "speed": 95
+  },
+  "spriteUrl": "/sprites/239.png",
+  "moves": [
+    "focus-punch",
+    "double-edge",
+    "focus-blast",
+    "thunder",
+    "dynamic-punch",
+    "cross-chop",
+    "hammer-arm",
+    "supercell-slam",
+    "take-down",
+    "thunderbolt",
+    "psychic",
+    "uproar",
+    "wild-charge",
+    "body-slam",
+    "discharge",
+    "tera-blast",
+    "fire-punch",
+    "ice-punch",
+    "thunder-punch",
+    "brick-break",
+    "facade",
+    "volt-switch",
+    "knock-off",
+    "swift",
+    "thief",
+    "shock-wave",
+    "electroweb",
+    "charge-beam",
+    "trailblaze",
+    "thunder-shock",
+    "quick-attack",
+    "feint",
+    "leer",
+    "thunder-wave",
+    "light-screen",
+    "protect",
+    "taunt"
+  ],
+  "abilities": [
+    "static",
+    "vital-spirit"
+  ]
+}

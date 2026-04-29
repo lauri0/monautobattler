@@ -1,0 +1,56 @@
+{
+  "id": 372,
+  "name": "shelgon",
+  "types": [
+    "dragon"
+  ],
+  "baseStats": {
+    "hp": 65,
+    "attack": 95,
+    "defense": 100,
+    "specialAttack": 60,
+    "specialDefense": 50,
+    "speed": 50
+  },
+  "spriteUrl": "/sprites/372.png",
+  "moves": [
+    "draco-meteor",
+    "double-edge",
+    "outrage",
+    "hydro-pump",
+    "fire-blast",
+    "take-down",
+    "flamethrower",
+    "hyper-voice",
+    "body-slam",
+    "dragon-pulse",
+    "crunch",
+    "dragon-claw",
+    "zen-headbutt",
+    "iron-head",
+    "tera-blast",
+    "rock-slide",
+    "brick-break",
+    "temper-flare",
+    "headbutt",
+    "facade",
+    "shadow-claw",
+    "thunder-fang",
+    "fire-fang",
+    "bite",
+    "dragon-breath",
+    "rock-tomb",
+    "dragon-tail",
+    "ember",
+    "fire-spin",
+    "mud-slap",
+    "leer",
+    "protect",
+    "iron-defense",
+    "dragon-dance"
+  ],
+  "abilities": [
+    "rock-head",
+    "overcoat"
+  ]
+}

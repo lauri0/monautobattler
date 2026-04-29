@@ -1,0 +1,60 @@
+{
+  "id": 204,
+  "name": "pineco",
+  "types": [
+    "bug"
+  ],
+  "baseStats": {
+    "hp": 50,
+    "attack": 65,
+    "defense": 90,
+    "specialAttack": 35,
+    "specialDefense": 35,
+    "speed": 15
+  },
+  "spriteUrl": "/sprites/204.png",
+  "moves": [
+    "explosion",
+    "self-destruct",
+    "double-edge",
+    "solar-beam",
+    "take-down",
+    "bug-buzz",
+    "body-slam",
+    "dig",
+    "poison-jab",
+    "seed-bomb",
+    "drill-run",
+    "lunge",
+    "tera-blast",
+    "ice-spinner",
+    "rock-slide",
+    "giga-drain",
+    "facade",
+    "venoshock",
+    "swift",
+    "rock-tomb",
+    "bug-bite",
+    "bulldoze",
+    "rapid-spin",
+    "payback",
+    "struggle-bug",
+    "pounce",
+    "tackle",
+    "sand-tomb",
+    "rollout",
+    "pin-missile",
+    "rock-blast",
+    "light-screen",
+    "reflect",
+    "protect",
+    "spikes",
+    "iron-defense",
+    "toxic-spikes",
+    "stealth-rock"
+  ],
+  "abilities": [
+    "sturdy",
+    "overcoat"
+  ]
+}

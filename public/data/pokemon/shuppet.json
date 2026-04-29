@@ -1,0 +1,53 @@
+{
+  "id": 353,
+  "name": "shuppet",
+  "types": [
+    "ghost"
+  ],
+  "baseStats": {
+    "hp": 44,
+    "attack": 75,
+    "defense": 35,
+    "specialAttack": 63,
+    "specialDefense": 33,
+    "speed": 45
+  },
+  "spriteUrl": "/sprites/353.png",
+  "moves": [
+    "gunk-shot",
+    "thunder",
+    "poltergeist",
+    "foul-play",
+    "thunderbolt",
+    "psychic",
+    "phantom-force",
+    "shadow-ball",
+    "dark-pulse",
+    "dazzling-gleam",
+    "tera-blast",
+    "lash-out",
+    "facade",
+    "sucker-punch",
+    "skitter-smack",
+    "psybeam",
+    "hex",
+    "thief",
+    "icy-wind",
+    "charge-beam",
+    "pounce",
+    "shadow-sneak",
+    "astonish",
+    "thunder-wave",
+    "protect",
+    "will-o-wisp",
+    "taunt",
+    "calm-mind",
+    "nasty-plot",
+    "trick-room"
+  ],
+  "abilities": [
+    "insomnia",
+    "frisk",
+    "cursed-body"
+  ]
+}

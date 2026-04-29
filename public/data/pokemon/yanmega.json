@@ -1,0 +1,60 @@
+{
+  "id": 469,
+  "name": "yanmega",
+  "types": [
+    "bug",
+    "flying"
+  ],
+  "baseStats": {
+    "hp": 86,
+    "attack": 76,
+    "defense": 86,
+    "specialAttack": 116,
+    "specialDefense": 56,
+    "speed": 95
+  },
+  "spriteUrl": "/sprites/469.png",
+  "moves": [
+    "hyper-beam",
+    "giga-impact",
+    "double-edge",
+    "solar-beam",
+    "take-down",
+    "psychic",
+    "uproar",
+    "bug-buzz",
+    "leech-life",
+    "crunch",
+    "shadow-ball",
+    "lunge",
+    "tera-blast",
+    "giga-drain",
+    "air-slash",
+    "psychic-noise",
+    "slash",
+    "facade",
+    "u-turn",
+    "night-slash",
+    "skitter-smack",
+    "swift",
+    "thief",
+    "ancient-power",
+    "air-cutter",
+    "aerial-ace",
+    "bug-bite",
+    "struggle-bug",
+    "pounce",
+    "tackle",
+    "quick-attack",
+    "dual-wingbeat",
+    "feint",
+    "swords-dance",
+    "protect",
+    "tailwind"
+  ],
+  "abilities": [
+    "speed-boost",
+    "tinted-lens",
+    "frisk"
+  ]
+}

@@ -1,0 +1,39 @@
+{
+  "id": 440,
+  "name": "happiny",
+  "types": [
+    "normal"
+  ],
+  "baseStats": {
+    "hp": 100,
+    "attack": 5,
+    "defense": 5,
+    "specialAttack": 15,
+    "specialDefense": 65,
+    "speed": 30
+  },
+  "spriteUrl": "/sprites/440.png",
+  "moves": [
+    "solar-beam",
+    "take-down",
+    "psychic",
+    "hyper-voice",
+    "shadow-ball",
+    "zen-headbutt",
+    "tera-blast",
+    "facade",
+    "covet",
+    "icy-wind",
+    "pound",
+    "disarming-voice",
+    "stored-power",
+    "thunder-wave",
+    "light-screen",
+    "protect"
+  ],
+  "abilities": [
+    "natural-cure",
+    "serene-grace",
+    "friend-guard"
+  ]
+}

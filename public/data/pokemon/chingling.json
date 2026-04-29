@@ -1,0 +1,51 @@
+{
+  "id": 433,
+  "name": "chingling",
+  "types": [
+    "psychic"
+  ],
+  "baseStats": {
+    "hp": 45,
+    "attack": 30,
+    "defense": 50,
+    "specialAttack": 65,
+    "specialDefense": 50,
+    "speed": 45
+  },
+  "spriteUrl": "/sprites/433.png",
+  "moves": [
+    "last-resort",
+    "double-edge",
+    "future-sight",
+    "psychic",
+    "uproar",
+    "hyper-voice",
+    "energy-ball",
+    "shadow-ball",
+    "zen-headbutt",
+    "psyshock",
+    "dazzling-gleam",
+    "tera-blast",
+    "psychic-noise",
+    "facade",
+    "knock-off",
+    "icy-wind",
+    "confusion",
+    "charge-beam",
+    "astonish",
+    "stored-power",
+    "wrap",
+    "growl",
+    "thunder-wave",
+    "recover",
+    "light-screen",
+    "reflect",
+    "protect",
+    "taunt",
+    "calm-mind",
+    "trick-room"
+  ],
+  "abilities": [
+    "levitate"
+  ]
+}

@@ -1,0 +1,63 @@
+{
+  "id": 246,
+  "name": "larvitar",
+  "types": [
+    "rock",
+    "ground"
+  ],
+  "baseStats": {
+    "hp": 50,
+    "attack": 64,
+    "defense": 50,
+    "specialAttack": 45,
+    "specialDefense": 50,
+    "speed": 41
+  },
+  "spriteUrl": "/sprites/246.png",
+  "moves": [
+    "hyper-beam",
+    "giga-impact",
+    "thrash",
+    "double-edge",
+    "outrage",
+    "earthquake",
+    "stone-edge",
+    "take-down",
+    "earth-power",
+    "body-slam",
+    "dig",
+    "crunch",
+    "dark-pulse",
+    "iron-head",
+    "tera-blast",
+    "rock-slide",
+    "brick-break",
+    "stomping-tantrum",
+    "facade",
+    "stomp",
+    "bite",
+    "ancient-power",
+    "rock-tomb",
+    "assurance",
+    "bulldoze",
+    "mud-shot",
+    "snarl",
+    "rock-throw",
+    "payback",
+    "smack-down",
+    "tackle",
+    "sand-tomb",
+    "rock-blast",
+    "mud-slap",
+    "leer",
+    "protect",
+    "taunt",
+    "iron-defense",
+    "dragon-dance",
+    "stealth-rock"
+  ],
+  "abilities": [
+    "guts",
+    "sand-veil"
+  ]
+}

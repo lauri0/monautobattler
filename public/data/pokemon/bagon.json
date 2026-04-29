@@ -1,0 +1,58 @@
+{
+  "id": 371,
+  "name": "bagon",
+  "types": [
+    "dragon"
+  ],
+  "baseStats": {
+    "hp": 45,
+    "attack": 75,
+    "defense": 60,
+    "specialAttack": 40,
+    "specialDefense": 30,
+    "speed": 50
+  },
+  "spriteUrl": "/sprites/371.png",
+  "moves": [
+    "draco-meteor",
+    "thrash",
+    "double-edge",
+    "outrage",
+    "hydro-pump",
+    "fire-blast",
+    "dragon-rush",
+    "take-down",
+    "flamethrower",
+    "hyper-voice",
+    "body-slam",
+    "dragon-pulse",
+    "crunch",
+    "dragon-claw",
+    "zen-headbutt",
+    "iron-head",
+    "tera-blast",
+    "rock-slide",
+    "brick-break",
+    "headbutt",
+    "facade",
+    "shadow-claw",
+    "thunder-fang",
+    "fire-fang",
+    "bite",
+    "dragon-breath",
+    "rock-tomb",
+    "dragon-tail",
+    "ember",
+    "twister",
+    "fire-spin",
+    "mud-slap",
+    "leer",
+    "protect",
+    "iron-defense",
+    "dragon-dance"
+  ],
+  "abilities": [
+    "rock-head",
+    "sheer-force"
+  ]
+}

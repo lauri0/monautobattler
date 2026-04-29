@@ -1,0 +1,63 @@
+{
+  "id": 317,
+  "name": "swalot",
+  "types": [
+    "poison"
+  ],
+  "baseStats": {
+    "hp": 100,
+    "attack": 73,
+    "defense": 83,
+    "specialAttack": 73,
+    "specialDefense": 83,
+    "speed": 55
+  },
+  "spriteUrl": "/sprites/317.png",
+  "moves": [
+    "hyper-beam",
+    "giga-impact",
+    "double-edge",
+    "solar-beam",
+    "gunk-shot",
+    "belch",
+    "earthquake",
+    "sludge-wave",
+    "take-down",
+    "ice-beam",
+    "sludge-bomb",
+    "body-slam",
+    "shadow-ball",
+    "poison-jab",
+    "seed-bomb",
+    "zen-headbutt",
+    "body-press",
+    "tera-blast",
+    "fire-punch",
+    "ice-punch",
+    "thunder-punch",
+    "giga-drain",
+    "brick-break",
+    "facade",
+    "sludge",
+    "knock-off",
+    "venoshock",
+    "thief",
+    "water-pulse",
+    "bulldoze",
+    "mud-shot",
+    "pound",
+    "acid-spray",
+    "bullet-seed",
+    "mud-slap",
+    "swords-dance",
+    "thunder-wave",
+    "amnesia",
+    "protect",
+    "toxic-spikes"
+  ],
+  "abilities": [
+    "liquid-ooze",
+    "sticky-hold",
+    "gluttony"
+  ]
+}

@@ -1,0 +1,60 @@
+{
+  "id": 436,
+  "name": "bronzor",
+  "types": [
+    "steel",
+    "psychic"
+  ],
+  "baseStats": {
+    "hp": 57,
+    "attack": 24,
+    "defense": 86,
+    "specialAttack": 24,
+    "specialDefense": 86,
+    "speed": 23
+  },
+  "spriteUrl": "/sprites/436.png",
+  "moves": [
+    "steel-beam",
+    "solar-beam",
+    "future-sight",
+    "earthquake",
+    "take-down",
+    "psychic",
+    "body-slam",
+    "shadow-ball",
+    "extrasensory",
+    "power-gem",
+    "zen-headbutt",
+    "flash-cannon",
+    "iron-head",
+    "psyshock",
+    "expanding-force",
+    "tera-blast",
+    "ice-spinner",
+    "rock-slide",
+    "stomping-tantrum",
+    "facade",
+    "hex",
+    "rock-tomb",
+    "bulldoze",
+    "confusion",
+    "payback",
+    "charge-beam",
+    "tackle",
+    "rock-blast",
+    "stored-power",
+    "light-screen",
+    "reflect",
+    "protect",
+    "iron-defense",
+    "calm-mind",
+    "trick-room",
+    "stealth-rock"
+  ],
+  "abilities": [
+    "levitate",
+    "heatproof",
+    "heavy-metal"
+  ]
+}

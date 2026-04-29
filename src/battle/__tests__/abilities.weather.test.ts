@@ -208,6 +208,7 @@ describe('Weather damage multipliers', () => {
   });
 
   it('sandstorm grants Rock types +50% SpD', () => {
+    stubRngConst(0.99); // no crit for both calls
     const atk = makePokemon({ name: 'a', types: ['normal'] });
     const rockDef = makePokemon({ name: 'd', types: ['rock'] });
     const move = makeMove({ type: 'normal', damageClass: 'special', power: 80 });

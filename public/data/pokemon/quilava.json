@@ -1,0 +1,60 @@
+{
+  "id": 156,
+  "name": "quilava",
+  "types": [
+    "fire"
+  ],
+  "baseStats": {
+    "hp": 58,
+    "attack": 64,
+    "defense": 58,
+    "specialAttack": 80,
+    "specialDefense": 65,
+    "speed": 80
+  },
+  "spriteUrl": "/sprites/156.png",
+  "moves": [
+    "eruption",
+    "overheat",
+    "double-edge",
+    "flare-blitz",
+    "fire-blast",
+    "inferno",
+    "heat-wave",
+    "take-down",
+    "flamethrower",
+    "wild-charge",
+    "play-rough",
+    "body-slam",
+    "dig",
+    "extrasensory",
+    "zen-headbutt",
+    "lava-plume",
+    "iron-head",
+    "fire-pledge",
+    "tera-blast",
+    "brick-break",
+    "temper-flare",
+    "facade",
+    "burning-jealousy",
+    "fire-fang",
+    "swift",
+    "flame-wheel",
+    "aerial-ace",
+    "covet",
+    "flame-charge",
+    "tackle",
+    "ember",
+    "quick-attack",
+    "fire-spin",
+    "double-kick",
+    "rollout",
+    "leer",
+    "protect",
+    "will-o-wisp"
+  ],
+  "abilities": [
+    "blaze",
+    "flash-fire"
+  ]
+}

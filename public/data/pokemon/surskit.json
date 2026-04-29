@@ -1,0 +1,57 @@
+{
+  "id": 283,
+  "name": "surskit",
+  "types": [
+    "bug",
+    "water"
+  ],
+  "baseStats": {
+    "hp": 40,
+    "attack": 30,
+    "defense": 32,
+    "specialAttack": 50,
+    "specialDefense": 52,
+    "speed": 65
+  },
+  "spriteUrl": "/sprites/283.png",
+  "moves": [
+    "solar-beam",
+    "hydro-pump",
+    "blizzard",
+    "take-down",
+    "surf",
+    "ice-beam",
+    "bug-buzz",
+    "liquidation",
+    "waterfall",
+    "leech-life",
+    "shadow-ball",
+    "lunge",
+    "tera-blast",
+    "giga-drain",
+    "facade",
+    "skitter-smack",
+    "psybeam",
+    "bubble-beam",
+    "thief",
+    "water-pulse",
+    "bug-bite",
+    "icy-wind",
+    "mud-shot",
+    "acrobatics",
+    "struggle-bug",
+    "fell-stinger",
+    "pounce",
+    "chilling-water",
+    "water-gun",
+    "quick-attack",
+    "aqua-jet",
+    "mud-slap",
+    "agility",
+    "protect"
+  ],
+  "abilities": [
+    "swift-swim",
+    "rain-dish"
+  ]
+}

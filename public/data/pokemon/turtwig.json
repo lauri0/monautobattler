@@ -1,0 +1,60 @@
+{
+  "id": 387,
+  "name": "turtwig",
+  "types": [
+    "grass"
+  ],
+  "baseStats": {
+    "hp": 55,
+    "attack": 68,
+    "defense": 64,
+    "specialAttack": 45,
+    "specialDefense": 55,
+    "speed": 31
+  },
+  "spriteUrl": "/sprites/387.png",
+  "moves": [
+    "leaf-storm",
+    "thrash",
+    "double-edge",
+    "solar-beam",
+    "superpower",
+    "take-down",
+    "energy-ball",
+    "earth-power",
+    "body-slam",
+    "crunch",
+    "seed-bomb",
+    "zen-headbutt",
+    "iron-head",
+    "grass-pledge",
+    "tera-blast",
+    "giga-drain",
+    "facade",
+    "bite",
+    "magical-leaf",
+    "bulldoze",
+    "razor-leaf",
+    "mud-shot",
+    "grassy-glide",
+    "smack-down",
+    "trailblaze",
+    "tackle",
+    "giga-drain",
+    "sand-tomb",
+    "bullet-seed",
+    "absorb",
+    "mud-slap",
+    "swords-dance",
+    "light-screen",
+    "reflect",
+    "amnesia",
+    "protect",
+    "stealth-rock",
+    "shell-smash"
+  ],
+  "abilities": [
+    "overgrow",
+    "shell-armor"
+  ]
+}

@@ -1,0 +1,13 @@
+{
+  "id": 292,
+  "name": "arm-thrust",
+  "type": "fighting",
+  "power": 15,
+  "accuracy": 100,
+  "pp": 20,
+  "damageClass": "physical",
+  "priority": 0,
+  "effect": {
+    "hitsVariable": true
+  }
+}

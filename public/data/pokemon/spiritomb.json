@@ -1,0 +1,54 @@
+{
+  "id": 442,
+  "name": "spiritomb",
+  "types": [
+    "ghost",
+    "dark"
+  ],
+  "baseStats": {
+    "hp": 50,
+    "attack": 92,
+    "defense": 108,
+    "specialAttack": 92,
+    "specialDefense": 108,
+    "speed": 35
+  },
+  "spriteUrl": "/sprites/442.png",
+  "moves": [
+    "hyper-beam",
+    "giga-impact",
+    "poltergeist",
+    "dream-eater",
+    "foul-play",
+    "psychic",
+    "phantom-force",
+    "body-slam",
+    "shadow-ball",
+    "dark-pulse",
+    "psyshock",
+    "tera-blast",
+    "lash-out",
+    "facade",
+    "sucker-punch",
+    "burning-jealousy",
+    "psybeam",
+    "hex",
+    "thief",
+    "rock-tomb",
+    "icy-wind",
+    "snarl",
+    "payback",
+    "shadow-sneak",
+    "stored-power",
+    "protect",
+    "will-o-wisp",
+    "taunt",
+    "calm-mind",
+    "nasty-plot",
+    "trick-room"
+  ],
+  "abilities": [
+    "pressure",
+    "infiltrator"
+  ]
+}

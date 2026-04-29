@@ -1,0 +1,51 @@
+{
+  "id": 398,
+  "name": "staraptor",
+  "types": [
+    "normal",
+    "flying"
+  ],
+  "baseStats": {
+    "hp": 85,
+    "attack": 120,
+    "defense": 70,
+    "specialAttack": 50,
+    "specialDefense": 60,
+    "speed": 100
+  },
+  "spriteUrl": "/sprites/398.png",
+  "moves": [
+    "hyper-beam",
+    "giga-impact",
+    "double-edge",
+    "close-combat",
+    "brave-bird",
+    "hurricane",
+    "heat-wave",
+    "fly",
+    "take-down",
+    "uproar",
+    "tera-blast",
+    "air-slash",
+    "facade",
+    "u-turn",
+    "wing-attack",
+    "swift",
+    "thief",
+    "air-cutter",
+    "aerial-ace",
+    "acrobatics",
+    "struggle-bug",
+    "tackle",
+    "quick-attack",
+    "dual-wingbeat",
+    "growl",
+    "agility",
+    "protect",
+    "tailwind"
+  ],
+  "abilities": [
+    "intimidate",
+    "reckless"
+  ]
+}
