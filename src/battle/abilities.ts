@@ -102,6 +102,11 @@ export const IMPLEMENTED_ABILITIES: Record<string, AbilityEffect> = {
   'electric-surge': { onSwitchIn: (self, opp, field, turn, ev) => setTerrain('electric',  self, opp, field, turn, ev) },
   'psychic-surge':  { onSwitchIn: (self, opp, field, turn, ev) => setTerrain('psychic',   self, opp, field, turn, ev) },
   'misty-surge':    { onSwitchIn: (self, opp, field, turn, ev) => setTerrain('misty',     self, opp, field, turn, ev) },
+  'prankster':     {},
+  'early-bird':    {},
+  'sap-sipper':    {},
+  'solid-rock':    {},
+  'filter':        {},
   'skill-link':    { maxVariableHits: true },
   'levitate':      {},
   'no-guard':      {},
@@ -359,6 +364,13 @@ export function absorbsWater(defender: BattlePokemon, move: Move): boolean {
     && move.damageClass !== 'status';
 }
 
+// Sap Sipper: nullify grass-type damaging moves and raise the defender's Attack by 1.
+export function absorbsGrass(defender: BattlePokemon, move: Move): boolean {
+  return defender.ability === 'sap-sipper'
+    && move.type === 'grass'
+    && move.damageClass !== 'status';
+}
+
 // Sturdy: a full-HP defender survives a would-be KO with 1 HP. Only activates
 // when the defender is at max HP entering the hit.
 export function sturdyActive(defender: BattlePokemon): boolean {
@@ -542,6 +554,11 @@ export const ABILITY_DESCRIPTIONS: Record<string, string> = {
   'moxie':          'Raises Attack by one stage each time the bearer knocks out an opposing Pokémon',
   'adaptability':   'Raises the bonus from Same-Type Attack Bonus from 1.5× to 2×',
   'weak-armor':     'Physical hits lower Defense by one stage but sharply raise Speed by two stages',
+  'prankster':      'Non-damaging moves have their priority increased by 1',
+  'early-bird':     'This Pokémon wakes up after only 1 turn of sleep',
+  'sap-sipper':     'Immune to Grass-type moves; being hit by one raises Attack by one stage instead',
+  'solid-rock':     'Reduces damage taken from super-effective moves by 25%',
+  'filter':         'Reduces damage taken from super-effective moves by 25%',
 };
 
 export function getAbilityDescription(name: AbilityId | undefined): string | undefined {
@@ -559,10 +576,11 @@ export function abilityMaxVariableHits(attacker: BattlePokemon): boolean {
   return entry?.maxVariableHits ?? false;
 }
 
-export function getDefenderAbilityDamageMultiplier(defender: BattlePokemon, move: Move): number {
+export function getDefenderAbilityDamageMultiplier(defender: BattlePokemon, move: Move, effectiveness = 1): number {
   if (move.damageClass === 'special' && defender.ability === 'ice-scales') return 0.5;
   if (move.damageClass === 'physical' && defender.ability === 'fur-coat') return 0.5;
   if (move.damageClass === 'physical' && defender.ability === 'marvel-scale' && defender.statusCondition) return 0.5;
+  if ((defender.ability === 'solid-rock' || defender.ability === 'filter') && effectiveness > 1) return 0.75;
   return 1;
 }
 

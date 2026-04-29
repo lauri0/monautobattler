@@ -2,7 +2,7 @@ import type { BattlePokemon, Move, TurnEvent, BattleResult, StatStageName, StatS
 import { calcDamage, calcExpectedDamage, effectiveSpeed, type DefenderScreens } from './damageCalc';
 import { defaultAI } from '../ai/aiModule';
 import { getTypeEffectiveness } from '../utils/typeChart';
-import { abilityMaxVariableHits, applySwitchInAbility, applyStatChangeFromFoe, noGuardInEffect, sheerForceSuppresses, absorbsWater, absorbsElectric, absorbsVoltAbsorb, absorbsFire, sturdyActive, ignoresRecoil, applyContactAbility, applyRattledByMove, applyWeakArmor, abilityBlocksAilment, abilityBlocksConfusion, hasMagicGuard, applyShedSkin, applyMoxie, applyEndOfTurnAbility } from './abilities';
+import { abilityMaxVariableHits, applySwitchInAbility, applyStatChangeFromFoe, noGuardInEffect, sheerForceSuppresses, absorbsWater, absorbsElectric, absorbsVoltAbsorb, absorbsFire, absorbsGrass, sturdyActive, ignoresRecoil, applyContactAbility, applyRattledByMove, applyWeakArmor, abilityBlocksAilment, abilityBlocksConfusion, hasMagicGuard, applyShedSkin, applyMoxie, applyEndOfTurnAbility } from './abilities';
 import { isGrounded } from './damageCalc';
 
 export const TRICK_ROOM_TURNS = 5;
@@ -260,6 +260,10 @@ export function effectivePriority(move: Move, attacker?: BattlePokemon, field?: 
   if (move.name === 'grassy-glide' && field?.terrain === 'grassy' && attacker && isGrounded(attacker)) {
     pri += 1;
   }
+  // Prankster: non-damaging moves gain +1 priority.
+  if (attacker?.ability === 'prankster' && move.damageClass === 'status') {
+    pri += 1;
+  }
   return pri;
 }
 
@@ -333,6 +337,12 @@ function canAct(
     const updated = { ...p, sleepTurnsUsed: turnsUsed };
     if (turnsUsed === 1) {
       events.push({ kind: 'cant_move', turn, pokemonName: p.data.name, reason: 'sleep' });
+      // Early Bird: wake up after only 1 turn of sleep.
+      if (p.ability === 'early-bird') {
+        const cured = { ...updated, statusCondition: undefined, sleepTurnsUsed: undefined };
+        events.push({ kind: 'status_cured', turn, pokemonName: p.data.name, condition: 'sleep' });
+        return { canAct: false, updated: cured };
+      }
       return { canAct: false, updated };
     } else if (turnsUsed === 2) {
       if (Math.random() < 1 / 3) {
@@ -681,6 +691,13 @@ export function simulateTurnDeterministic(
       // Flash Fire: nullify fire damage and activate the 1.5× fire boost.
       if (absorbsFire(defender, effectiveMove)) {
         defender = { ...defender, flashFireActive: true };
+        return { attacker, defender, flinched: false, dealtDamage: false };
+      }
+
+      // Sap Sipper: nullify grass damage and raise Attack by 1.
+      if (absorbsGrass(defender, effectiveMove)) {
+        const atk = clampStage(defender.statStages.attack + 1);
+        defender = { ...defender, statStages: { ...defender.statStages, attack: atk } as StatStages };
         return { attacker, defender, flinched: false, dealtDamage: false };
       }
 
@@ -1160,6 +1177,20 @@ export function resolveSingleAttack(
     if (!defender.flashFireActive) {
       defender = { ...defender, flashFireActive: true };
     }
+    events.push({
+      kind: 'attack', turn: turnNumber,
+      attackerName: attacker.data.name, defenderName: defender.data.name,
+      moveName: move.name, moveType: move.type, damageClass: move.damageClass,
+      damage: 0, isCrit: false, missed: false, effectiveness: 0,
+      attackerHpAfter: attacker.currentHp, defenderHpAfter: defender.currentHp,
+    });
+    return { attacker, defender, dealtDamage: false, defenderFlinched: false, pivotTriggered: false, field };
+  }
+
+  // Sap Sipper: nullify grass-type damaging moves and raise Attack by 1.
+  if (absorbsGrass(defender, effMove)) {
+    events.push({ kind: 'ability_triggered', turn: turnNumber, pokemonName: defender.data.name, ability: 'sap-sipper' });
+    defender = applyStatChange(defender, 'attack', 1, turnNumber, events);
     events.push({
       kind: 'attack', turn: turnNumber,
       attackerName: attacker.data.name, defenderName: defender.data.name,

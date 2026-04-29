@@ -173,7 +173,7 @@ export function calcDamage(
   const terrainMult = terrainMoveMult(attacker, defender, move, field?.terrain);
 
   const tintedMult = tintedLensMultiplier(attacker, effectiveness);
-  const defAbilityMult = getDefenderAbilityDamageMultiplier(defender, move);
+  const defAbilityMult = getDefenderAbilityDamageMultiplier(defender, move, effectiveness);
   const base = Math.floor(Math.floor((Math.floor(2 * 50 / 5) + 2) * move.power * A / D) / 50 + 2);
   const damage = Math.floor(base * critMult * roll * stab * effectiveness * screenMult * abilityMult * weatherMult * terrainMult * tintedMult * defAbilityMult);
 
@@ -220,7 +220,7 @@ export function calcMinDamage(
   const weatherMult = weatherMoveMult(move.type, field?.weather);
   const terrainMult = terrainMoveMult(attacker, defender, move, field?.terrain);
   const tintedMult = tintedLensMultiplier(attacker, effectiveness);
-  const defAbilityMult = getDefenderAbilityDamageMultiplier(defender, move);
+  const defAbilityMult = getDefenderAbilityDamageMultiplier(defender, move, effectiveness);
   const base = Math.floor(Math.floor((Math.floor(2 * 50 / 5) + 2) * move.power * A / D) / 50 + 2);
   const damage = Math.floor(base * 1.0 * 0.85 * stab * effectiveness * screenMult * abilityMult * weatherMult * terrainMult * tintedMult * defAbilityMult);
   return Math.max(1, damage);
@@ -262,7 +262,7 @@ export function calcExpectedDamage(
   const weatherMult = weatherMoveMult(move.type, field?.weather);
   const terrainMult = terrainMoveMult(attacker, defender, move, field?.terrain);
   const tintedMult = tintedLensMultiplier(attacker, effectiveness);
-  const defAbilityMult = getDefenderAbilityDamageMultiplier(defender, move);
+  const defAbilityMult = getDefenderAbilityDamageMultiplier(defender, move, effectiveness);
   const base = Math.floor(Math.floor((Math.floor(2 * 50 / 5) + 2) * move.power * A / D) / 50 + 2);
   const damage = Math.floor(base * 1.0 * roll * stab * effectiveness * screenMult * abilityMult * weatherMult * terrainMult * tintedMult * defAbilityMult);
   return Math.max(1, damage);

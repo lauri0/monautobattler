@@ -354,3 +354,103 @@
   color: var(--text-muted);
   font-style: italic;
 }
+
+/* ── Field state strip ──────────────────────────────────────────── */
+
+.field-state-strip {
+  display: grid;
+  grid-template-columns: 1fr auto 1fr;
+  gap: 0;
+  margin-bottom: 1rem;
+  padding: 0.6rem 1rem;
+  min-height: 2.6rem;
+  align-items: start;
+}
+
+.field-strip-divider {
+  width: 1px;
+  align-self: stretch;
+  background: var(--border);
+  margin: 0 0.75rem;
+}
+
+.field-pane {
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+  min-width: 0;
+}
+
+.field-pane-header {
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: var(--text-muted);
+  text-transform: capitalize;
+  letter-spacing: 0.04em;
+}
+
+.field-pane-empty {
+  font-size: 0.75rem;
+  color: var(--text-muted);
+  opacity: 0.5;
+  font-style: italic;
+}
+
+.field-chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.3rem;
+}
+
+.field-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.2rem;
+  padding: 0.1rem 0.45rem;
+  border-radius: 10px;
+  font-size: 0.72rem;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+  white-space: nowrap;
+}
+
+.chip-stage-pos {
+  background: #1a4a2e;
+  color: #4ade80;
+  border: 1px solid #2d6b44;
+}
+
+.chip-stage-neg {
+  background: #4a1a1a;
+  color: #f87171;
+  border: 1px solid #6b2d2d;
+}
+
+.chip-hazard {
+  background: #3d2b0a;
+  color: #f59e0b;
+  border: 1px solid #7c5208;
+}
+
+.chip-tspikes {
+  background: #2a1040;
+  color: #c084fc;
+  border: 1px solid #5b2d8a;
+}
+
+.chip-screen {
+  background: #0a2a4a;
+  color: #60a5fa;
+  border: 1px solid #1e4d8c;
+}
+
+.chip-tailwind {
+  background: #0a3030;
+  color: #34d399;
+  border: 1px solid #0f5c4a;
+}
+
+.chip-turns {
+  opacity: 0.75;
+  font-weight: 400;
+}

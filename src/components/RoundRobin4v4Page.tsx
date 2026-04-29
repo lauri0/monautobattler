@@ -29,6 +29,7 @@ import { parseDamageSummary, buildNameToIdMap } from '../battle/damageSummary';
 import { getPokemonPersisted } from '../persistence/userStorage';
 import TeamView from './TeamView';
 import PlayerActionBar from './PlayerActionBar';
+import FieldStateStrip from './FieldStateStrip';
 import TypeBadge from './TypeBadge';
 import { renderTeamEvent } from './TeamEventLog';
 import { useTeamBattleController } from './useTeamBattleController';
@@ -526,6 +527,8 @@ function MatchView(props: {
         </div>
         <TeamView state={displayedState} side={1} />
       </div>
+
+      <FieldStateStrip state={displayedState} />
 
       {done && !isPlaying && winner !== null && (
         <div className="winner-banner card">

@@ -41,6 +41,44 @@ describe('Ice Scales', () => {
   });
 });
 
+describe('Solid Rock / Filter', () => {
+  const waterDef  = makePokemon({ name: 'plain',      types: ['water'],                        stats: { defense: 100, specialDefense: 100 } });
+  const solidRock = makePokemon({ name: 'solidrock',  types: ['water'], ability: 'solid-rock', stats: { defense: 100, specialDefense: 100 } });
+  const filter    = makePokemon({ name: 'filter',     types: ['water'], ability: 'filter',     stats: { defense: 100, specialDefense: 100 } });
+  const electric  = makeMove({ name: 'thunderbolt', type: 'electric', power: 90, damageClass: 'special' });
+  const neutral   = makeMove({ name: 'tackle',      type: 'normal',   power: 90, damageClass: 'physical' });
+
+  it('reduces supereffective damage by 1/4', () => {
+    stubRngConst(0.99);
+    const vsPlain = calcDamage(makePokemon({ name: 'a', types: ['fire'], stats: { specialAttack: 100 } }), waterDef, electric);
+    stubRngConst(0.99);
+    const vsSR    = calcDamage(makePokemon({ name: 'a', types: ['fire'], stats: { specialAttack: 100 } }), solidRock, electric);
+    expect(vsSR.damage / vsPlain.damage).toBeCloseTo(0.75, 1);
+  });
+
+  it('does not reduce neutral damage', () => {
+    stubRngConst(0.99);
+    const vsPlain = calcDamage(makePokemon({ name: 'a', types: ['normal'], stats: { attack: 100 } }), waterDef, neutral);
+    stubRngConst(0.99);
+    const vsSR    = calcDamage(makePokemon({ name: 'a', types: ['normal'], stats: { attack: 100 } }), solidRock, neutral);
+    expect(vsSR.damage).toBe(vsPlain.damage);
+  });
+
+  it('applies in calcExpectedDamage', () => {
+    const attk = makePokemon({ name: 'a', types: ['fire'], stats: { specialAttack: 100 } });
+    const vsPlain = calcExpectedDamage(attk, waterDef,  electric);
+    const vsSR    = calcExpectedDamage(attk, solidRock, electric);
+    expect(vsSR / vsPlain).toBeCloseTo(0.75, 1);
+  });
+
+  it('filter has the same effect as solid-rock on supereffective hits', () => {
+    const attk = makePokemon({ name: 'a', types: ['fire'], stats: { specialAttack: 100 } });
+    const vsSR     = calcExpectedDamage(attk, solidRock, electric);
+    const vsFilter = calcExpectedDamage(attk, filter,    electric);
+    expect(vsFilter).toBe(vsSR);
+  });
+});
+
 describe('Fur Coat', () => {
   const plain   = makePokemon({ name: 'plain',   types: ['normal'],                     stats: { defense: 100, specialDefense: 100 } });
   const furCoat = makePokemon({ name: 'furcoat', types: ['normal'], ability: 'fur-coat', stats: { defense: 100, specialDefense: 100 } });

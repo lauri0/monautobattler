@@ -14,6 +14,7 @@ import TeamView from './TeamView';
 import WeatherDisplay from './WeatherDisplay';
 import TerrainDisplay from './TerrainDisplay';
 import PlayerActionBar from './PlayerActionBar';
+import FieldStateStrip from './FieldStateStrip';
 import { renderTeamEvent } from './TeamEventLog';
 import { useTeamBattleController } from './useTeamBattleController';
 import { formatPokemonName } from '../utils/formatName';
@@ -202,6 +203,8 @@ export default function Battle4v4Page({ allPokemon, onBack }: Props) {
         </div>
         <TeamView state={displayedState} side={1} />
       </div>
+
+      <FieldStateStrip state={displayedState} />
 
       {done && !isPlaying && winner !== null && (
         <div className="winner-banner card">

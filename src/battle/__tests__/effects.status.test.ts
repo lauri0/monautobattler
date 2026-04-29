@@ -63,6 +63,31 @@ describe('sleep', () => {
   });
 });
 
+// ── Early Bird ───────────────────────────────────────────────────────────────
+describe('early-bird', () => {
+  it('wakes up after exactly 1 turn of sleep', () => {
+    const attacker = makePokemon({ statusCondition: 'sleep', ability: 'early-bird' });
+    const defender = makePokemon();
+    const move = makeMove({ power: 60 });
+    const events: TurnEvent[] = [];
+    const r = resolveSingleAttack(attacker, defender, move, 1, { preFlinched: false, foeHitUserThisTurn: false }, events);
+    expect(events.find(e => e.kind === 'cant_move')).toBeTruthy();
+    expect(events.find(e => e.kind === 'status_cured')).toBeTruthy();
+    expect(r.attacker.statusCondition).toBeUndefined();
+  });
+
+  it('can act on the turn after waking', () => {
+    stubRng([0, 0.99, 1.0]); // acc, no-crit, roll
+    const attacker = makePokemon({ ability: 'early-bird' }); // already awake
+    const defender = makePokemon();
+    const move = makeMove({ power: 60 });
+    const events: TurnEvent[] = [];
+    const r = resolveSingleAttack(attacker, defender, move, 2, { preFlinched: false, foeHitUserThisTurn: false }, events);
+    expect(events.find(e => e.kind === 'cant_move')).toBeFalsy();
+    expect(r.defender.currentHp).toBeLessThan(defender.currentHp);
+  });
+});
+
 // ── Freeze ───────────────────────────────────────────────────────────────────
 describe('freeze', () => {
   it('thaws (25% chance) when RNG < 0.25', () => {

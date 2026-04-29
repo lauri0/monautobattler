@@ -62,6 +62,35 @@ describe('turn order', () => {
     expect(first2.kind === 'attack' && first2.attackerName).toBe('b');
   });
 
+  it('prankster: slow pokemon with prankster status move goes before fast pokemon using normal move', () => {
+    const slow = makePokemon({ name: 'slow', stats: { speed: 50 }, ability: 'prankster' });
+    const fast = makePokemon({ name: 'fast', stats: { speed: 200 } });
+    const statusMove = makeMove({ name: 'growl', power: 0, damageClass: 'status', priority: 0, effect: { statChanges: [{ stat: 'attack', change: -1, target: 'foe' }] } });
+    const normalMove = makeMove({ name: 'tackle', power: 40, priority: 0 });
+
+    // slow's status move (prankster → priority 1) goes before fast's normal move (priority 0).
+    // Status moves emit an 'attack' event when landing, followed by 'stat_change'.
+    // The first attack event should belong to slow.
+    stubRng([0, 0.99, 1.0, 0.99, 0, 0.99, 1.0]);
+    const r = resolveTurnWithMoves(slow, fast, statusMove, normalMove, 1);
+    const firstAttack = r.events.find(e => e.kind === 'attack');
+    expect(firstAttack?.kind === 'attack' && firstAttack.attackerName).toBe('slow');
+  });
+
+  it('prankster: does not boost priority of damaging moves', () => {
+    const slow = makePokemon({ name: 'slow', stats: { speed: 50 }, ability: 'prankster' });
+    const fast = makePokemon({ name: 'fast', stats: { speed: 200 } });
+    const damageMove = makeMove({ name: 'tackle', power: 40, damageClass: 'physical', priority: 0 });
+    const normalMove = makeMove({ name: 'scratch', power: 40, priority: 0 });
+
+    // fast (speed 200) should go first since prankster does not boost physical moves.
+    // Extra RNG: applyContactAbility rolls when fast hits slow (slow has prankster ability).
+    stubRng([0, 0.99, 1.0, 0.99, 0, 0.99, 1.0]);
+    const r = resolveTurnWithMoves(slow, fast, damageMove, normalMove, 1);
+    const attacks = r.events.filter(e => e.kind === 'attack');
+    expect(attacks[0].kind === 'attack' && attacks[0].attackerName).toBe('fast');
+  });
+
   it('firstTurnOnly move emits move_failed on turn 2 without damage', () => {
     const a = makePokemon({ name: 'a', stats: { speed: 200 } });
     const b = makePokemon({ name: 'b', stats: { speed: 50 } });
