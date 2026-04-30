@@ -41,6 +41,7 @@ export interface MoveEffect {
   protect?: boolean;       // marks Protect
   fieldEffect?: FieldEffectKind; // marks a field/side-condition-setting status move
   taunt?: boolean;         // applies Taunt to the target (blocks status moves for N turns)
+  throatChop?: boolean;    // prevents the target from using sound moves for 2 turns (Throat Chop)
   removesScreens?: boolean; // removes Reflect and Light Screen on defender's side before the hit (Brick Break)
   failsIfTargetNotAttacking?: boolean; // fails if the target is not using a damaging move this turn (Sucker Punch)
   clearsHazards?: boolean; // removes entry hazards (Stealth Rock) from user's side after hitting (Rapid Spin)
@@ -162,6 +163,9 @@ export interface BattlePokemon {
   // Taunt: remaining turns during which the pokemon cannot select status moves.
   // 0/undefined = not taunted. Decremented at end of turn.
   tauntTurns?: number;
+  // Throat Chop: remaining turns during which the pokemon cannot use sound moves.
+  // 0/undefined = not silenced. Decremented at end of turn.
+  throatChopTurns?: number;
   // True on a pokemon's first turn on the field (start of battle, or fresh after
   // switching in). Cleared at end of turn. Fake Out uses this gate.
   justSwitchedIn?: boolean;
@@ -209,6 +213,8 @@ export type TurnEvent =
   | { kind: 'toxic_spikes_absorbed'; turn: number; pokemonName: string }
   | { kind: 'taunted'; turn: number; pokemonName: string; turns: number }
   | { kind: 'taunt_end'; turn: number; pokemonName: string }
+  | { kind: 'throat_chopped'; turn: number; pokemonName: string; turns: number }
+  | { kind: 'throat_chop_end'; turn: number; pokemonName: string }
   | { kind: 'ability_triggered'; turn: number; pokemonName: string; ability: AbilityId }
   | { kind: 'weather_set'; turn: number; weather: WeatherKind; turns: number; pokemonName: string }
   | { kind: 'weather_expired'; turn: number; weather: WeatherKind }

@@ -2,13 +2,14 @@ import type { BattlePokemon, Move, TurnEvent, BattleResult, StatStageName, StatS
 import { calcDamage, calcExpectedDamage, effectiveSpeed, type DefenderScreens } from './damageCalc';
 import { defaultAI } from '../ai/aiModule';
 import { getTypeEffectiveness } from '../utils/typeChart';
-import { abilityMaxVariableHits, applySwitchInAbility, applyStatChangeFromFoe, noGuardInEffect, sheerForceSuppresses, absorbsWater, absorbsElectric, absorbsVoltAbsorb, absorbsMotorDrive, absorbsFire, absorbsGrass, absorbsStormDrain, absorbsWind, sturdyActive, ignoresRecoil, applyContactAbility, applyRattledByMove, applyJustified, applyWeakArmor, abilityBlocksAilment, abilityBlocksConfusion, hasMagicGuard, applyShedSkin, applyMoxie, applyEndOfTurnAbility, applyAngerPoint, applyStench, applyPoisonTouch, hasPoisonHeal, applySteadfast } from './abilities';
+import { abilityMaxVariableHits, applySwitchInAbility, applyStatChangeFromFoe, noGuardInEffect, sheerForceSuppresses, absorbsWater, absorbsElectric, absorbsVoltAbsorb, absorbsMotorDrive, absorbsFire, absorbsGrass, absorbsStormDrain, absorbsWind, absorbsSound, isSoundMove, sturdyActive, ignoresRecoil, applyContactAbility, applyRattledByMove, applyJustified, applyWeakArmor, abilityBlocksAilment, abilityBlocksConfusion, hasMagicGuard, applyShedSkin, applyMoxie, applyEndOfTurnAbility, applyAngerPoint, applyStench, applyPoisonTouch, hasPoisonHeal, applySteadfast } from './abilities';
 import { isGrounded } from './damageCalc';
 
 export const TRICK_ROOM_TURNS = 5;
 export const TAILWIND_TURNS = 4;
 export const SCREEN_TURNS = 5;
 export const TAUNT_TURNS = 3;
+export const THROAT_CHOP_TURNS = 2;
 
 function makeSide(): SideFieldState {
   return { tailwindTurns: 0, lightScreenTurns: 0, reflectTurns: 0, stealthRock: false, spikes: 0, toxicSpikes: false };
@@ -552,6 +553,18 @@ export function tickTaunt(p: BattlePokemon, turn: number, events: TurnEvent[]): 
   return { ...p, tauntTurns: next };
 }
 
+// Decrements a pokemon's throat-chop counter. Emits throat_chop_end if it expires.
+export function tickThroatChop(p: BattlePokemon, turn: number, events: TurnEvent[]): BattlePokemon {
+  if (!p.throatChopTurns) return p;
+  const next = p.throatChopTurns - 1;
+  if (next <= 0) {
+    events.push({ kind: 'throat_chop_end', turn, pokemonName: p.data.name });
+    const { throatChopTurns: _drop, ...rest } = p;
+    return { ...rest };
+  }
+  return { ...p, throatChopTurns: next };
+}
+
 // ── Deterministic simulation for expectiminimax tree search ─────────────────
 
 export interface ChanceOutcome {
@@ -764,6 +777,11 @@ export function simulateTurnDeterministic(
         if (move.effect?.crashOnMiss && attacker.ability !== 'magic-guard') {
           attacker = { ...attacker, currentHp: Math.max(0, attacker.currentHp - Math.floor(attacker.level50Stats.hp / 2)) };
         }
+        return { attacker, defender, flinched: false, dealtDamage: false };
+      }
+
+      // Soundproof: nullify damaging sound moves.
+      if (absorbsSound(defender, effectiveMove)) {
         return { attacker, defender, flinched: false, dealtDamage: false };
       }
 
@@ -1153,6 +1171,29 @@ export function resolveSingleAttack(
     return { attacker, defender, dealtDamage: false, defenderFlinched: false, pivotTriggered: false, field };
   }
 
+  // Throat Chop: prevents the attacker from using sound moves.
+  if (isSoundMove(move) && (attacker.throatChopTurns ?? 0) > 0) {
+    events.push({ kind: 'move_failed', turn: turnNumber, pokemonName: attacker.data.name, moveName: move.name });
+    return { attacker, defender, dealtDamage: false, defenderFlinched: false, pivotTriggered: false, field };
+  }
+
+  // Soundproof: defender is immune to all sound-based moves.
+  if (isSoundMove(move) && defender.ability === 'soundproof') {
+    events.push({ kind: 'ability_triggered', turn: turnNumber, pokemonName: defender.data.name, ability: 'soundproof' });
+    if (move.damageClass !== 'status') {
+      events.push({
+        kind: 'attack', turn: turnNumber,
+        attackerName: attacker.data.name, defenderName: defender.data.name,
+        moveName: move.name, moveType: move.type, damageClass: move.damageClass,
+        damage: 0, isCrit: false, missed: false, effectiveness: 0,
+        attackerHpAfter: attacker.currentHp, defenderHpAfter: defender.currentHp,
+      });
+    } else {
+      events.push({ kind: 'move_failed', turn: turnNumber, pokemonName: attacker.data.name, moveName: move.name });
+    }
+    return { attacker, defender, dealtDamage: false, defenderFlinched: false, pivotTriggered: false, field };
+  }
+
   if (move.damageClass === 'status') {
     return resolveStatusMove(attacker, defender, move, turnNumber, attackerSide, field, events);
   }
@@ -1423,6 +1464,12 @@ export function resolveSingleAttack(
       attacker = applyMoxie(attacker, turnNumber, events);
     }
 
+    // Throat Chop: silence the defender for THROAT_CHOP_TURNS turns.
+    if (move.effect?.throatChop && defender.currentHp > 0) {
+      defender = { ...defender, throatChopTurns: THROAT_CHOP_TURNS };
+      events.push({ kind: 'throat_chopped', turn: turnNumber, pokemonName: defender.data.name, turns: THROAT_CHOP_TURNS });
+    }
+
     // Rapid Spin: clear entry hazards from the user's side.
     if (move.effect?.clearsHazards && attacker.currentHp > 0) {
       const userSide = field.sides[attackerSide];
@@ -1607,9 +1654,11 @@ export function resolveTurnWithMoves(
     p2 = applyEndOfTurnTerrain(p2, field, turnNumber, events);
   }
 
-  // Taunt countdown (runs regardless of KO).
+  // Taunt / Throat Chop countdowns (run regardless of KO).
   p1 = tickTaunt(p1, turnNumber, events);
   p2 = tickTaunt(p2, turnNumber, events);
+  p1 = tickThroatChop(p1, turnNumber, events);
+  p2 = tickThroatChop(p2, turnNumber, events);
 
   // Decrement any active field / side counters. Runs regardless of KO so that
   // Trick Room etc. still expires when one side faints.

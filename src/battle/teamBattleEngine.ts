@@ -16,7 +16,7 @@ import type {
   StatStages,
 } from '../models/types';
 import { buildBattlePokemon } from './buildBattlePokemon';
-import { applyEndOfTurnStatus, applyEndOfTurnTerrain, applyEndOfTurnWeather, applySpikesOnEntry, applyStealthRockOnEntry, applyToxicSpikesOnEntry, effectivePriority, makeInitialField, resolveSingleAttack, tickTaunt, usableMoves } from './battleEngine';
+import { applyEndOfTurnStatus, applyEndOfTurnTerrain, applyEndOfTurnWeather, applySpikesOnEntry, applyStealthRockOnEntry, applyToxicSpikesOnEntry, effectivePriority, makeInitialField, resolveSingleAttack, tickTaunt, tickThroatChop, usableMoves } from './battleEngine';
 import { effectiveSpeed } from './damageCalc';
 import { applySwitchInAbility, applySwitchOutAbility } from './abilities';
 
@@ -237,6 +237,8 @@ function completeTurn(
   a1Ticked = applyEndOfTurnTerrain(a1Ticked, field, turn, inner);
   a0Ticked = tickTaunt(a0Ticked, turn, inner);
   a1Ticked = tickTaunt(a1Ticked, turn, inner);
+  a0Ticked = tickThroatChop(a0Ticked, turn, inner);
+  a1Ticked = tickThroatChop(a1Ticked, turn, inner);
   if (a0Ticked.protectedThisTurn) a0Ticked = { ...a0Ticked, protectedThisTurn: false };
   if (a1Ticked.protectedThisTurn) a1Ticked = { ...a1Ticked, protectedThisTurn: false };
   if (a0Ticked.justSwitchedIn) a0Ticked = { ...a0Ticked, justSwitchedIn: false };

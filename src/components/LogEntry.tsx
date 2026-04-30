@@ -310,6 +310,26 @@ export default function LogEntry({ ev }: { ev: TurnEvent }) {
     );
   }
 
+  if (ev.kind === 'throat_chopped') {
+    return (
+      <div className="log-entry log-entry--status">
+        <span className="log-turn">T{ev.turn}</span>
+        <span className="log-attacker">{ev.pokemonName}</span>
+        <span className="log-miss"> had its throat chopped! Can't use sound moves for {ev.turns} turns.</span>
+      </div>
+    );
+  }
+
+  if (ev.kind === 'throat_chop_end') {
+    return (
+      <div className="log-entry log-entry--effect">
+        <span className="log-turn">T{ev.turn}</span>
+        <span className="log-attacker">{ev.pokemonName}</span>
+        <span className="log-eff"> can use sound moves again!</span>
+      </div>
+    );
+  }
+
   if (ev.kind === 'weather_set') {
     const starts: Record<string, string> = {
       sun: 'The sunlight turned harsh!',

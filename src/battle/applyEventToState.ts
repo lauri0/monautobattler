@@ -106,6 +106,10 @@ export function applyEventToState(
       return { ...patchByName(p1, p2, event.pokemonName, p => ({ ...p, confused: true })), field };
     case 'confusion_end':
       return { ...patchByName(p1, p2, event.pokemonName, p => ({ ...p, confused: false })), field };
+    case 'throat_chopped':
+      return { ...patchByName(p1, p2, event.pokemonName, p => ({ ...p, throatChopTurns: event.turns })), field };
+    case 'throat_chop_end':
+      return { ...patchByName(p1, p2, event.pokemonName, p => ({ ...p, throatChopTurns: undefined })), field };
     case 'weather_set':
       return { p1, p2, field: { ...field, weather: event.weather, weatherTurns: event.turns } };
     case 'weather_expired':
@@ -175,6 +179,10 @@ function applyTurnEventToTeamState(state: TeamBattleState, event: TurnEvent): Te
       return patchAllTeams(state, event.pokemonName, p => ({ ...p, confused: true }));
     case 'confusion_end':
       return patchAllTeams(state, event.pokemonName, p => ({ ...p, confused: false }));
+    case 'throat_chopped':
+      return patchAllTeams(state, event.pokemonName, p => ({ ...p, throatChopTurns: event.turns }));
+    case 'throat_chop_end':
+      return patchAllTeams(state, event.pokemonName, p => ({ ...p, throatChopTurns: undefined }));
     case 'weather_set':
       return { ...state, field: { ...state.field, weather: event.weather, weatherTurns: event.turns } };
     case 'weather_expired':

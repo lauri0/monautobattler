@@ -231,6 +231,36 @@ export const IMPLEMENTED_ABILITIES: Record<string, AbilityEffect> = {
   },
   'infiltrator': {},
   'wind-rider':  {},
+  'soundproof':  {},
+  'pressure':    {},
+  'chlorophyll': {
+    onEndOfTurn: (self, turn, events) => {
+      if (self.currentHp <= 0 || self.currentHp >= self.level50Stats.hp) return self;
+      const heal = Math.floor(self.level50Stats.hp / 16);
+      if (heal <= 0) return self;
+      const hpAfter = Math.min(self.level50Stats.hp, self.currentHp + heal);
+      events.push({ kind: 'ability_triggered', turn, pokemonName: self.data.name, ability: 'chlorophyll' });
+      events.push({ kind: 'heal', turn, pokemonName: self.data.name, healed: hpAfter - self.currentHp, hpAfter });
+      return { ...self, currentHp: hpAfter };
+    },
+  },
+  'moody': {
+    onEndOfTurn: (self, turn, events) => {
+      if (self.currentHp <= 0) return self;
+      const ALL_STATS: StatStageName[] = ['attack', 'defense', 'special-attack', 'special-defense', 'speed'];
+      const boostable = ALL_STATS.filter(s => self.statStages[s] < 6);
+      if (boostable.length === 0) return self;
+      const boostStat = boostable[Math.floor(Math.random() * boostable.length)];
+      const lowerable = ALL_STATS.filter(s => s !== boostStat && self.statStages[s] > -6);
+      events.push({ kind: 'ability_triggered', turn, pokemonName: self.data.name, ability: 'moody' });
+      let updated = applyStatChange(self, boostStat, 2, turn, events);
+      if (lowerable.length > 0) {
+        const lowerStat = lowerable[Math.floor(Math.random() * lowerable.length)];
+        updated = applyStatChange(updated, lowerStat, -1, turn, events);
+      }
+      return updated;
+    },
+  },
 };
 
 // Tinted Lens: not-very-effective hits (effectiveness < 1) deal double damage.
@@ -440,6 +470,22 @@ export function absorbsWater(defender: BattlePokemon, move: Move): boolean {
 export function absorbsGrass(defender: BattlePokemon, move: Move): boolean {
   return defender.ability === 'sap-sipper'
     && move.type === 'grass'
+    && move.damageClass !== 'status';
+}
+
+export const SOUND_MOVES = new Set([
+  'alluring-voice', 'bug-buzz', 'hyper-voice', 'parting-shot', 'snarl',
+]);
+
+export function isSoundMove(move: Move): boolean {
+  return SOUND_MOVES.has(move.name);
+}
+
+// Soundproof: incoming sound-based damaging moves are nullified entirely.
+// Status sound moves are also blocked (handled separately in battleEngine).
+export function absorbsSound(defender: BattlePokemon, move: Move): boolean {
+  return defender.ability === 'soundproof'
+    && isSoundMove(move)
     && move.damageClass !== 'status';
 }
 
@@ -716,6 +762,10 @@ export const ABILITY_DESCRIPTIONS: Record<string, string> = {
   'filter':         'Reduces damage taken from super-effective moves by 25%',
   'infiltrator':    'Moves ignore the effects of Light Screen and Reflect',
   'wind-rider':     'Boosts Attack when Tailwind takes effect; immune to wind moves and boosts Attack when hit by one',
+  'chlorophyll':    'Restores 1/16 of max HP at the end of every turn',
+  'soundproof':     'Immune to all sound-based moves',
+  'pressure':       'No effect',
+  'moody':          'Raises one random stat by 2 stages and lowers a different random stat by 1 stage at the end of each turn',
 };
 
 export function getAbilityDescription(name: AbilityId | undefined): string | undefined {

@@ -40,6 +40,7 @@ export interface PokemonOverrides {
   ability?: string;
   abilities?: string[];
   flashFireActive?: boolean;
+  throatChopTurns?: number;
 }
 
 export function makePokemon(overrides: PokemonOverrides = {}): BattlePokemon {
@@ -89,6 +90,7 @@ export function makePokemon(overrides: PokemonOverrides = {}): BattlePokemon {
     lastMoveProtected: overrides.lastMoveProtected,
     ability: overrides.ability,
     flashFireActive: overrides.flashFireActive,
+    throatChopTurns: overrides.throatChopTurns,
     statStages: { ...ZERO_STAGES, ...(overrides.statStages ?? {}) },
   };
 }

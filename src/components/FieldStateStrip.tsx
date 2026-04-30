@@ -26,7 +26,8 @@ function SidePane({ state, side }: { state: TeamBattleState; side: SideIndex }) 
   if (sideField.reflectTurns > 0)     screens.push({ label: 'Reflect',       turns: sideField.reflectTurns,      cls: 'chip-screen' });
   if (sideField.tailwindTurns > 0)    screens.push({ label: 'Tailwind',      turns: sideField.tailwindTurns,     cls: 'chip-tailwind' });
 
-  const isEmpty = nonZeroStages.length === 0 && hazards.length === 0 && screens.length === 0;
+  const throatChopTurns = active.throatChopTurns ?? 0;
+  const isEmpty = nonZeroStages.length === 0 && hazards.length === 0 && screens.length === 0 && throatChopTurns === 0;
 
   return (
     <div className="field-pane">
@@ -52,6 +53,11 @@ function SidePane({ state, side }: { state: TeamBattleState; side: SideIndex }) 
               {s.label} <span className="chip-turns">{s.turns}</span>
             </span>
           ))}
+          {throatChopTurns > 0 && (
+            <span className="field-chip chip-status">
+              Throat Chop <span className="chip-turns">{throatChopTurns}</span>
+            </span>
+          )}
         </div>
       )}
     </div>

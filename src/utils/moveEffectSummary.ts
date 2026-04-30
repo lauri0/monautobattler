@@ -111,6 +111,10 @@ export function effectSummary(move: Move): string {
     parts.push('clears hazards');
   }
 
+  if (eff.throatChop) {
+    parts.push('silences 2t');
+  }
+
   if (eff.crashOnMiss) {
     parts.push('crash 50% on miss');
   }

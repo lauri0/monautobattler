@@ -44,6 +44,7 @@ export default function PokedexPage({ allPokemon, onSelectPokemon, onBack }: Pro
       if (p.name.toLowerCase().includes(q)) return true;
       if (formatPokemonName(p.name).toLowerCase().includes(q)) return true;
       if (qCompact && p.availableMoves.some(m => m.name.toLowerCase().replace(/-/g, '').includes(qCompact))) return true;
+      if (qCompact && p.abilities.some(a => a.toLowerCase().replace(/-/g, '').includes(qCompact))) return true;
       return false;
     };
     return allPokemon
@@ -72,7 +73,7 @@ export default function PokedexPage({ allPokemon, onSelectPokemon, onBack }: Pro
         <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
           <input
             type="text"
-            placeholder="Search by name or move..."
+            placeholder="Search by name, move, or ability..."
             value={search}
             onChange={e => setSearch(e.target.value)}
             style={{ flex: 1, minWidth: 200 }}

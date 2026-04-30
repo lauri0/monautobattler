@@ -248,6 +248,11 @@ async function fetchMoveData(moveUrl: string): Promise<Move | null> {
       effect = { ...effect, failsIfTargetNotAttacking: true };
     }
 
+    // Throat Chop: silences the target for 2 turns
+    if (data.name === 'throat-chop') {
+      effect = { ...effect, throatChop: true };
+    }
+
     // Body Press: uses attacker's Defense as the attack stat
     if (data.name === 'body-press') {
       effect = { ...effect, useOwnDefense: true };
