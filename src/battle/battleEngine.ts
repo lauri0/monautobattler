@@ -2,7 +2,7 @@ import type { BattlePokemon, Move, TurnEvent, BattleResult, StatStageName, StatS
 import { calcDamage, calcExpectedDamage, effectiveSpeed, type DefenderScreens } from './damageCalc';
 import { defaultAI } from '../ai/aiModule';
 import { getTypeEffectiveness } from '../utils/typeChart';
-import { abilityMaxVariableHits, applySwitchInAbility, applyStatChangeFromFoe, noGuardInEffect, sheerForceSuppresses, absorbsWater, absorbsElectric, absorbsVoltAbsorb, absorbsFire, absorbsGrass, sturdyActive, ignoresRecoil, applyContactAbility, applyRattledByMove, applyWeakArmor, abilityBlocksAilment, abilityBlocksConfusion, hasMagicGuard, applyShedSkin, applyMoxie, applyEndOfTurnAbility } from './abilities';
+import { abilityMaxVariableHits, applySwitchInAbility, applyStatChangeFromFoe, noGuardInEffect, sheerForceSuppresses, absorbsWater, absorbsElectric, absorbsVoltAbsorb, absorbsMotorDrive, absorbsFire, absorbsGrass, absorbsStormDrain, sturdyActive, ignoresRecoil, applyContactAbility, applyRattledByMove, applyJustified, applyWeakArmor, abilityBlocksAilment, abilityBlocksConfusion, hasMagicGuard, applyShedSkin, applyMoxie, applyEndOfTurnAbility, applyAngerPoint, applyStench, applyPoisonTouch, hasPoisonHeal, applySteadfast } from './abilities';
 import { isGrounded } from './damageCalc';
 
 export const TRICK_ROOM_TURNS = 5;
@@ -238,14 +238,16 @@ export function usableMoves(p: BattlePokemon, _turnNumber?: number): Move[] {
  */
 function effectivePowerMove(
   move: Move,
+  attacker: BattlePokemon,
   defender: BattlePokemon,
   foeHitUserThisTurn: boolean,
+  foeMovedBeforeUser: boolean,
 ): Move {
   const eff = move.effect;
-  if (!eff) return move;
   let multiplier = 1;
-  if (eff.doublePowerIfHit && foeHitUserThisTurn) multiplier *= 2;
-  if (eff.doublePowerIfTargetStatus && defender.statusCondition) multiplier *= 2;
+  if (eff?.doublePowerIfHit && foeHitUserThisTurn) multiplier *= 2;
+  if (eff?.doublePowerIfTargetStatus && defender.statusCondition) multiplier *= 2;
+  if (attacker.ability === 'analytic' && foeMovedBeforeUser && move.damageClass !== 'status') multiplier *= 1.3;
   if (multiplier === 1) return move;
   return { ...move, power: move.power * multiplier };
 }
@@ -442,9 +444,17 @@ function applySecondaryEffects(
   if (eff.drain !== undefined && eff.drain !== 0 && damage > 0) {
     if (eff.drain > 0) {
       const healed = Math.max(1, Math.floor(damage * eff.drain / 100));
-      const newHp = Math.min(attacker.level50Stats.hp, attacker.currentHp + healed);
-      events.push({ kind: 'drain', turn, pokemonName: attacker.data.name, healed: newHp - attacker.currentHp, hpAfter: newHp });
-      attacker = { ...attacker, currentHp: newHp };
+      if (defender.ability === 'liquid-ooze') {
+        // Liquid Ooze: draining moves hurt the attacker instead of healing them.
+        const newHp = Math.max(0, attacker.currentHp - healed);
+        events.push({ kind: 'ability_triggered', turn, pokemonName: defender.data.name, ability: 'liquid-ooze' });
+        events.push({ kind: 'recoil', turn, pokemonName: attacker.data.name, damage: healed, hpAfter: newHp });
+        attacker = { ...attacker, currentHp: newHp };
+      } else {
+        const newHp = Math.min(attacker.level50Stats.hp, attacker.currentHp + healed);
+        events.push({ kind: 'drain', turn, pokemonName: attacker.data.name, healed: newHp - attacker.currentHp, hpAfter: newHp });
+        attacker = { ...attacker, currentHp: newHp };
+      }
     } else if (!ignoresRecoil(attacker)) {
       const recoil = Math.max(1, Math.floor(damage * Math.abs(eff.drain) / 100));
       const newHp = Math.max(0, attacker.currentHp - recoil);
@@ -515,6 +525,14 @@ export function applyEndOfTurnStatus(
   if (p.statusCondition !== 'burn' && p.statusCondition !== 'poison') return p;
   if (p.currentHp <= 0) return p;
   if (hasMagicGuard(p)) return p;
+  if (hasPoisonHeal(p)) {
+    if (p.currentHp >= p.level50Stats.hp) return p;
+    const heal = Math.max(1, Math.floor(p.level50Stats.hp / 8));
+    const hpAfter = Math.min(p.level50Stats.hp, p.currentHp + heal);
+    events.push({ kind: 'ability_triggered', turn, pokemonName: p.data.name, ability: 'poison-heal' });
+    events.push({ kind: 'heal', turn, pokemonName: p.data.name, healed: hpAfter - p.currentHp, hpAfter });
+    return { ...p, currentHp: hpAfter };
+  }
   const divisor = p.statusCondition === 'burn' ? 16 : 8;
   const tick = Math.max(1, Math.floor(p.level50Stats.hp / divisor));
   const newHp = Math.max(0, p.currentHp - tick);
@@ -654,6 +672,7 @@ export function simulateTurnDeterministic(
     hit: boolean,
     effects: { statChange: boolean; ailment: boolean; flinch: boolean; confusion: boolean },
     foeHitUserThisTurn: boolean,
+    foeMovedBeforeUser: boolean,
   ): { attacker: BattlePokemon; defender: BattlePokemon; flinched: boolean; dealtDamage: boolean } {
     if (!move || !move.power) return { attacker, defender, flinched: false, dealtDamage: false };
     const fraction = actionFraction(attacker);
@@ -663,7 +682,7 @@ export function simulateTurnDeterministic(
     let dealtDamage = false;
 
     if (hit) {
-      const effectiveMove = effectivePowerMove(move, defender, foeHitUserThisTurn);
+      const effectiveMove = effectivePowerMove(move, attacker, defender, foeHitUserThisTurn, foeMovedBeforeUser);
 
       // Water Absorb: nullify water damage and heal 1/4 max HP.
       if (absorbsWater(defender, effectiveMove)) {
@@ -680,11 +699,25 @@ export function simulateTurnDeterministic(
         return { attacker, defender, flinched: false, dealtDamage: false };
       }
 
+      // Storm Drain: nullify water damage and raise Sp. Atk by 1.
+      if (absorbsStormDrain(defender, effectiveMove)) {
+        const spa = clampStage(defender.statStages['special-attack'] + 1);
+        defender = { ...defender, statStages: { ...defender.statStages, 'special-attack': spa } as StatStages };
+        return { attacker, defender, flinched: false, dealtDamage: false };
+      }
+
       // Volt Absorb: nullify electric damage and heal 1/4 max HP.
       if (absorbsVoltAbsorb(defender, effectiveMove)) {
         const maxHp = defender.level50Stats.hp;
         const heal = Math.max(1, Math.floor(maxHp / 4));
         defender = { ...defender, currentHp: Math.min(maxHp, defender.currentHp + heal) };
+        return { attacker, defender, flinched: false, dealtDamage: false };
+      }
+
+      // Motor Drive: nullify electric damage and raise Speed by 1.
+      if (absorbsMotorDrive(defender, effectiveMove)) {
+        const spd = clampStage(defender.statStages.speed + 1);
+        defender = { ...defender, statStages: { ...defender.statStages, speed: spd } as StatStages };
         return { attacker, defender, flinched: false, dealtDamage: false };
       }
 
@@ -764,6 +797,12 @@ export function simulateTurnDeterministic(
       }
     }
 
+    // Crash on miss (deterministic path).
+    if (!hit && move.effect?.crashOnMiss && attacker.ability !== 'magic-guard') {
+      const crash = Math.floor(attacker.level50Stats.hp / 2);
+      attacker = { ...attacker, currentHp: Math.max(0, attacker.currentHp - crash) };
+    }
+
     return { attacker, defender, flinched, dealtDamage };
   }
 
@@ -774,7 +813,7 @@ export function simulateTurnDeterministic(
   let firstDealtDamage = false;
   {
     // First attacker never has a "hit earlier this turn" bonus available.
-    const r = applyMove(a, d, firstMove, firstHit, firstEffects, false);
+    const r = applyMove(a, d, firstMove, firstHit, firstEffects, false, false);
     a = r.attacker; d = r.defender; secondFlinched = r.flinched;
     firstDealtDamage = r.dealtDamage;
     if (isP1First) { p1 = a; p2 = d; } else { p2 = a; p1 = d; }
@@ -788,7 +827,7 @@ export function simulateTurnDeterministic(
   if (!battleOver && !secondFlinched) {
     let a2 = isP1First ? p2 : p1;
     let d2 = isP1First ? p1 : p2;
-    const r = applyMove(a2, d2, secondMove, secondHit, secondEffects, firstDealtDamage);
+    const r = applyMove(a2, d2, secondMove, secondHit, secondEffects, firstDealtDamage, true);
     a2 = r.attacker; d2 = r.defender;
     if (isP1First) { p1 = d2; p2 = a2; } else { p2 = d2; p1 = a2; }
     if (p1.currentHp <= 0 || p2.currentHp <= 0) {
@@ -802,6 +841,7 @@ export function simulateTurnDeterministic(
     function tickStatus(p: BattlePokemon): BattlePokemon {
       if (p.statusCondition !== 'burn' && p.statusCondition !== 'poison') return p;
       if (p.ability === 'magic-guard') return p;
+      if (hasPoisonHeal(p)) return { ...p, currentHp: Math.min(p.level50Stats.hp, p.currentHp + Math.max(1, Math.floor(p.level50Stats.hp / 8))) };
       const divisor = p.statusCondition === 'burn' ? 16 : 8;
       const tick = Math.max(1, Math.floor(p.level50Stats.hp / divisor));
       return { ...p, currentHp: Math.max(0, p.currentHp - tick) };
@@ -829,6 +869,7 @@ export interface SingleAttackResult {
 export interface AttackCtx {
   preFlinched: boolean;
   foeHitUserThisTurn: boolean;
+  foeMovedBeforeUser?: boolean;
   field?: FieldState;
   attackerSide?: SideIndex;
   // The move the defender has selected this turn. Used by Sucker Punch.
@@ -1034,6 +1075,7 @@ export function resolveSingleAttack(
 
   if (ctx.preFlinched) {
     events.push({ kind: 'cant_move', turn: turnNumber, pokemonName: attacker.data.name, reason: 'flinch' });
+    attacker = applySteadfast(attacker, turnNumber, events);
     return { attacker, defender, dealtDamage: false, defenderFlinched: false, pivotTriggered: false, field };
   }
   if (move.effect?.firstTurnOnly && !attacker.justSwitchedIn) {
@@ -1088,7 +1130,7 @@ export function resolveSingleAttack(
   }
 
   const wasLockedBefore = !!attacker.lockedMove && attacker.lockedMove.moveId === move.id;
-  const effMove = effectivePowerMove(move, defender, ctx.foeHitUserThisTurn);
+  const effMove = effectivePowerMove(move, attacker, defender, ctx.foeHitUserThisTurn, ctx.foeMovedBeforeUser ?? false);
 
   // Brick Break: strip Reflect / Light Screen on the defender's side before
   // damage is calculated, so this attack (and any follow-up) ignores them.
@@ -1115,6 +1157,7 @@ export function resolveSingleAttack(
   let defenderFlinched = false;
   let totalConnected = false;
   let lastHitDamage = 0;
+  let anyHitWasCrit = false;
 
   // Water Absorb: nullify water damaging moves and heal the defender by 1/4 max HP.
   // Emit an attack event (damage 0, no miss) so the log reflects the absorption.
@@ -1151,6 +1194,20 @@ export function resolveSingleAttack(
     return { attacker, defender, dealtDamage: false, defenderFlinched: false, pivotTriggered: false, field };
   }
 
+  // Storm Drain: nullify water damaging moves and raise Sp. Atk by 1.
+  if (absorbsStormDrain(defender, effMove)) {
+    events.push({ kind: 'ability_triggered', turn: turnNumber, pokemonName: defender.data.name, ability: 'storm-drain' });
+    defender = applyStatChange(defender, 'special-attack', 1, turnNumber, events);
+    events.push({
+      kind: 'attack', turn: turnNumber,
+      attackerName: attacker.data.name, defenderName: defender.data.name,
+      moveName: move.name, moveType: move.type, damageClass: move.damageClass,
+      damage: 0, isCrit: false, missed: false, effectiveness: 0,
+      attackerHpAfter: attacker.currentHp, defenderHpAfter: defender.currentHp,
+    });
+    return { attacker, defender, dealtDamage: false, defenderFlinched: false, pivotTriggered: false, field };
+  }
+
   // Volt Absorb: nullify electric damaging moves and heal the defender by 1/4 max HP.
   if (absorbsVoltAbsorb(defender, effMove)) {
     events.push({ kind: 'ability_triggered', turn: turnNumber, pokemonName: defender.data.name, ability: 'volt-absorb' });
@@ -1161,6 +1218,20 @@ export function resolveSingleAttack(
       events.push({ kind: 'heal', turn: turnNumber, pokemonName: defender.data.name, healed: newHp - defender.currentHp, hpAfter: newHp });
       defender = { ...defender, currentHp: newHp };
     }
+    events.push({
+      kind: 'attack', turn: turnNumber,
+      attackerName: attacker.data.name, defenderName: defender.data.name,
+      moveName: move.name, moveType: move.type, damageClass: move.damageClass,
+      damage: 0, isCrit: false, missed: false, effectiveness: 0,
+      attackerHpAfter: attacker.currentHp, defenderHpAfter: defender.currentHp,
+    });
+    return { attacker, defender, dealtDamage: false, defenderFlinched: false, pivotTriggered: false, field };
+  }
+
+  // Motor Drive: nullify electric damaging moves and raise the defender's Speed by 1.
+  if (absorbsMotorDrive(defender, effMove)) {
+    events.push({ kind: 'ability_triggered', turn: turnNumber, pokemonName: defender.data.name, ability: 'motor-drive' });
+    defender = applyStatChange(defender, 'speed', 1, turnNumber, events);
     events.push({
       kind: 'attack', turn: turnNumber,
       attackerName: attacker.data.name, defenderName: defender.data.name,
@@ -1203,6 +1274,7 @@ export function resolveSingleAttack(
 
   const escalating = !!move.effect?.escalatingHits;
   const skillLink = attacker.ability === 'skill-link';
+  let didMiss = false;
 
   for (let hitIndex = 0; hitIndex < hitCount; hitIndex++) {
     // Triple Axel / Triple Kick: each hit scales power by (N+1) and rolls its
@@ -1243,12 +1315,13 @@ export function resolveSingleAttack(
       events.push({ kind: 'ability_triggered', turn: turnNumber, pokemonName: defender.data.name, ability: 'sturdy' });
     }
 
-    if (result.missed) break;
+    if (result.missed) { didMiss = true; break; }
 
     if (!result.missed && result.effectiveness !== 0) {
       totalConnected = true;
       if (damageThisHit > 0) dealtDamage = true;
       lastHitDamage = actualDamage;
+      if (result.isCrit) anyHitWasCrit = true;
     }
 
     if (defender.currentHp <= 0) break;
@@ -1262,8 +1335,14 @@ export function resolveSingleAttack(
     // Contact abilities (Static, Flame Body, Poison Point, Effect Spore) roll
     // against the attacker if the move made contact.
     attacker = applyContactAbility(attacker, defender, move, turnNumber, events);
+    defender = applyPoisonTouch(attacker, defender, move, turnNumber, events);
     defender = applyRattledByMove(defender, move, turnNumber, events);
+    defender = applyJustified(defender, move, turnNumber, events);
     defender = applyWeakArmor(defender, move, turnNumber, events);
+    defender = applyAngerPoint(defender, anyHitWasCrit, turnNumber, events);
+    if (!defenderFlinched) {
+      defenderFlinched = applyStench(attacker, defender, move, turnNumber, events);
+    }
     // Moxie: raise Attack by 1 when the bearer scores a KO.
     if (defender.currentHp <= 0 && dealtDamage) {
       attacker = applyMoxie(attacker, turnNumber, events);
@@ -1284,6 +1363,15 @@ export function resolveSingleAttack(
         if (hadToxic) events.push({ kind: 'field_expired', turn: turnNumber, effect: 'toxicSpikes', side: attackerSide });
       }
     }
+  }
+
+  // Crash damage on miss (Supercell Slam): 1/2 user's max HP, rounded down.
+  // Magic Guard blocks this.
+  if (didMiss && move.effect?.crashOnMiss && !hasMagicGuard(attacker)) {
+    const crash = Math.floor(attacker.level50Stats.hp / 2);
+    const hpAfter = Math.max(0, attacker.currentHp - crash);
+    events.push({ kind: 'crash', turn: turnNumber, pokemonName: attacker.data.name, damage: crash, hpAfter });
+    attacker = { ...attacker, currentHp: hpAfter };
   }
 
   // Tick an existing forced-move lock. Skip on the turn the lock is first set.
@@ -1393,6 +1481,7 @@ export function resolveTurnWithMoves(
     const r = resolveSingleAttack(attacker, defender, move, turnNumber, {
       preFlinched: !isFirst && secondFlinched,
       foeHitUserThisTurn: !isFirst && firstDealtDamage,
+      foeMovedBeforeUser: !isFirst,
       field,
       attackerSide: isP1 ? 0 : 1,
       defenderMove: otherEntry ? otherEntry.move : null,

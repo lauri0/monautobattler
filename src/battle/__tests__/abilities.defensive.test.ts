@@ -2,7 +2,7 @@ import { describe, it, expect } from 'vitest';
 import { runFullBattle } from '../battleEngine';
 import { makePokemon, makeMove } from './fixtures';
 import { stubRngConst } from './rng';
-import { absorbsWater, absorbsElectric, sturdyActive, ignoresRecoil } from '../abilities';
+import { absorbsWater, absorbsElectric, absorbsStormDrain, sturdyActive, ignoresRecoil } from '../abilities';
 
 describe('Rock Head', () => {
   it('prevents recoil from recoil moves', () => {
@@ -140,6 +140,44 @@ describe('Lightning Rod', () => {
     expect(absorbsElectric(
       makePokemon({ name: 'x', ability: 'lightning-rod' }),
       makeMove({ type: 'electric', damageClass: 'status', power: 0 }),
+    )).toBe(false);
+  });
+});
+
+describe('Storm Drain', () => {
+  it('nullifies water damage and raises Sp. Atk by 1', () => {
+    stubRngConst(0);
+    const target = makePokemon({
+      name: 'gastrodon', types: ['water', 'ground'], ability: 'storm-drain',
+      stats: { hp: 400 },
+      moves: [makeMove({ name: 'tackle', power: 1 })],
+    });
+    const attacker = makePokemon({
+      name: 'vaporeon', types: ['water'],
+      stats: { specialAttack: 200 },
+      moves: [makeMove({ name: 'surf', type: 'water', power: 90, accuracy: 100, damageClass: 'special' })],
+    });
+    const result = runFullBattle(attacker, target);
+    const triggered = result.log.find(e => e.kind === 'ability_triggered' && e.ability === 'storm-drain');
+    expect(triggered).toBeDefined();
+    const spaRaise = result.log.find(e => e.kind === 'stat_change' && e.pokemonName === 'gastrodon' && e.stat === 'special-attack');
+    expect(spaRaise).toBeDefined();
+    if (spaRaise && spaRaise.kind === 'stat_change') expect(spaRaise.change).toBe(1);
+    const firstSurf = result.log.find(e => e.kind === 'attack' && e.moveName === 'surf');
+    if (firstSurf && firstSurf.kind === 'attack') expect(firstSurf.damage).toBe(0);
+  });
+
+  it('does not trigger on non-water attacks', () => {
+    expect(absorbsStormDrain(
+      makePokemon({ name: 'x', ability: 'storm-drain' }),
+      makeMove({ type: 'fire', damageClass: 'special', power: 90 }),
+    )).toBe(false);
+  });
+
+  it('does not trigger on status water moves', () => {
+    expect(absorbsStormDrain(
+      makePokemon({ name: 'x', ability: 'storm-drain' }),
+      makeMove({ type: 'water', damageClass: 'status', power: 0 }),
     )).toBe(false);
   });
 });

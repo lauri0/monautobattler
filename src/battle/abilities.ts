@@ -211,6 +211,24 @@ export const IMPLEMENTED_ABILITIES: Record<string, AbilityEffect> = {
   'moxie':         {},
   'adaptability':  {},
   'weak-armor':    {},
+  'anger-point':   {},
+  'magma-armor':   {},
+  'liquid-ooze':   {},
+  'stench':        {},
+  'poison-touch':  {},
+  'poison-heal':   {},
+  'hustle': {
+    damageMultiplier: (_self, move) => move.damageClass === 'physical' ? 1.5 : 1,
+  },
+  'steadfast':  {},
+  'justified':  {},
+  'storm-drain': {},
+  'water-veil':  {},
+  'analytic':    {},
+  'motor-drive': {},
+  'sharpness': {
+    damageMultiplier: (_self, move) => isSlicingMove(move) ? 1.5 : 1,
+  },
 };
 
 // Tinted Lens: not-very-effective hits (effectiveness < 1) deal double damage.
@@ -229,10 +247,26 @@ export function absorbsElectric(defender: BattlePokemon, move: Move): boolean {
     && move.damageClass !== 'status';
 }
 
+// Storm Drain: incoming water-type damaging moves are nullified and the
+// defender's Special Attack rises by one stage. Mirrors Lightning Rod's shape.
+export function absorbsStormDrain(defender: BattlePokemon, move: Move): boolean {
+  return defender.ability === 'storm-drain'
+    && move.type === 'water'
+    && move.damageClass !== 'status';
+}
+
 // Volt Absorb: incoming electric-type damaging moves are nullified and the
 // defender heals 1/4 of their max HP. Mirrors Water Absorb.
 export function absorbsVoltAbsorb(defender: BattlePokemon, move: Move): boolean {
   return defender.ability === 'volt-absorb'
+    && move.type === 'electric'
+    && move.damageClass !== 'status';
+}
+
+// Motor Drive: incoming electric-type damaging moves are nullified and the
+// defender's Speed rises by one stage.
+export function absorbsMotorDrive(defender: BattlePokemon, move: Move): boolean {
+  return defender.ability === 'motor-drive'
     && move.type === 'electric'
     && move.damageClass !== 'status';
 }
@@ -243,6 +277,8 @@ export function abilityBlocksAilment(p: BattlePokemon, ailment: StatusCondition)
     case 'vital-spirit': return ailment === 'sleep';
     case 'immunity':     return ailment === 'poison';
     case 'limber':       return ailment === 'paralysis';
+    case 'magma-armor':  return ailment === 'freeze';
+    case 'water-veil':   return ailment === 'burn';
     default:             return false;
   }
 }
@@ -327,6 +363,40 @@ export function applyRattledByMove(
   if (move.type !== 'bug' && move.type !== 'ghost' && move.type !== 'dark') return defender;
   events.push({ kind: 'ability_triggered', turn, pokemonName: defender.data.name, ability: 'rattled' });
   return applyStatChange(defender, 'speed', 1, turn, events);
+}
+
+// Justified: when the bearer is hit by a Dark-type damaging move, raise Attack
+// by one stage.
+export function applyJustified(
+  defender: BattlePokemon,
+  move: Move,
+  turn: number,
+  events: TurnEvent[],
+): BattlePokemon {
+  if (defender.ability !== 'justified') return defender;
+  if (defender.currentHp <= 0) return defender;
+  if (move.type !== 'dark') return defender;
+  events.push({ kind: 'ability_triggered', turn, pokemonName: defender.data.name, ability: 'justified' });
+  return applyStatChange(defender, 'attack', 1, turn, events);
+}
+
+// Steadfast: when the bearer flinches, raise its Speed by one stage.
+export function applySteadfast(
+  p: BattlePokemon,
+  turn: number,
+  events: TurnEvent[],
+): BattlePokemon {
+  if (p.ability !== 'steadfast') return p;
+  events.push({ kind: 'ability_triggered', turn, pokemonName: p.data.name, ability: 'steadfast' });
+  return applyStatChange(p, 'speed', 1, turn, events);
+}
+
+const SLICING_KEYWORDS = ['ace', 'cut', 'slash', 'edge', 'razor', 'blade', 'axe', 'sword', 'scissor', 'claw'];
+
+export function isSlicingMove(move: Move): boolean {
+  if (move.damageClass === 'status') return false;
+  const lower = move.name.toLowerCase();
+  return SLICING_KEYWORDS.some(kw => lower.includes(kw));
 }
 
 // Weak Armor: when the bearer is hit by a physical move, its Defense drops by
@@ -491,6 +561,62 @@ export function noGuardInEffect(attacker: BattlePokemon, defender: BattlePokemon
   return attacker.ability === 'no-guard' || defender.ability === 'no-guard';
 }
 
+// Stench: when the bearer deals damage, there is a 10% chance the target flinches.
+// Returns true if the target flinched (caller updates defenderFlinched).
+export function applyStench(
+  attacker: BattlePokemon,
+  defender: BattlePokemon,
+  move: Move,
+  turn: number,
+  events: TurnEvent[],
+): boolean {
+  if (attacker.ability !== 'stench') return false;
+  if (move.damageClass === 'status') return false;
+  if (defender.currentHp <= 0) return false;
+  if (defender.ability === 'inner-focus') return false;
+  if (Math.random() >= 0.1) return false;
+  events.push({ kind: 'ability_triggered', turn, pokemonName: attacker.data.name, ability: 'stench' });
+  return true;
+}
+
+// Poison Touch: when the bearer hits a target with a contact move, the target
+// has a 30% chance of being poisoned.
+export function applyPoisonTouch(
+  attacker: BattlePokemon,
+  defender: BattlePokemon,
+  move: Move,
+  turn: number,
+  events: TurnEvent[],
+): BattlePokemon {
+  if (attacker.ability !== 'poison-touch') return defender;
+  if (!makesContact(move)) return defender;
+  if (defender.currentHp <= 0) return defender;
+  if (defender.statusCondition) return defender;
+  if (Math.random() >= 0.3) return defender;
+  return inflict(defender, 'poison', attacker, turn, events);
+}
+
+// Poison Heal: true when end-of-turn poison should heal instead of damage.
+export function hasPoisonHeal(p: BattlePokemon): boolean {
+  return p.ability === 'poison-heal' && p.statusCondition === 'poison';
+}
+
+// Anger Point: when the bearer takes a critical hit, raise its Attack to +6.
+export function applyAngerPoint(
+  defender: BattlePokemon,
+  isCrit: boolean,
+  turn: number,
+  events: TurnEvent[],
+): BattlePokemon {
+  if (defender.ability !== 'anger-point') return defender;
+  if (!isCrit) return defender;
+  if (defender.currentHp <= 0) return defender;
+  const change = 6 - defender.statStages.attack;
+  if (change <= 0) return defender;
+  events.push({ kind: 'ability_triggered', turn, pokemonName: defender.data.name, ability: 'anger-point' });
+  return applyStatChange(defender, 'attack', change, turn, events);
+}
+
 export const ABILITY_DESCRIPTIONS: Record<string, string> = {
   'intimidate':     'Lowers the foe\'s Attack by one stage on switch-in',
   'overgrow':       'Boosts Grass-type moves by 50% when HP drops below 1/3',
@@ -554,6 +680,20 @@ export const ABILITY_DESCRIPTIONS: Record<string, string> = {
   'moxie':          'Raises Attack by one stage each time the bearer knocks out an opposing Pokémon',
   'adaptability':   'Raises the bonus from Same-Type Attack Bonus from 1.5× to 2×',
   'weak-armor':     'Physical hits lower Defense by one stage but sharply raise Speed by two stages',
+  'anger-point':    'Maxes out Attack when the bearer takes a critical hit',
+  'magma-armor':    'Prevents the bearer from being frozen',
+  'liquid-ooze':    'Opponent\'s draining moves deal damage to them instead of restoring their HP',
+  'stench':         'Adds a 10% flinch chance to all of the bearer\'s damaging moves',
+  'poison-touch':   '30% chance to poison the target when the bearer hits with a contact move',
+  'poison-heal':    'If poisoned, restores 1/8 of max HP at the end of each turn instead of taking damage',
+  'hustle':         'Boosts Attack by 50% but reduces the accuracy of physical moves by 20%',
+  'storm-drain':    'Draws and nullifies Water-type moves; raises Sp. Atk by 1',
+  'water-veil':     'Prevents the bearer from being burned',
+  'analytic':       'Boosts the power of moves by 30% when the bearer moves last in the turn',
+  'motor-drive':    'Immune to Electric-type moves; raises Speed by 1 when hit by one',
+  'steadfast':      'Raises Speed by one stage whenever the bearer flinches',
+  'justified':      'Raises Attack by one stage when the bearer is hit by a Dark-type move',
+  'sharpness':      'Boosts the power of slicing moves (those with ace, cut, slash, edge, razor, blade, axe, sword, or scissor in their name) by 50%',
   'prankster':      'Non-damaging moves have their priority increased by 1',
   'early-bird':     'This Pokémon wakes up after only 1 turn of sleep',
   'sap-sipper':     'Immune to Grass-type moves; being hit by one raises Attack by one stage instead',

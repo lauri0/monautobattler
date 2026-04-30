@@ -1,18 +1,19 @@
 {
-  "id": 157,
-  "name": "typhlosion",
+  "id": 10233,
+  "name": "typhlosion-hisui",
   "types": [
-    "fire"
+    "fire",
+    "ghost"
   ],
   "baseStats": {
-    "hp": 78,
+    "hp": 73,
     "attack": 84,
     "defense": 78,
-    "specialAttack": 109,
+    "specialAttack": 119,
     "specialDefense": 85,
-    "speed": 100
+    "speed": 95
   },
-  "spriteUrl": "/sprites/157.png",
+  "spriteUrl": "/sprites/10233.png",
   "moves": [
     "hyper-beam",
     "focus-punch",
@@ -36,12 +37,10 @@
     "body-slam",
     "dig",
     "shadow-ball",
-    "extrasensory",
     "zen-headbutt",
     "lava-plume",
     "iron-head",
     "fire-pledge",
-    "throat-chop",
     "tera-blast",
     "fire-punch",
     "thunder-punch",
@@ -52,21 +51,18 @@
     "facade",
     "shadow-claw",
     "burning-jealousy",
-    "scorching-sands",
     "fire-fang",
     "hex",
     "swift",
     "flame-wheel",
-    "rock-tomb",
     "aerial-ace",
-    "covet",
     "bulldoze",
+    "infernal-parade",
     "flame-charge",
     "tackle",
     "ember",
     "quick-attack",
     "fire-spin",
-    "double-kick",
     "rollout",
     "leer",
     "protect",
@@ -75,6 +71,6 @@
   ],
   "abilities": [
     "blaze",
-    "flash-fire"
+    "frisk"
   ]
 }

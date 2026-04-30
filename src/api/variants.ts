@@ -29,10 +29,13 @@ export const ALOLAN_VARIANTS: VariantEntry[] = [
 ];
 
 export const HISUIAN_VARIANTS: VariantEntry[] = [
-  { baseId: 58,  baseName: 'growlithe', variantId: 10229, variantName: 'growlithe-hisui' },
-  { baseId: 59,  baseName: 'arcanine',  variantId: 10230, variantName: 'arcanine-hisui' },
-  { baseId: 100, baseName: 'voltorb',   variantId: 10231, variantName: 'voltorb-hisui' },
-  { baseId: 101, baseName: 'electrode', variantId: 10232, variantName: 'electrode-hisui' },
+  { baseId: 58,  baseName: 'growlithe',  variantId: 10229, variantName: 'growlithe-hisui' },
+  { baseId: 59,  baseName: 'arcanine',   variantId: 10230, variantName: 'arcanine-hisui' },
+  { baseId: 100, baseName: 'voltorb',    variantId: 10231, variantName: 'voltorb-hisui' },
+  { baseId: 101, baseName: 'electrode',  variantId: 10232, variantName: 'electrode-hisui' },
+  { baseId: 157, baseName: 'typhlosion', variantId: 10233, variantName: 'typhlosion-hisui' },
+  { baseId: 211, baseName: 'qwilfish',   variantId: 10234, variantName: 'qwilfish-hisui' },
+  { baseId: 215, baseName: 'sneasel',    variantId: 10235, variantName: 'sneasel-hisui' },
 ];
 
 export const PALDEAN_VARIANTS: VariantEntry[] = [

@@ -31,6 +31,7 @@ export interface MoveEffect {
   superEffectiveAgainst?: TypeName[];  // extra types this move is super effective against (Freeze-Dry vs Water)
   useFoeAttack?: boolean;  // use the defender's Attack stat for damage instead of the attacker's (Foul Play)
   useOwnDefense?: boolean; // use the attacker's Defense stat as the attack stat (Body Press)
+  ignoreDefenseStages?: boolean; // treat the defender's defense stat stage as 0 (Sacred Sword, Chip Away)
   hitsExactly?: number;   // hit exactly N times, each roll independently (Dual Wingbeat, Dual Chop)
   hitsVariable?: boolean; // hit 2–5 times with 3/8, 3/8, 1/8, 1/8 distribution (Icicle Spear, Rock Blast, …)
   escalatingHits?: boolean; // Triple Axel / Triple Kick: N-th hit uses power * N, each hit rolls accuracy independently and the sequence ends on a miss. Skill Link guarantees all hits.
@@ -43,6 +44,7 @@ export interface MoveEffect {
   removesScreens?: boolean; // removes Reflect and Light Screen on defender's side before the hit (Brick Break)
   failsIfTargetNotAttacking?: boolean; // fails if the target is not using a damaging move this turn (Sucker Punch)
   clearsHazards?: boolean; // removes entry hazards (Stealth Rock) from user's side after hitting (Rapid Spin)
+  crashOnMiss?: boolean;  // user takes 1/2 max HP crash damage when this move misses (Supercell Slam)
 }
 
 export type FieldEffectKind =
@@ -213,7 +215,8 @@ export type TurnEvent =
   | { kind: 'weather_damage'; turn: number; pokemonName: string; weather: WeatherKind; damage: number; hpAfter: number }
   | { kind: 'terrain_set'; turn: number; terrain: TerrainKind; turns: number; pokemonName: string }
   | { kind: 'terrain_expired'; turn: number; terrain: TerrainKind }
-  | { kind: 'terrain_heal'; turn: number; pokemonName: string; healed: number; hpAfter: number };
+  | { kind: 'terrain_heal'; turn: number; pokemonName: string; healed: number; hpAfter: number }
+  | { kind: 'crash'; turn: number; pokemonName: string; damage: number; hpAfter: number };
 
 export interface BattleResult {
   winner: BattlePokemon;

@@ -45,12 +45,15 @@ function typeEffectiveness(move: Move, defender: BattlePokemon, attacker?: Battl
 // Weather-dependent accuracy override for moves whose hit chance is keyed to
 // the weather. Returns `null` when the move always hits under the current
 // weather, otherwise the (possibly scaled) percentage accuracy to roll against.
-function effectiveAccuracy(move: Move, weather: WeatherKind | undefined): number | null {
+function effectiveAccuracy(move: Move, weather: WeatherKind | undefined, attacker?: BattlePokemon): number | null {
   if (move.accuracy === null) return null;
   if (weather === 'snow' && move.name === 'blizzard') return null;
   if (weather === 'rain' && (move.name === 'thunder' || move.name === 'hurricane')) return null;
-  if (weather === 'sun' && (move.name === 'thunder' || move.name === 'hurricane')) return move.accuracy * 0.5;
-  return move.accuracy;
+  let acc = (weather === 'sun' && (move.name === 'thunder' || move.name === 'hurricane'))
+    ? move.accuracy * 0.5
+    : move.accuracy;
+  if (attacker?.ability === 'hustle' && move.damageClass === 'physical') acc *= 0.8;
+  return acc;
 }
 
 function weatherMoveMult(moveType: TypeName, weather: WeatherKind | undefined): number {
@@ -125,7 +128,7 @@ export function calcDamage(
 ): DamageResult {
   // Check accuracy (with weather-based overrides for Blizzard / Thunder / Hurricane).
   // No Guard on either side bypasses the miss roll entirely.
-  const acc = effectiveAccuracy(move, field?.weather);
+  const acc = effectiveAccuracy(move, field?.weather, attacker);
   if (acc !== null && !noGuardInEffect(attacker, defender)) {
     const hitRoll = Math.random();
     if (hitRoll > acc / 100) {
@@ -157,10 +160,12 @@ export function calcDamage(
       A = attacker.level50Stats.attack * statStageMult(attacker.statStages.attack);
       if (attacker.statusCondition === 'burn' && attacker.ability !== 'guts') A *= 0.5;
     }
-    D = defender.level50Stats.defense * statStageMult(defender.statStages.defense);
+    const defStage = move.effect?.ignoreDefenseStages ? 0 : defender.statStages.defense;
+    D = defender.level50Stats.defense * statStageMult(defStage);
   } else {
     A = attacker.level50Stats.specialAttack * statStageMult(attacker.statStages['special-attack']);
-    D = defender.level50Stats.specialDefense * statStageMult(defender.statStages['special-defense']);
+    const spdStage = move.effect?.ignoreDefenseStages ? 0 : defender.statStages['special-defense'];
+    D = defender.level50Stats.specialDefense * statStageMult(spdStage);
   }
 
   D *= weatherDefenseMult(defender.data.types, move.damageClass, field?.weather);
@@ -206,10 +211,12 @@ export function calcMinDamage(
     } else {
       A = attacker.level50Stats.attack * statStageMult(attacker.statStages.attack);
     }
-    D = defender.level50Stats.defense * statStageMult(defender.statStages.defense);
+    const defStageMin = move.effect?.ignoreDefenseStages ? 0 : defender.statStages.defense;
+    D = defender.level50Stats.defense * statStageMult(defStageMin);
   } else {
     A = attacker.level50Stats.specialAttack * statStageMult(attacker.statStages['special-attack']);
-    D = defender.level50Stats.specialDefense * statStageMult(defender.statStages['special-defense']);
+    const spdStageMin = move.effect?.ignoreDefenseStages ? 0 : defender.statStages['special-defense'];
+    D = defender.level50Stats.specialDefense * statStageMult(spdStageMin);
   }
 
   D *= weatherDefenseMult(defender.data.types, move.damageClass, field?.weather);
@@ -247,10 +254,12 @@ export function calcExpectedDamage(
     } else {
       A = attacker.level50Stats.attack * statStageMult(attacker.statStages.attack);
     }
-    D = defender.level50Stats.defense * statStageMult(defender.statStages.defense);
+    const defStageExp = move.effect?.ignoreDefenseStages ? 0 : defender.statStages.defense;
+    D = defender.level50Stats.defense * statStageMult(defStageExp);
   } else {
     A = attacker.level50Stats.specialAttack * statStageMult(attacker.statStages['special-attack']);
-    D = defender.level50Stats.specialDefense * statStageMult(defender.statStages['special-defense']);
+    const spdStageExp = move.effect?.ignoreDefenseStages ? 0 : defender.statStages['special-defense'];
+    D = defender.level50Stats.specialDefense * statStageMult(spdStageExp);
   }
 
   D *= weatherDefenseMult(defender.data.types, move.damageClass, field?.weather);
