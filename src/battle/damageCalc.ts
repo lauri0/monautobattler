@@ -111,8 +111,10 @@ export function effectiveSpeed(p: BattlePokemon, tailwind = false): number {
 }
 
 // True when a screen matching the move's class applies and the hit is not a crit.
-function screenApplies(move: Move, screens: DefenderScreens | undefined, isCrit: boolean): boolean {
+// Infiltrator ignores Light Screen and Reflect entirely.
+function screenApplies(move: Move, screens: DefenderScreens | undefined, isCrit: boolean, attacker?: BattlePokemon): boolean {
   if (!screens || isCrit) return false;
+  if (attacker?.ability === 'infiltrator') return false;
   if (move.damageClass === 'physical') return !!screens.reflect;
   if (move.damageClass === 'special') return !!screens.lightScreen;
   return false;
@@ -172,7 +174,7 @@ export function calcDamage(
 
   const stab = attacker.data.types.includes(move.type) ? (attacker.ability === 'adaptability' ? 2.0 : 1.5) : 1.0;
   const critMult = isCrit ? (attacker.ability === 'sniper' ? 2.25 : 1.5) : 1.0;
-  const screenMult = screenApplies(move, defenderScreens, isCrit) ? 0.5 : 1.0;
+  const screenMult = screenApplies(move, defenderScreens, isCrit, attacker) ? 0.5 : 1.0;
   const abilityMult = getAbilityDamageMultiplier(attacker, move);
   const weatherMult = weatherMoveMult(move.type, field?.weather);
   const terrainMult = terrainMoveMult(attacker, defender, move, field?.terrain);
@@ -222,7 +224,7 @@ export function calcMinDamage(
   D *= weatherDefenseMult(defender.data.types, move.damageClass, field?.weather);
 
   const stab = attacker.data.types.includes(move.type) ? (attacker.ability === 'adaptability' ? 2.0 : 1.5) : 1.0;
-  const screenMult = screenApplies(move, defenderScreens, false) ? 0.5 : 1.0;
+  const screenMult = screenApplies(move, defenderScreens, false, attacker) ? 0.5 : 1.0;
   const abilityMult = getAbilityDamageMultiplier(attacker, move);
   const weatherMult = weatherMoveMult(move.type, field?.weather);
   const terrainMult = terrainMoveMult(attacker, defender, move, field?.terrain);
@@ -266,7 +268,7 @@ export function calcExpectedDamage(
 
   const stab = attacker.data.types.includes(move.type) ? (attacker.ability === 'adaptability' ? 2.0 : 1.5) : 1.0;
   const roll = 0.925; // average of 0.85–1.00
-  const screenMult = screenApplies(move, defenderScreens, false) ? 0.5 : 1.0;
+  const screenMult = screenApplies(move, defenderScreens, false, attacker) ? 0.5 : 1.0;
   const abilityMult = getAbilityDamageMultiplier(attacker, move);
   const weatherMult = weatherMoveMult(move.type, field?.weather);
   const terrainMult = terrainMoveMult(attacker, defender, move, field?.terrain);

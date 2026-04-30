@@ -111,6 +111,10 @@ export function effectSummary(move: Move): string {
     parts.push('clears hazards');
   }
 
+  if (eff.crashOnMiss) {
+    parts.push('crash 50% on miss');
+  }
+
   if (eff.failsIfTargetNotAttacking) {
     parts.push('fails vs status');
   }

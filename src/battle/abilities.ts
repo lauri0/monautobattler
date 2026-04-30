@@ -229,6 +229,8 @@ export const IMPLEMENTED_ABILITIES: Record<string, AbilityEffect> = {
   'sharpness': {
     damageMultiplier: (_self, move) => isSlicingMove(move) ? 1.5 : 1,
   },
+  'infiltrator': {},
+  'wind-rider':  {},
 };
 
 // Tinted Lens: not-very-effective hits (effectiveness < 1) deal double damage.
@@ -438,6 +440,19 @@ export function absorbsWater(defender: BattlePokemon, move: Move): boolean {
 export function absorbsGrass(defender: BattlePokemon, move: Move): boolean {
   return defender.ability === 'sap-sipper'
     && move.type === 'grass'
+    && move.damageClass !== 'status';
+}
+
+const WIND_MOVES = new Set(['air-cutter', 'blizzard', 'heat-wave', 'hurricane', 'icy-wind', 'petal-blizzard']);
+
+export function isWindMove(move: Move): boolean {
+  return WIND_MOVES.has(move.name);
+}
+
+// Wind Rider: incoming wind moves are nullified and the defender's Attack rises by 1.
+export function absorbsWind(defender: BattlePokemon, move: Move): boolean {
+  return defender.ability === 'wind-rider'
+    && isWindMove(move)
     && move.damageClass !== 'status';
 }
 
@@ -699,6 +714,8 @@ export const ABILITY_DESCRIPTIONS: Record<string, string> = {
   'sap-sipper':     'Immune to Grass-type moves; being hit by one raises Attack by one stage instead',
   'solid-rock':     'Reduces damage taken from super-effective moves by 25%',
   'filter':         'Reduces damage taken from super-effective moves by 25%',
+  'infiltrator':    'Moves ignore the effects of Light Screen and Reflect',
+  'wind-rider':     'Boosts Attack when Tailwind takes effect; immune to wind moves and boosts Attack when hit by one',
 };
 
 export function getAbilityDescription(name: AbilityId | undefined): string | undefined {

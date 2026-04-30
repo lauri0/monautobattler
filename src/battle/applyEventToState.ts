@@ -82,6 +82,7 @@ export function applyEventToState(
       return { ...d, field };
     }
     case 'recoil':
+    case 'crash':
     case 'drain':
     case 'heal':
     case 'status_damage':
@@ -152,6 +153,7 @@ function applyTurnEventToTeamState(state: TeamBattleState, event: TurnEvent): Te
       return patchAllTeams(s, event.defenderName, hpPatch(event.defenderHpAfter));
     }
     case 'recoil':
+    case 'crash':
     case 'drain':
     case 'heal':
     case 'status_damage':

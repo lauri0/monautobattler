@@ -2,7 +2,7 @@ import type { BattlePokemon, Move, TurnEvent, BattleResult, StatStageName, StatS
 import { calcDamage, calcExpectedDamage, effectiveSpeed, type DefenderScreens } from './damageCalc';
 import { defaultAI } from '../ai/aiModule';
 import { getTypeEffectiveness } from '../utils/typeChart';
-import { abilityMaxVariableHits, applySwitchInAbility, applyStatChangeFromFoe, noGuardInEffect, sheerForceSuppresses, absorbsWater, absorbsElectric, absorbsVoltAbsorb, absorbsMotorDrive, absorbsFire, absorbsGrass, absorbsStormDrain, sturdyActive, ignoresRecoil, applyContactAbility, applyRattledByMove, applyJustified, applyWeakArmor, abilityBlocksAilment, abilityBlocksConfusion, hasMagicGuard, applyShedSkin, applyMoxie, applyEndOfTurnAbility, applyAngerPoint, applyStench, applyPoisonTouch, hasPoisonHeal, applySteadfast } from './abilities';
+import { abilityMaxVariableHits, applySwitchInAbility, applyStatChangeFromFoe, noGuardInEffect, sheerForceSuppresses, absorbsWater, absorbsElectric, absorbsVoltAbsorb, absorbsMotorDrive, absorbsFire, absorbsGrass, absorbsStormDrain, absorbsWind, sturdyActive, ignoresRecoil, applyContactAbility, applyRattledByMove, applyJustified, applyWeakArmor, abilityBlocksAilment, abilityBlocksConfusion, hasMagicGuard, applyShedSkin, applyMoxie, applyEndOfTurnAbility, applyAngerPoint, applyStench, applyPoisonTouch, hasPoisonHeal, applySteadfast } from './abilities';
 import { isGrounded } from './damageCalc';
 
 export const TRICK_ROOM_TURNS = 5;
@@ -681,6 +681,8 @@ export function simulateTurnDeterministic(
     let flinched = false;
     let dealtDamage = false;
 
+    let hitImmune = false;
+
     if (hit) {
       const effectiveMove = effectivePowerMove(move, attacker, defender, foeHitUserThisTurn, foeMovedBeforeUser);
 
@@ -689,6 +691,9 @@ export function simulateTurnDeterministic(
         const maxHp = defender.level50Stats.hp;
         const heal = Math.max(1, Math.floor(maxHp / 4));
         defender = { ...defender, currentHp: Math.min(maxHp, defender.currentHp + heal) };
+        if (move.effect?.crashOnMiss && attacker.ability !== 'magic-guard') {
+          attacker = { ...attacker, currentHp: Math.max(0, attacker.currentHp - Math.floor(attacker.level50Stats.hp / 2)) };
+        }
         return { attacker, defender, flinched: false, dealtDamage: false };
       }
 
@@ -696,6 +701,9 @@ export function simulateTurnDeterministic(
       if (absorbsElectric(defender, effectiveMove)) {
         const spa = clampStage(defender.statStages['special-attack'] + 1);
         defender = { ...defender, statStages: { ...defender.statStages, 'special-attack': spa } as StatStages };
+        if (move.effect?.crashOnMiss && attacker.ability !== 'magic-guard') {
+          attacker = { ...attacker, currentHp: Math.max(0, attacker.currentHp - Math.floor(attacker.level50Stats.hp / 2)) };
+        }
         return { attacker, defender, flinched: false, dealtDamage: false };
       }
 
@@ -703,6 +711,9 @@ export function simulateTurnDeterministic(
       if (absorbsStormDrain(defender, effectiveMove)) {
         const spa = clampStage(defender.statStages['special-attack'] + 1);
         defender = { ...defender, statStages: { ...defender.statStages, 'special-attack': spa } as StatStages };
+        if (move.effect?.crashOnMiss && attacker.ability !== 'magic-guard') {
+          attacker = { ...attacker, currentHp: Math.max(0, attacker.currentHp - Math.floor(attacker.level50Stats.hp / 2)) };
+        }
         return { attacker, defender, flinched: false, dealtDamage: false };
       }
 
@@ -711,6 +722,9 @@ export function simulateTurnDeterministic(
         const maxHp = defender.level50Stats.hp;
         const heal = Math.max(1, Math.floor(maxHp / 4));
         defender = { ...defender, currentHp: Math.min(maxHp, defender.currentHp + heal) };
+        if (move.effect?.crashOnMiss && attacker.ability !== 'magic-guard') {
+          attacker = { ...attacker, currentHp: Math.max(0, attacker.currentHp - Math.floor(attacker.level50Stats.hp / 2)) };
+        }
         return { attacker, defender, flinched: false, dealtDamage: false };
       }
 
@@ -718,12 +732,18 @@ export function simulateTurnDeterministic(
       if (absorbsMotorDrive(defender, effectiveMove)) {
         const spd = clampStage(defender.statStages.speed + 1);
         defender = { ...defender, statStages: { ...defender.statStages, speed: spd } as StatStages };
+        if (move.effect?.crashOnMiss && attacker.ability !== 'magic-guard') {
+          attacker = { ...attacker, currentHp: Math.max(0, attacker.currentHp - Math.floor(attacker.level50Stats.hp / 2)) };
+        }
         return { attacker, defender, flinched: false, dealtDamage: false };
       }
 
       // Flash Fire: nullify fire damage and activate the 1.5× fire boost.
       if (absorbsFire(defender, effectiveMove)) {
         defender = { ...defender, flashFireActive: true };
+        if (move.effect?.crashOnMiss && attacker.ability !== 'magic-guard') {
+          attacker = { ...attacker, currentHp: Math.max(0, attacker.currentHp - Math.floor(attacker.level50Stats.hp / 2)) };
+        }
         return { attacker, defender, flinched: false, dealtDamage: false };
       }
 
@@ -731,10 +751,24 @@ export function simulateTurnDeterministic(
       if (absorbsGrass(defender, effectiveMove)) {
         const atk = clampStage(defender.statStages.attack + 1);
         defender = { ...defender, statStages: { ...defender.statStages, attack: atk } as StatStages };
+        if (move.effect?.crashOnMiss && attacker.ability !== 'magic-guard') {
+          attacker = { ...attacker, currentHp: Math.max(0, attacker.currentHp - Math.floor(attacker.level50Stats.hp / 2)) };
+        }
+        return { attacker, defender, flinched: false, dealtDamage: false };
+      }
+
+      // Wind Rider: nullify wind moves and raise Attack by 1.
+      if (absorbsWind(defender, effectiveMove)) {
+        const atk = clampStage(defender.statStages.attack + 1);
+        defender = { ...defender, statStages: { ...defender.statStages, attack: atk } as StatStages };
+        if (move.effect?.crashOnMiss && attacker.ability !== 'magic-guard') {
+          attacker = { ...attacker, currentHp: Math.max(0, attacker.currentHp - Math.floor(attacker.level50Stats.hp / 2)) };
+        }
         return { attacker, defender, flinched: false, dealtDamage: false };
       }
 
       const rawDmg = expectedDamageWithCrit(attacker, defender, effectiveMove);
+      if (rawDmg === 0 && move.power) hitImmune = true;
       let dmg = rawDmg > 0 ? Math.max(1, Math.floor(rawDmg * fraction)) : 0;
 
       // Sturdy: full-HP defender survives a would-be KO with 1 HP.
@@ -797,8 +831,8 @@ export function simulateTurnDeterministic(
       }
     }
 
-    // Crash on miss (deterministic path).
-    if (!hit && move.effect?.crashOnMiss && attacker.ability !== 'magic-guard') {
+    // Crash on miss or type immunity (deterministic path).
+    if ((!hit || hitImmune) && move.effect?.crashOnMiss && attacker.ability !== 'magic-guard') {
       const crash = Math.floor(attacker.level50Stats.hp / 2);
       attacker = { ...attacker, currentHp: Math.max(0, attacker.currentHp - crash) };
     }
@@ -970,6 +1004,10 @@ function resolveStatusMove(
       sides[attackerSide] = updatedSide;
       const nextField: FieldState = { ...field, sides };
       events.push({ kind: 'field_set', turn, effect: fx, side: attackerSide, turns: duration, pokemonName: attacker.data.name });
+      if (fx === 'tailwind' && attacker.ability === 'wind-rider') {
+        events.push({ kind: 'ability_triggered', turn, pokemonName: attacker.data.name, ability: 'wind-rider' });
+        attacker = applyStatChange(attacker, 'attack', 1, turn, events);
+      }
       return { attacker, defender, dealtDamage: false, defenderFlinched: false, pivotTriggered: false, field: nextField };
     }
     if (fx === 'stealthRock') {
@@ -1054,6 +1092,21 @@ function resolveStatusMove(
 
   const pivotTriggered = !!(eff?.pivotSwitch && attacker.currentHp > 0);
   return { attacker, defender, dealtDamage: false, defenderFlinched: false, pivotTriggered, field };
+}
+
+// Applies crash damage (1/2 max HP, floored) to the attacker when a crashOnMiss
+// move fails to connect. Magic Guard blocks it. Returns the updated attacker.
+function applyCrashDamage(
+  attacker: BattlePokemon,
+  move: Move,
+  turn: number,
+  events: TurnEvent[],
+): BattlePokemon {
+  if (!move.effect?.crashOnMiss || hasMagicGuard(attacker)) return attacker;
+  const crash = Math.floor(attacker.level50Stats.hp / 2);
+  const hpAfter = Math.max(0, attacker.currentHp - crash);
+  events.push({ kind: 'crash', turn, pokemonName: attacker.data.name, damage: crash, hpAfter });
+  return { ...attacker, currentHp: hpAfter };
 }
 
 /**
@@ -1177,6 +1230,7 @@ export function resolveSingleAttack(
       damage: 0, isCrit: false, missed: false, effectiveness: 0,
       attackerHpAfter: attacker.currentHp, defenderHpAfter: defender.currentHp,
     });
+    attacker = applyCrashDamage(attacker, move, turnNumber, events);
     return { attacker, defender, dealtDamage: false, defenderFlinched: false, pivotTriggered: false, field };
   }
 
@@ -1191,6 +1245,7 @@ export function resolveSingleAttack(
       damage: 0, isCrit: false, missed: false, effectiveness: 0,
       attackerHpAfter: attacker.currentHp, defenderHpAfter: defender.currentHp,
     });
+    attacker = applyCrashDamage(attacker, move, turnNumber, events);
     return { attacker, defender, dealtDamage: false, defenderFlinched: false, pivotTriggered: false, field };
   }
 
@@ -1205,6 +1260,7 @@ export function resolveSingleAttack(
       damage: 0, isCrit: false, missed: false, effectiveness: 0,
       attackerHpAfter: attacker.currentHp, defenderHpAfter: defender.currentHp,
     });
+    attacker = applyCrashDamage(attacker, move, turnNumber, events);
     return { attacker, defender, dealtDamage: false, defenderFlinched: false, pivotTriggered: false, field };
   }
 
@@ -1225,6 +1281,7 @@ export function resolveSingleAttack(
       damage: 0, isCrit: false, missed: false, effectiveness: 0,
       attackerHpAfter: attacker.currentHp, defenderHpAfter: defender.currentHp,
     });
+    attacker = applyCrashDamage(attacker, move, turnNumber, events);
     return { attacker, defender, dealtDamage: false, defenderFlinched: false, pivotTriggered: false, field };
   }
 
@@ -1239,6 +1296,7 @@ export function resolveSingleAttack(
       damage: 0, isCrit: false, missed: false, effectiveness: 0,
       attackerHpAfter: attacker.currentHp, defenderHpAfter: defender.currentHp,
     });
+    attacker = applyCrashDamage(attacker, move, turnNumber, events);
     return { attacker, defender, dealtDamage: false, defenderFlinched: false, pivotTriggered: false, field };
   }
 
@@ -1255,6 +1313,7 @@ export function resolveSingleAttack(
       damage: 0, isCrit: false, missed: false, effectiveness: 0,
       attackerHpAfter: attacker.currentHp, defenderHpAfter: defender.currentHp,
     });
+    attacker = applyCrashDamage(attacker, move, turnNumber, events);
     return { attacker, defender, dealtDamage: false, defenderFlinched: false, pivotTriggered: false, field };
   }
 
@@ -1269,6 +1328,22 @@ export function resolveSingleAttack(
       damage: 0, isCrit: false, missed: false, effectiveness: 0,
       attackerHpAfter: attacker.currentHp, defenderHpAfter: defender.currentHp,
     });
+    attacker = applyCrashDamage(attacker, move, turnNumber, events);
+    return { attacker, defender, dealtDamage: false, defenderFlinched: false, pivotTriggered: false, field };
+  }
+
+  // Wind Rider: nullify wind moves and raise Attack by 1.
+  if (absorbsWind(defender, effMove)) {
+    events.push({ kind: 'ability_triggered', turn: turnNumber, pokemonName: defender.data.name, ability: 'wind-rider' });
+    defender = applyStatChange(defender, 'attack', 1, turnNumber, events);
+    events.push({
+      kind: 'attack', turn: turnNumber,
+      attackerName: attacker.data.name, defenderName: defender.data.name,
+      moveName: move.name, moveType: move.type, damageClass: move.damageClass,
+      damage: 0, isCrit: false, missed: false, effectiveness: 0,
+      attackerHpAfter: attacker.currentHp, defenderHpAfter: defender.currentHp,
+    });
+    attacker = applyCrashDamage(attacker, move, turnNumber, events);
     return { attacker, defender, dealtDamage: false, defenderFlinched: false, pivotTriggered: false, field };
   }
 
@@ -1365,13 +1440,10 @@ export function resolveSingleAttack(
     }
   }
 
-  // Crash damage on miss (Supercell Slam): 1/2 user's max HP, rounded down.
-  // Magic Guard blocks this.
-  if (didMiss && move.effect?.crashOnMiss && !hasMagicGuard(attacker)) {
-    const crash = Math.floor(attacker.level50Stats.hp / 2);
-    const hpAfter = Math.max(0, attacker.currentHp - crash);
-    events.push({ kind: 'crash', turn: turnNumber, pokemonName: attacker.data.name, damage: crash, hpAfter });
-    attacker = { ...attacker, currentHp: hpAfter };
+  // Crash damage: fires on accuracy miss OR type immunity (effectiveness 0).
+  // Ability absorptions are handled in their own early-return blocks above.
+  if (didMiss || !totalConnected) {
+    attacker = applyCrashDamage(attacker, move, turnNumber, events);
   }
 
   // Tick an existing forced-move lock. Skip on the turn the lock is first set.

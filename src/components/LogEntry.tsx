@@ -63,6 +63,16 @@ export default function LogEntry({ ev }: { ev: TurnEvent }) {
     );
   }
 
+  if (ev.kind === 'crash') {
+    return (
+      <div className="log-entry log-entry--effect">
+        <span className="log-turn">T{ev.turn}</span>
+        <span className="log-attacker">{ev.pokemonName}</span>
+        <span className="log-miss"> kept going and crashed! (-{ev.damage} HP, {ev.hpAfter} HP)</span>
+      </div>
+    );
+  }
+
   if (ev.kind === 'drain') {
     return (
       <div className="log-entry log-entry--effect">
