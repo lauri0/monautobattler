@@ -3,6 +3,7 @@ import type { Move } from '../models/types';
 const STAT_SHORT: Record<string, string> = {
   'attack': 'Atk', 'defense': 'Def',
   'special-attack': 'SpA', 'special-defense': 'SpD', 'speed': 'Spe',
+  'accuracy': 'Acc', 'evasion': 'Eva',
 };
 
 export function effectSummary(move: Move): string {
@@ -73,6 +74,10 @@ export function effectSummary(move: Move): string {
 
   if (eff.useOwnDefense) {
     parts.push('uses own Def');
+  }
+
+  if (eff.ignoreDefenseStages) {
+    parts.push('ignores Def stages');
   }
 
   if (eff.hitsExactly) {

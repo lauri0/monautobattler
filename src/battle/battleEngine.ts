@@ -2,7 +2,7 @@ import type { BattlePokemon, Move, TurnEvent, BattleResult, StatStageName, StatS
 import { calcDamage, calcExpectedDamage, effectiveSpeed, effectiveAccuracy, type DefenderScreens } from './damageCalc';
 import { defaultAI } from '../ai/aiModule';
 import { getTypeEffectiveness } from '../utils/typeChart';
-import { abilityMaxVariableHits, applySwitchInAbility, applyStatChangeFromFoe, noGuardInEffect, sheerForceSuppresses, absorbsWater, absorbsElectric, absorbsVoltAbsorb, absorbsMotorDrive, absorbsFire, absorbsGrass, absorbsStormDrain, absorbsWind, absorbsSound, isSoundMove, sturdyActive, ignoresRecoil, applyContactAbility, applyRattledByMove, applyJustified, applyWeakArmor, abilityBlocksAilment, abilityBlocksConfusion, hasMagicGuard, applyShedSkin, applyMoxie, applyEndOfTurnAbility, applyAngerPoint, applyStench, applyPoisonTouch, hasPoisonHeal, applySteadfast } from './abilities';
+import { abilityMaxVariableHits, applySwitchInAbility, applyStatChangeFromFoe, noGuardInEffect, sheerForceSuppresses, absorbsWater, absorbsElectric, absorbsVoltAbsorb, absorbsMotorDrive, absorbsFire, absorbsGrass, absorbsStormDrain, absorbsWind, absorbsSound, isSoundMove, sturdyActive, ignoresRecoil, applyContactAbility, applyRattledByMove, applyJustified, applyWeakArmor, abilityBlocksAilment, abilityBlocksConfusion, hasMagicGuard, applyShedSkin, applyMoxie, applyEndOfTurnAbility, applyAngerPoint, applyStench, applyPoisonTouch, hasPoisonHeal, applySteadfast, applyRoughSkin } from './abilities';
 import { isGrounded } from './damageCalc';
 
 export const TRICK_ROOM_TURNS = 5;
@@ -1449,9 +1449,10 @@ export function resolveSingleAttack(
     attacker = eff.attacker;
     defender = eff.defender;
     defenderFlinched = eff.defenderFlinched;
-    // Contact abilities (Static, Flame Body, Poison Point, Effect Spore) roll
+    // Contact abilities (Static, Flame Body, Poison Point, Effect Spore, Rough Skin) roll
     // against the attacker if the move made contact.
     attacker = applyContactAbility(attacker, defender, move, turnNumber, events);
+    attacker = applyRoughSkin(attacker, defender, move, turnNumber, events);
     defender = applyPoisonTouch(attacker, defender, move, turnNumber, events);
     defender = applyRattledByMove(defender, move, turnNumber, events);
     defender = applyJustified(defender, move, turnNumber, events);
@@ -1636,10 +1637,10 @@ export function resolveTurnWithMoves(
     p2 = applyShedSkin(p2, turnNumber, events);
   }
 
-  // End-of-turn abilities (e.g. Speed Boost).
+  // End-of-turn abilities (e.g. Speed Boost, Hydration).
   if (!battleOver) {
-    p1 = applyEndOfTurnAbility(p1, turnNumber, events);
-    p2 = applyEndOfTurnAbility(p2, turnNumber, events);
+    p1 = applyEndOfTurnAbility(p1, turnNumber, events, field);
+    p2 = applyEndOfTurnAbility(p2, turnNumber, events, field);
   }
 
   // End-of-turn weather chip damage (sandstorm only).

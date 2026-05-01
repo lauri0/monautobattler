@@ -18,7 +18,7 @@ import type {
 import { buildBattlePokemon } from './buildBattlePokemon';
 import { applyEndOfTurnStatus, applyEndOfTurnTerrain, applyEndOfTurnWeather, applySpikesOnEntry, applyStealthRockOnEntry, applyToxicSpikesOnEntry, effectivePriority, makeInitialField, resolveSingleAttack, tickTaunt, tickThroatChop, usableMoves } from './battleEngine';
 import { effectiveSpeed } from './damageCalc';
-import { applySwitchInAbility, applySwitchOutAbility } from './abilities';
+import { applyEndOfTurnAbility, applySwitchInAbility, applySwitchOutAbility } from './abilities';
 
 const MAX_TURNS = 500;
 
@@ -239,6 +239,8 @@ function completeTurn(
   a1Ticked = tickTaunt(a1Ticked, turn, inner);
   a0Ticked = tickThroatChop(a0Ticked, turn, inner);
   a1Ticked = tickThroatChop(a1Ticked, turn, inner);
+  a0Ticked = applyEndOfTurnAbility(a0Ticked, turn, inner, field);
+  a1Ticked = applyEndOfTurnAbility(a1Ticked, turn, inner, field);
   if (a0Ticked.protectedThisTurn) a0Ticked = { ...a0Ticked, protectedThisTurn: false };
   if (a1Ticked.protectedThisTurn) a1Ticked = { ...a1Ticked, protectedThisTurn: false };
   if (a0Ticked.justSwitchedIn) a0Ticked = { ...a0Ticked, justSwitchedIn: false };

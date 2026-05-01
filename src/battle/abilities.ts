@@ -22,7 +22,7 @@ export interface AbilityEffect {
   // Returns the updated bearer. May push events.
   onSwitchOut?: (self: BattlePokemon, turn: number, events: TurnEvent[]) => BattlePokemon;
   // Applied at the end of every turn. Returns the (possibly updated) bearer.
-  onEndOfTurn?: (self: BattlePokemon, turn: number, events: TurnEvent[]) => BattlePokemon;
+  onEndOfTurn?: (self: BattlePokemon, turn: number, events: TurnEvent[], field?: FieldState) => BattlePokemon;
   // Multiplier applied to the bearer's outgoing damage.
   damageMultiplier?: (self: BattlePokemon, move: Move) => number;
   // When true, variable-hit moves (hitsVariable) always hit their maximum (5).
@@ -149,6 +149,7 @@ export const IMPLEMENTED_ABILITIES: Record<string, AbilityEffect> = {
   'flame-body':    {},
   'poison-point':  {},
   'effect-spore':  {},
+  'rough-skin':    {},
   'lightning-rod': {},
   'tinted-lens': {},
   'flash-fire': {
@@ -220,6 +221,19 @@ export const IMPLEMENTED_ABILITIES: Record<string, AbilityEffect> = {
   },
   // Snow Cloak: incoming move accuracy is multiplied by 0.8. Applied in effectiveAccuracy().
   'snow-cloak': {},
+  'flare-boost': {
+    damageMultiplier: (self, move) =>
+      self.statusCondition === 'burn' && move.damageClass === 'special' ? 1.5 : 1,
+  },
+  'hydration': {
+    onEndOfTurn: (self, turn, events, field) => {
+      if (self.currentHp <= 0 || !self.statusCondition) return self;
+      if (field?.weather !== 'rain') return self;
+      events.push({ kind: 'ability_triggered', turn, pokemonName: self.data.name, ability: 'hydration' });
+      events.push({ kind: 'status_cured', turn, pokemonName: self.data.name, condition: self.statusCondition });
+      return { ...self, statusCondition: undefined, sleepTurnsUsed: undefined, frozenTurnsUsed: undefined };
+    },
+  },
   'steadfast':  {},
   'justified':  {},
   'storm-drain': {},
@@ -661,6 +675,26 @@ export function applyPoisonTouch(
   return inflict(defender, 'poison', attacker, turn, events);
 }
 
+// Rough Skin: when the bearer is hit by a contact move, the attacker takes
+// 1/8 of its own max HP as damage.
+export function applyRoughSkin(
+  attacker: BattlePokemon,
+  defender: BattlePokemon,
+  move: Move,
+  turn: number,
+  events: TurnEvent[],
+): BattlePokemon {
+  if (defender.ability !== 'rough-skin') return attacker;
+  if (!makesContact(move)) return attacker;
+  if (attacker.currentHp <= 0) return attacker;
+  if (attacker.ability === 'magic-guard') return attacker;
+  events.push({ kind: 'ability_triggered', turn, pokemonName: defender.data.name, ability: 'rough-skin' });
+  const damage = Math.max(1, Math.floor(attacker.level50Stats.hp / 8));
+  const hpAfter = Math.max(0, attacker.currentHp - damage);
+  events.push({ kind: 'recoil', turn, pokemonName: attacker.data.name, damage, hpAfter });
+  return { ...attacker, currentHp: hpAfter };
+}
+
 // Poison Heal: true when end-of-turn poison should heal instead of damage.
 export function hasPoisonHeal(p: BattlePokemon): boolean {
   return p.ability === 'poison-heal' && p.statusCondition === 'poison';
@@ -714,6 +748,7 @@ export const ABILITY_DESCRIPTIONS: Record<string, string> = {
   'static':         '30% chance to paralyze a foe that makes contact',
   'flame-body':     '30% chance to burn a foe that makes contact',
   'poison-point':   '30% chance to poison a foe that makes contact',
+  'rough-skin':     'Damages the attacker for 1/8 of its max HP when it hits with a contact move',
   'effect-spore':   '30% chance to inflict paralysis, poison, or sleep on contact',
   'lightning-rod':  'Draws and nullifies Electric-type moves; raises Sp. Atk by 1',
   'flash-fire':     'Immune to Fire-type moves and the first one absorbed boosts Fire-type move power by 1.5×',
@@ -753,6 +788,8 @@ export const ABILITY_DESCRIPTIONS: Record<string, string> = {
   'poison-heal':    'If poisoned, restores 1/8 of max HP at the end of each turn instead of taking damage',
   'hustle':         'Boosts Attack by 50% but reduces the accuracy of physical moves by 20%',
   'snow-cloak':     'Reduces the accuracy of moves targeting this Pokémon by 20% during snow',
+  'flare-boost':    'Boosts the power of special moves by 50% while the bearer is burned',
+  'hydration':      'Cures the bearer\'s status condition at the end of each turn while rain is active',
   'storm-drain':    'Draws and nullifies Water-type moves; raises Sp. Atk by 1',
   'water-veil':     'Prevents the bearer from being burned',
   'analytic':       'Boosts the power of moves by 30% when the bearer moves last in the turn',
@@ -823,12 +860,13 @@ export function applyEndOfTurnAbility(
   p: BattlePokemon,
   turn: number,
   events: TurnEvent[],
+  field?: FieldState,
 ): BattlePokemon {
   const ability = p.ability;
   if (!ability) return p;
   const entry = IMPLEMENTED_ABILITIES[ability];
   if (!entry?.onEndOfTurn) return p;
-  return entry.onEndOfTurn(p, turn, events);
+  return entry.onEndOfTurn(p, turn, events, field);
 }
 
 // Applies the incoming pokemon's switch-in ability against the opponent and
