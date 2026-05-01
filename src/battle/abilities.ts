@@ -218,6 +218,8 @@ export const IMPLEMENTED_ABILITIES: Record<string, AbilityEffect> = {
   'hustle': {
     damageMultiplier: (_self, move) => move.damageClass === 'physical' ? 1.5 : 1,
   },
+  // Snow Cloak: incoming move accuracy is multiplied by 0.8. Applied in effectiveAccuracy().
+  'snow-cloak': {},
   'steadfast':  {},
   'justified':  {},
   'storm-drain': {},
@@ -750,6 +752,7 @@ export const ABILITY_DESCRIPTIONS: Record<string, string> = {
   'poison-touch':   '30% chance to poison the target when the bearer hits with a contact move',
   'poison-heal':    'If poisoned, restores 1/8 of max HP at the end of each turn instead of taking damage',
   'hustle':         'Boosts Attack by 50% but reduces the accuracy of physical moves by 20%',
+  'snow-cloak':     'Reduces the accuracy of moves targeting this Pokémon by 20% during snow',
   'storm-drain':    'Draws and nullifies Water-type moves; raises Sp. Atk by 1',
   'water-veil':     'Prevents the bearer from being burned',
   'analytic':       'Boosts the power of moves by 30% when the bearer moves last in the turn',

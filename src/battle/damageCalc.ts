@@ -63,6 +63,7 @@ export function effectiveAccuracy(move: Move, weather: WeatherKind | undefined, 
   if (attacker && defender) {
     acc *= accuracyStageMult(attacker, defender);
   }
+  if (defender?.ability === 'snow-cloak' && weather === 'snow') acc *= 0.8;
   return acc;
 }
 
