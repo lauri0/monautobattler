@@ -1,5 +1,5 @@
 import type { BattlePokemon, Move, TurnEvent, BattleResult, StatStageName, StatStages, AIStrategy, FieldState, FieldEffectKind, SideIndex, SideFieldState, TypeName } from '../models/types';
-import { calcDamage, calcExpectedDamage, effectiveSpeed, type DefenderScreens } from './damageCalc';
+import { calcDamage, calcExpectedDamage, effectiveSpeed, effectiveAccuracy, type DefenderScreens } from './damageCalc';
 import { defaultAI } from '../ai/aiModule';
 import { getTypeEffectiveness } from '../utils/typeChart';
 import { abilityMaxVariableHits, applySwitchInAbility, applyStatChangeFromFoe, noGuardInEffect, sheerForceSuppresses, absorbsWater, absorbsElectric, absorbsVoltAbsorb, absorbsMotorDrive, absorbsFire, absorbsGrass, absorbsStormDrain, absorbsWind, absorbsSound, isSoundMove, sturdyActive, ignoresRecoil, applyContactAbility, applyRattledByMove, applyJustified, applyWeakArmor, abilityBlocksAilment, abilityBlocksConfusion, hasMagicGuard, applyShedSkin, applyMoxie, applyEndOfTurnAbility, applyAngerPoint, applyStench, applyPoisonTouch, hasPoisonHeal, applySteadfast } from './abilities';
@@ -971,7 +971,8 @@ function resolveStatusMove(
 
   // Accuracy roll (Sleep Powder 75, Thunder Wave 90, Poison Powder 75, etc.)
   // No Guard on either side bypasses the miss roll entirely.
-  if (move.accuracy !== null && !noGuardInEffect(attacker, defender) && Math.random() > move.accuracy / 100) {
+  const statusAcc = effectiveAccuracy(move, field?.weather, attacker, defender);
+  if (statusAcc !== null && !noGuardInEffect(attacker, defender) && Math.random() * 100 > statusAcc) {
     events.push({
       kind: 'attack', turn,
       attackerName: attacker.data.name, defenderName: defender.data.name,

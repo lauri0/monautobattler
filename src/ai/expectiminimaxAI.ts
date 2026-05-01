@@ -1,6 +1,7 @@
 import type { BattlePokemon, Move, AIStrategy } from '../models/types';
 import { simulateTurnDeterministic, usableMoves } from '../battle/battleEngine';
 import type { ChanceOutcome } from '../battle/battleEngine';
+import { effectiveAccuracy } from '../battle/damageCalc';
 
 const DEPTH = 2;
 const PRUNE_THRESHOLD = 0.01;
@@ -59,9 +60,11 @@ interface MoveBranch {
 function branchesForMove(
   defender: BattlePokemon,
   move: Move,
+  attacker?: BattlePokemon,
 ): MoveBranch[] {
   const eff = move.effect;
-  const accProb = move.accuracy !== null ? move.accuracy / 100 : 1;
+  const rawAcc = effectiveAccuracy(move, undefined, attacker, defender);
+  const accProb = rawAcc !== null ? Math.min(rawAcc / 100, 1) : 1;
 
   // If move misses: no effects
   const missBranch: MoveBranch = {
@@ -117,8 +120,8 @@ export function enumerateOutcomes(
   m1: Move,
   m2: Move,
 ): ChanceOutcome[] {
-  const branches1 = branchesForMove(p2, m1);
-  const branches2 = branchesForMove(p1, m2);
+  const branches1 = branchesForMove(p2, m1, p1);
+  const branches2 = branchesForMove(p1, m2, p2);
   const outcomes: ChanceOutcome[] = [];
   for (const b1 of branches1) {
     for (const b2 of branches2) {

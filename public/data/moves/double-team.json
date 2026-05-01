@@ -1,0 +1,20 @@
+{
+  "id": 104,
+  "name": "double-team",
+  "type": "normal",
+  "power": 0,
+  "accuracy": null,
+  "pp": 15,
+  "damageClass": "status",
+  "priority": 0,
+  "effect": {
+    "statChanges": [
+      {
+        "stat": "evasion",
+        "change": 1,
+        "target": "user"
+      }
+    ],
+    "statChance": 0
+  }
+}

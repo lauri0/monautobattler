@@ -9,7 +9,7 @@ import type {
 } from '../../models/types';
 
 const ZERO_STAGES: StatStages = {
-  attack: 0, defense: 0, 'special-attack': 0, 'special-defense': 0, speed: 0,
+  attack: 0, defense: 0, 'special-attack': 0, 'special-defense': 0, speed: 0, accuracy: 0, evasion: 0,
 };
 
 const DEFAULT_STATS: Level50Stats = {

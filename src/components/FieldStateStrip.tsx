@@ -7,6 +7,8 @@ const STAGE_LABELS: [keyof import('../models/types').StatStages, string][] = [
   ['special-attack',  'SpA'],
   ['special-defense', 'SpD'],
   ['speed',           'SPE'],
+  ['accuracy',        'ACC'],
+  ['evasion',         'EVA'],
 ];
 
 function SidePane({ state, side }: { state: TeamBattleState; side: SideIndex }) {

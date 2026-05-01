@@ -154,10 +154,8 @@ export const IMPLEMENTED_ABILITIES: Record<string, AbilityEffect> = {
   'flash-fire': {
     damageMultiplier: (self, move) => self.flashFireActive && move.type === 'fire' ? 1.5 : 1,
   },
-  // Keen Eye would prevent foe-initiated accuracy drops and ignore the target's
-  // evasion stage. This engine doesn't model accuracy or evasion stat stages
-  // (see StatStageName), so the ability has no mechanical effect — it's
-  // registered here so the UI doesn't flag it as "(Unimplemented)".
+  // Keen Eye: foe cannot lower this Pokémon's accuracy. Blocking is handled
+  // in applyStatChangeFromFoe. Evasion-stage ignoring is handled in effectiveAccuracy.
   'keen-eye':    {},
   'own-tempo':    {},
   'vital-spirit': {},
@@ -593,6 +591,10 @@ export function applyStatChangeFromFoe(
   }
   if (change < 0 && stat === 'attack' && (target.ability === 'hyper-cutter' || target.ability === 'own-tempo' || target.ability === 'inner-focus' || target.ability === 'scrappy')) {
     events.push({ kind: 'ability_triggered', turn, pokemonName: target.data.name, ability: target.ability });
+    return target;
+  }
+  if (change < 0 && stat === 'accuracy' && target.ability === 'keen-eye') {
+    events.push({ kind: 'ability_triggered', turn, pokemonName: target.data.name, ability: 'keen-eye' });
     return target;
   }
 

@@ -14,6 +14,7 @@ function statLabel(stat: string): string {
   const map: Record<string, string> = {
     'attack': 'Attack', 'defense': 'Defense',
     'special-attack': 'Sp. Atk', 'special-defense': 'Sp. Def', 'speed': 'Speed',
+    'accuracy': 'Accuracy', 'evasion': 'Evasion',
   };
   return map[stat] ?? stat;
 }

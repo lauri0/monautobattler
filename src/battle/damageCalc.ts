@@ -42,10 +42,17 @@ function typeEffectiveness(move: Move, defender: BattlePokemon, attacker?: Battl
   return base;
 }
 
+// Accuracy/evasion stage multiplier: (3 + max(net,0)) / (3 - min(net,0))
+// Net stage = attacker accuracy stage minus defender evasion stage, clamped [-6,+6].
+function accuracyStageMult(attacker: BattlePokemon, defender: BattlePokemon): number {
+  const net = Math.max(-6, Math.min(6, attacker.statStages.accuracy - defender.statStages.evasion));
+  return (3 + Math.max(net, 0)) / (3 - Math.min(net, 0));
+}
+
 // Weather-dependent accuracy override for moves whose hit chance is keyed to
 // the weather. Returns `null` when the move always hits under the current
 // weather, otherwise the (possibly scaled) percentage accuracy to roll against.
-function effectiveAccuracy(move: Move, weather: WeatherKind | undefined, attacker?: BattlePokemon): number | null {
+export function effectiveAccuracy(move: Move, weather: WeatherKind | undefined, attacker?: BattlePokemon, defender?: BattlePokemon): number | null {
   if (move.accuracy === null) return null;
   if (weather === 'snow' && move.name === 'blizzard') return null;
   if (weather === 'rain' && (move.name === 'thunder' || move.name === 'hurricane')) return null;
@@ -53,6 +60,9 @@ function effectiveAccuracy(move: Move, weather: WeatherKind | undefined, attacke
     ? move.accuracy * 0.5
     : move.accuracy;
   if (attacker?.ability === 'hustle' && move.damageClass === 'physical') acc *= 0.8;
+  if (attacker && defender) {
+    acc *= accuracyStageMult(attacker, defender);
+  }
   return acc;
 }
 
@@ -130,7 +140,7 @@ export function calcDamage(
 ): DamageResult {
   // Check accuracy (with weather-based overrides for Blizzard / Thunder / Hurricane).
   // No Guard on either side bypasses the miss roll entirely.
-  const acc = effectiveAccuracy(move, field?.weather, attacker);
+  const acc = effectiveAccuracy(move, field?.weather, attacker, defender);
   if (acc !== null && !noGuardInEffect(attacker, defender)) {
     const hitRoll = Math.random();
     if (hitRoll > acc / 100) {

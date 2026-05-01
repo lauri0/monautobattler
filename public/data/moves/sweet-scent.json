@@ -1,0 +1,20 @@
+{
+  "id": 230,
+  "name": "sweet-scent",
+  "type": "normal",
+  "power": 0,
+  "accuracy": 100,
+  "pp": 20,
+  "damageClass": "status",
+  "priority": 0,
+  "effect": {
+    "statChanges": [
+      {
+        "stat": "evasion",
+        "change": -2,
+        "target": "foe"
+      }
+    ],
+    "statChance": 0
+  }
+}

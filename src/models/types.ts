@@ -7,7 +7,7 @@ export type TypeName =
 
 export type StatusCondition = 'burn' | 'poison' | 'paralysis' | 'sleep' | 'freeze';
 
-export type StatStageName = 'attack' | 'defense' | 'special-attack' | 'special-defense' | 'speed';
+export type StatStageName = 'attack' | 'defense' | 'special-attack' | 'special-defense' | 'speed' | 'accuracy' | 'evasion';
 
 export interface StatChange {
   stat: StatStageName;
@@ -85,6 +85,8 @@ export interface StatStages {
   'special-attack': number;
   'special-defense': number;
   speed: number;
+  accuracy: number;
+  evasion: number;
 }
 
 export interface Move {

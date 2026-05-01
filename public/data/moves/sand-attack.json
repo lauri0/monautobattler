@@ -1,0 +1,20 @@
+{
+  "id": 28,
+  "name": "sand-attack",
+  "type": "ground",
+  "power": 0,
+  "accuracy": 100,
+  "pp": 15,
+  "damageClass": "status",
+  "priority": 0,
+  "effect": {
+    "statChanges": [
+      {
+        "stat": "accuracy",
+        "change": -1,
+        "target": "foe"
+      }
+    ],
+    "statChance": 0
+  }
+}
