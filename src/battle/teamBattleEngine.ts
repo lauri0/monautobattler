@@ -279,6 +279,8 @@ function tickFieldInTeam(
     if (next.weatherTurns === 0) {
       out.push({ side: 0, kind: 'weather_expired', turn, weather: next.weather });
       next.weather = undefined;
+    } else {
+      out.push({ side: 0, kind: 'weather_tick', turn, weather: next.weather, turnsLeft: next.weatherTurns });
     }
   }
   if (next.terrainTurns > 0 && next.terrain) {
@@ -286,6 +288,8 @@ function tickFieldInTeam(
     if (next.terrainTurns === 0) {
       out.push({ side: 0, kind: 'terrain_expired', turn, terrain: next.terrain });
       next.terrain = undefined;
+    } else {
+      out.push({ side: 0, kind: 'terrain_tick', turn, terrain: next.terrain, turnsLeft: next.terrainTurns });
     }
   }
   for (const s of [0, 1] as SideIndex[]) {

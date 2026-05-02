@@ -112,10 +112,14 @@ export function applyEventToState(
       return { ...patchByName(p1, p2, event.pokemonName, p => ({ ...p, throatChopTurns: undefined })), field };
     case 'weather_set':
       return { p1, p2, field: { ...field, weather: event.weather, weatherTurns: event.turns } };
+    case 'weather_tick':
+      return { p1, p2, field: { ...field, weatherTurns: event.turnsLeft } };
     case 'weather_expired':
       return { p1, p2, field: { ...field, weather: undefined, weatherTurns: 0 } };
     case 'terrain_set':
       return { p1, p2, field: { ...field, terrain: event.terrain, terrainTurns: event.turns } };
+    case 'terrain_tick':
+      return { p1, p2, field: { ...field, terrainTurns: event.turnsLeft } };
     case 'terrain_expired':
       return { p1, p2, field: { ...field, terrain: undefined, terrainTurns: 0 } };
     case 'field_set':
@@ -185,10 +189,14 @@ function applyTurnEventToTeamState(state: TeamBattleState, event: TurnEvent): Te
       return patchAllTeams(state, event.pokemonName, p => ({ ...p, throatChopTurns: undefined }));
     case 'weather_set':
       return { ...state, field: { ...state.field, weather: event.weather, weatherTurns: event.turns } };
+    case 'weather_tick':
+      return { ...state, field: { ...state.field, weatherTurns: event.turnsLeft } };
     case 'weather_expired':
       return { ...state, field: { ...state.field, weather: undefined, weatherTurns: 0 } };
     case 'terrain_set':
       return { ...state, field: { ...state.field, terrain: event.terrain, terrainTurns: event.turns } };
+    case 'terrain_tick':
+      return { ...state, field: { ...state.field, terrainTurns: event.turnsLeft } };
     case 'terrain_expired':
       return { ...state, field: { ...state.field, terrain: undefined, terrainTurns: 0 } };
     case 'field_set':

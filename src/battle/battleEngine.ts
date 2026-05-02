@@ -179,6 +179,8 @@ function tickField(field: FieldState, turn: number, events: TurnEvent[]): FieldS
     if (next.weatherTurns === 0) {
       events.push({ kind: 'weather_expired', turn, weather: next.weather });
       next.weather = undefined;
+    } else {
+      events.push({ kind: 'weather_tick', turn, weather: next.weather, turnsLeft: next.weatherTurns });
     }
   }
   if (next.terrainTurns > 0 && next.terrain) {
@@ -186,6 +188,8 @@ function tickField(field: FieldState, turn: number, events: TurnEvent[]): FieldS
     if (next.terrainTurns === 0) {
       events.push({ kind: 'terrain_expired', turn, terrain: next.terrain });
       next.terrain = undefined;
+    } else {
+      events.push({ kind: 'terrain_tick', turn, terrain: next.terrain, turnsLeft: next.terrainTurns });
     }
   }
   for (const s of [0, 1] as SideIndex[]) {

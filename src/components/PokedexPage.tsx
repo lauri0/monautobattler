@@ -14,7 +14,9 @@ interface Props {
 }
 
 export default function PokedexPage({ allPokemon, onSelectPokemon, onBack }: Props) {
-  const [search, setSearch] = useState('');
+  const [search, setSearch] = useState(() => {
+    try { return localStorage.getItem('pokedex_search') ?? ''; } catch { return ''; }
+  });
   const [typeFilter, setTypeFilter] = useState<TypeName | null>(() => {
     try { return localStorage.getItem('pokedex_type_filter') as TypeName | null; } catch { return null; }
   });
@@ -75,7 +77,7 @@ export default function PokedexPage({ allPokemon, onSelectPokemon, onBack }: Pro
             type="text"
             placeholder="Search by name, move, or ability..."
             value={search}
-            onChange={e => setSearch(e.target.value)}
+            onChange={e => { setSearch(e.target.value); try { e.target.value ? localStorage.setItem('pokedex_search', e.target.value) : localStorage.removeItem('pokedex_search'); } catch {} }}
             style={{ flex: 1, minWidth: 200 }}
           />
           <label style={{ display: 'flex', alignItems: 'center', gap: '0.4rem', fontSize: '0.9rem', cursor: 'pointer', whiteSpace: 'nowrap' }}>

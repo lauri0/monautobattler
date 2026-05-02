@@ -160,6 +160,7 @@ export const IMPLEMENTED_ABILITIES: Record<string, AbilityEffect> = {
   'keen-eye':    {},
   'own-tempo':    {},
   'vital-spirit': {},
+  'insomnia':     {},
   'clear-body':   {},
   'hyper-cutter': {},
   'inner-focus':  {},
@@ -171,6 +172,7 @@ export const IMPLEMENTED_ABILITIES: Record<string, AbilityEffect> = {
   },
   'ice-scales': {},
   'fur-coat':   {},
+  'heatproof':  {},
   'scrappy':    {},
   'technician': {
     damageMultiplier: (_self, move) => move.power > 0 && move.power <= 60 ? 1.5 : 1,
@@ -320,7 +322,8 @@ export function absorbsMotorDrive(defender: BattlePokemon, move: Move): boolean 
 // Ability-based immunity to a major status ailment.
 export function abilityBlocksAilment(p: BattlePokemon, ailment: StatusCondition): boolean {
   switch (p.ability) {
-    case 'vital-spirit': return ailment === 'sleep';
+    case 'vital-spirit':
+    case 'insomnia':     return ailment === 'sleep';
     case 'immunity':     return ailment === 'poison';
     case 'limber':       return ailment === 'paralysis';
     case 'magma-armor':  return ailment === 'freeze';
@@ -759,12 +762,14 @@ export const ABILITY_DESCRIPTIONS: Record<string, string> = {
   'hyper-cutter':   'Prevents other Pokémon from lowering this Pokémon\'s Attack stat',
   'inner-focus':    'Prevents flinching. Immune to Intimidate and other foe-initiated Attack drops',
   'vital-spirit':   'Prevents this Pokémon from falling asleep',
+  'insomnia':       'Prevents this Pokémon from falling asleep',
   'immunity':       'Prevents this Pokémon from being poisoned',
   'limber':         'Prevents this Pokémon from being paralyzed',
   'shell-armor':    'Prevents the opponent from landing critical hits',
   'iron-fist':      'Boosts the power of punching moves by 20%',
   'ice-scales':     'Halves damage taken from special moves',
   'fur-coat':       'Halves damage taken from physical moves',
+  'heatproof':      'Halves damage taken from Fire-type moves',
   'scrappy':        'Normal- and Fighting-type moves hit Ghost types and immunity to Intimidate',
   'technician':     'Moves with 60 base power or less have their power multiplied by 1.5×',
   'merciless':      'Attacks always result in a critical hit if the target is poisoned. Bypasses Shell Armor.',
@@ -830,6 +835,7 @@ export function getDefenderAbilityDamageMultiplier(defender: BattlePokemon, move
   if (move.damageClass === 'physical' && defender.ability === 'fur-coat') return 0.5;
   if (move.damageClass === 'physical' && defender.ability === 'marvel-scale' && defender.statusCondition) return 0.5;
   if ((defender.ability === 'solid-rock' || defender.ability === 'filter') && effectiveness > 1) return 0.75;
+  if (move.type === 'fire' && defender.ability === 'heatproof') return 0.5;
   return 1;
 }
 

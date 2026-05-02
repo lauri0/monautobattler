@@ -219,9 +219,11 @@ export type TurnEvent =
   | { kind: 'throat_chop_end'; turn: number; pokemonName: string }
   | { kind: 'ability_triggered'; turn: number; pokemonName: string; ability: AbilityId }
   | { kind: 'weather_set'; turn: number; weather: WeatherKind; turns: number; pokemonName: string }
+  | { kind: 'weather_tick'; turn: number; weather: WeatherKind; turnsLeft: number }
   | { kind: 'weather_expired'; turn: number; weather: WeatherKind }
   | { kind: 'weather_damage'; turn: number; pokemonName: string; weather: WeatherKind; damage: number; hpAfter: number }
   | { kind: 'terrain_set'; turn: number; terrain: TerrainKind; turns: number; pokemonName: string }
+  | { kind: 'terrain_tick'; turn: number; terrain: TerrainKind; turnsLeft: number }
   | { kind: 'terrain_expired'; turn: number; terrain: TerrainKind }
   | { kind: 'terrain_heal'; turn: number; pokemonName: string; healed: number; hpAfter: number }
   | { kind: 'crash'; turn: number; pokemonName: string; damage: number; hpAfter: number };
